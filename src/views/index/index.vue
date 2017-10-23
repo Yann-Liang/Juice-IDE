@@ -69,32 +69,31 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.index{
-   display: flex;
-   flex-direction:column; 
-   width: 100%;
-   height: 100%;
+.index {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
-.main{
-    display: flex;
-    flex:1;
-
+.main {
+  display: flex;
+  flex: 1;
 }
 .tabs {
   width: 48px;
   background: #eee;
 }
 
-.main-right{
-    display: flex;
-    flex-direction:column; 
+.main-right {
+  display: flex;
+  flex-direction: column;
 }
 
-.editor{
-    height: 70%;
+.editor {
+  height: 70%;
 }
 
-.console{
-    height: 30%;
+.console {
+  height: 30%;
 }
 </style>
