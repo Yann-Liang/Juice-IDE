@@ -12,6 +12,8 @@
             <li>运行</li>
         </ul>
             <deploy-tab></deploy-tab>
+            <run-tab></run-tab>
+            <compile-tab></compile-tab>
         <div class="main-right">
             <editor class="editor"></editor>
             <console class="console"></console>
