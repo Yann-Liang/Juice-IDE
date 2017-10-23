@@ -84,6 +84,7 @@
 
 <style lang="less" scoped>
     .tabs{
-
+        width: 48px;
+        background:#000;
     }
 </style>
