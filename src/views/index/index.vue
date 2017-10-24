@@ -11,10 +11,10 @@
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
-            <files-tab v-if="filesTabFlag"></files-tab>
-            <deploy-tab v-if="deployTabFlag"></deploy-tab>
-            <run-tab v-if="runTabFlag"></run-tab>
-            <compile-tab v-if="compileTabFlag"></compile-tab>
+            <files-tab class="tab" v-if="filesTabFlag"></files-tab>
+            <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
+            <run-tab class="tab" v-if="runTabFlag"></run-tab>
+            <compile-tab class="tab" v-if="compileTabFlag"></compile-tab>
             <div class="main-right">
                 <editor class="editor"></editor>
                 <console class="console" v-if="consoleFlag"></console>
@@ -122,6 +122,10 @@
         >li {
             cursor: pointer;
         }
+    }
+
+    tab{
+        width: 200px;
     }
 
     .main-right {
