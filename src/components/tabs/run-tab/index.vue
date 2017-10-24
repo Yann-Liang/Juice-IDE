@@ -1,6 +1,12 @@
 <template>
     <div class="">
-        运行
+        <p>查询需要运行的合约</p>
+        <input type="text">
+        <el-button type="primay">查询合约</el-button>
+        <p>选择需要运行的函数</p>
+        <p>输入函数运行所需参数</p>
+
+        <el-button type="primay">运行</el-button>
     </div>
 </template>
 
@@ -44,19 +50,19 @@
         },
         //组件
         components: {
-            
+
         },
         //过滤器
-        filters:{
+        filters: {
 
         },
         //自定义指令
-        directive:{
+        directive: {
 
         }
     }
 </script>
 
 <style lang="less" scoped>
-    
+
 </style>
