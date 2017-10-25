@@ -2,7 +2,7 @@
     <div class="header">
 
         <div>
-            <ul class="list" @click.stop='setTab($event)'  style="cursor:default">
+            <ul class="list">
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
@@ -21,7 +21,7 @@
                     </ul>
                 </li>
                 <li>
-                    帮助
+                    <a href="https://www.baidu.com">帮助</a>
                 </li>
             </ul>
 
@@ -56,6 +56,7 @@
         },
         methods: {
             setTab:function(e){
+                console.log(111111111111111)
                 if(e.target.innerText=='文件'){
                     console.log(1)
                     // this.fileVisible=true;
@@ -71,7 +72,6 @@
                     console.log(3);
                     this.editVisible=false;
                     this.fileVisible=false;
-
                 }
             },
             showFile () {
@@ -144,7 +144,7 @@
        height: @height;
        display: flex;
        flex-direction:row;
-       background-color:#1b1b1b;
+       background-color:red;
        color:#fff;
        .img{
         img{
