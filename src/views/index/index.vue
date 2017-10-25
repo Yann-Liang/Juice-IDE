@@ -1,6 +1,6 @@
 <template>
     <div class="index">
-        <header class="header">
+        <header class="header1">
             <i class="header-icon"></i>
             <ul class="header-right fr" id="toolbar">
                 <li class="min"></li>
@@ -119,7 +119,7 @@
         height: 100%;
     }
 
-    .header {
+    .header1 {
 			height: 50px;
 			line-height: 50px;
 			color: white;
