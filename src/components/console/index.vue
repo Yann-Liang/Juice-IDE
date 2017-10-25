@@ -1,12 +1,18 @@
 <template>
-    <div class="">
-        控制台
+    <div class="log-output">
+        <p v-if="compileStatus < 4">[开始编译]</p>
+        <p v-if="compileStatus < 4">编译中...</p>
+        <div class="compile-success" v-if="compileStatus == 2">
+            <p>Compiler Success</p>
+        </div>
+        <div class="compile-failed" v-if="compileStatus == 3">
+            <p>Compiler Failed</p>
+        </div>
     </div>
 </template>
 
 <script>
-    //import  from ''
-
+    import {mapState, mapActions, mapGetters} from 'vuex';
     export default {
         //组件名
         name: 'index',
@@ -22,7 +28,7 @@
         },
         //计算
         computed: {
-
+            ...mapGetters(['compileStatus'])
         },
         //方法
         methods: {
@@ -58,5 +64,10 @@
 </script>
 
 <style lang="less" scoped>
-
+    .log-output{
+        padding:10px 15px;
+        line-height:30px;
+        color:#fff;
+        background-color: #222;
+    }
 </style>
