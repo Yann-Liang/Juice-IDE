@@ -1,5 +1,15 @@
 <template>
     <div class="index">
+        <header class="header">
+            <i class="header-icon"></i>
+            <ul class="header-right fr" id="toolbar">
+                <li class="min"></li>
+                <li class="max"></li>
+                <li class="close"></li>
+            </ul>
+            <p>Juice IDE</p>
+
+        </header>
         <com-header>
 
         </com-header>
@@ -32,6 +42,7 @@
     import runTab from "@/components/tabs/run-tab/";
     import console from "@/components/console/";
     import editor from "@/components/editor/";
+    //var child_process = require('child_process');
 
     export default {
         //组件名
@@ -81,7 +92,9 @@
             }
         },
         //生命周期函数
-        created() {},
+        created() {
+
+        },
         beforeMount() {},
         mounted() {},
         //监视
@@ -110,6 +123,49 @@
         width: 100%;
         height: 100%;
     }
+
+    .header {
+			height: 50px;
+			line-height: 50px;
+			color: white;
+			background: #0b8aee;
+			-webkit-app-region: drag;
+		}
+
+		.header-icon {
+			float: left;
+			margin: 9px;
+			width: 32px;
+			height: 32px;
+			background: url(./images/icon.png);
+			background-size: 100% 100%;
+		}
+
+		.header-right {
+			-webkit-app-region: no-drag;
+		}
+
+		.header-right>li {
+			cursor: pointer;
+			display: inline-block;
+			margin: 14px 15px 0px;
+			width: 16px;
+			height: 16px;
+			background-repeat: no-repeat;
+			background-size: 90%;
+		}
+
+		.min{
+			background: url(./images/shrink.png) 0 8px;
+		}
+
+		.max{
+			background: url(./images/magnify.png) 0 0;
+		}
+
+		.close{
+			background: url(./images/close.png);
+		}
 
     .main {
         display: flex;
