@@ -41,7 +41,7 @@
         },
         //生命周期函数
         created() {
-            console.log(111)
+
         },
         beforeMount() {
 
