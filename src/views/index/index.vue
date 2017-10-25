@@ -32,6 +32,7 @@
     import runTab from "@/components/tabs/run-tab/";
     import console from "@/components/console/";
     import editor from "@/components/editor/";
+    //var child_process = require('child_process');
 
     export default {
         //组件名
@@ -81,7 +82,9 @@
             }
         },
         //生命周期函数
-        created() {},
+        created() {
+
+        },
         beforeMount() {},
         mounted() {},
         //监视
