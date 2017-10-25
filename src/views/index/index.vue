@@ -175,8 +175,9 @@
         }
     }
 
-    tab{
-        width: 200px;
+    .tab{
+        width: 220px;
+        border-right: 1px solid #999;
     }
 
     .main-right {

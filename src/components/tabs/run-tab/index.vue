@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="run-index">
         <p>查询需要运行的合约</p>
         <input type="text">
         <el-button type="primay">查询合约</el-button>
@@ -12,6 +12,7 @@
 
 <script>
     //import  from ''
+    import RunService from '@/services/run-service.js'
 
     export default {
         //组件名
@@ -64,5 +65,7 @@
 </script>
 
 <style lang="less" scoped>
+    .run-index{
 
+    }
 </style>
