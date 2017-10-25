@@ -1,46 +1,54 @@
 <template>
     <div class="header">
-        <div class="img">
-            <img src="./image/img.png" height="32" width="115" alt="">
-        </div>
+
         <div>
-            <ul class="list" @click='setTab($event)'  style="cursor:default">
+            <ul class="list" style="cursor:default" @click.stop='setTab($event)'>
                 <li>
                     文件
-                    <file-data :fileVisible="fileVisible"></file-data>
-                    <!-- <ul v-if='fileVisible'>
-                        <li>新建文件</li>
-                        <li>新建文件夹</li>
-                        <li>导入本地文件</li>
-                        <li>保存</li>
-                        <li>导出到本地</li>
-                        <li>全部保存</li>
-                        <li>删除</li>
-                        <li>删除所有文件</li>
-                        <li  v-for="fileName in fileData" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickEvent($event)" :class="{active: fileClass == fileName}">{{fileName}}</li>
-                    </ul> -->
+                    <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
+                    <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
+                    <ul v-show='fileVisible' ref="filedata" >
+                        <li v-for="fileName in fileData" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == fileName}">{{fileName}}</li>
+                    </ul>
                 </li>
                 <li>
                     编辑
-                    <edit-data :editVisible="editVisible"></edit-data>
+                    <ul v-show='editVisible' ref="editdata" >
+                        <li v-for="(value,key) in editData" @mouseenter="showActive(value)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == value}" :data-type="value" @click.stop="clickEditEvent($event)">
+                            {{value}}
+                            <span :data-type="value">{{key}}</span>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     帮助
                 </li>
             </ul>
+
         </div>
-        <!-- 文件编辑帮助111 -->
     </div>
 </template>
 <script>
-    import FileData from '@/components/fileComponent/file-data.vue';
-    import EditData from '@/components/editComponent/edit-data.vue';
     export default {
         name: 'header',
         data() {
             return {
                 fileVisible:false,
                 editVisible:false,
+                iSame:true,
+                activeClass:"",
+                fileData:['新建文件', '新建文件夹', '导入本地文件', '保存', '导出到本地','全部保存','删除','删除所有文件'],
+                editData:{
+                    "Ctrl+Z":"撤销",
+                    "Ctrl+Y":"恢复",
+                    "Ctrl+C":"复制",
+                    "Ctrl+X":"剪切",
+                    "Ctrl+V":"粘贴",
+                    "Ctrl+F":"查找",
+                    "Ctrl+H":"替换",
+                    "":"格式化",
+                },
+
             }
         },
         props: {
@@ -48,14 +56,16 @@
         },
         methods: {
             setTab:function(e){
-                this.audit=e.target.innerText=='已审核'?'2':'1';
                 if(e.target.innerText=='文件'){
                     console.log(1)
-                    this.fileVisible=true;
+                    // this.fileVisible=true;
                     this.editVisible=false;
+                    this.fileVisible ? this.hideFile() : this.showFile();
+                    // this.visible ? this.hide() : this.show()
                 }else if(e.target.innerText=='编辑'){
-                    console.log(22)
-                    this.editVisible=true;
+                    console.log(2)
+                    // this.editVisible=true;
+                    this.editVisible ? this.hideEdit() : this.showEdit()
                     this.fileVisible=false;
                 }else{
                     console.log(3);
@@ -64,16 +74,66 @@
 
                 }
             },
+            showFile () {
+                this.fileVisible = true
+                document.addEventListener('click', this.hidePanelFile, false)
+            },
+            hideFile () {
+                this.fileVisible = false
+                document.removeEventListener('click', this.hidePanelFile, false)
+            },
+            hidePanelFile (e) {
+                console.log(this.$refs.filedata)
+                console.log(this.$refs.filedata.contains(e.target));
+                if (!this.$refs.filedata.contains(e.target)) {
+                    this.hideFile()
+                }
+            },
+            showEdit () {
+                this.editVisible = true
+                document.addEventListener('click', this.hidePanelEdit, false)
+            },
+            hideEdit () {
+                this.editVisible = false
+                document.removeEventListener('click', this.hidePanelEdit, false)
+            },
+            hidePanelEdit (e) {
+                console.log(this.$refs.editdata)
+                console.log(this.$refs.editdata.contains(e.target));
+                if (!this.$refs.editdata.contains(e.target)) {
+                    this.hideEdit();
+                }
+            },
+            //鼠标悬停效果
+            showActive: function(name) {
+              this.activeClass = name
+            },
+            //鼠标离开效果
+            removeActive: function(){
+                this.activeClass = ""
+            },
+            //文件每个li的点击事件
+            clickFileEvent:function(e){
+                console.log(e.target.innerText);
+            },
+            //编辑每个li的点击事件
+            clickEditEvent:function(e){
+                this.editVisible = false
+                console.log(e.target.getAttribute("data-type"));
+            }
 
+        },
+        beforeDestroy () {
+            this.hideFile();
+            this.hideEdit();
         },
         created() {
 
         },
         //组件
         components: {
-            'file-data':FileData,
-            'edit-data':EditData
-        }
+
+        },
 
     }
 </script>
@@ -96,12 +156,35 @@
         display: flex;
         flex-direction:row;
         height:@height;
-        padding-left:40px;
+        padding-left:0px;
         li{
             line-height: @height;
             padding:0 30px;
             position: relative;
+            ul{
+                position: absolute;
+                width:170px;
+                top:@height;
+                left:0px;
+                padding:5px 0;
+                background-color:#1b1b1b;
+                .same{
+                    height:35px;
+                    line-height: 35px;
+                    padding:0 20px;
+                    span{
+                        float:right;
+                        color:#999999;
+                    }
+                }
+                .active{
+                    background-color:gray;
+                }
+            }
+            &:hover{
+                background:gray;
 
+            }
         }
        }
    }
