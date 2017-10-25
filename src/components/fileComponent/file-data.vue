@@ -1,6 +1,6 @@
 <template>
     <!-- <div class="file-data" > -->
-        <ul v-if='fileVisible'>
+        <ul v-show='fileVisible'>
             <!-- <li>新建文件</li>
             <li>新建文件夹</li>
             <li>导入本地文件</li>

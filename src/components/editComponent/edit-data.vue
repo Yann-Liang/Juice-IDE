@@ -1,5 +1,5 @@
 <template>
-    <ul v-if='editVisible'>
+    <ul v-show='editVisible'>
         <!-- <li>新建文件</li>
         <li>新建文件夹</li>
         <li>导入本地文件</li>
