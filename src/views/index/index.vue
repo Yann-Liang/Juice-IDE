@@ -1,6 +1,6 @@
 <template>
     <div class="index">
-        <header class="header">
+        <header class="header1">
             <i class="header-icon"></i>
             <ul class="header-right fr" id="toolbar">
                 <li class="min"></li>
@@ -17,7 +17,6 @@
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
                 <li @click="compileTab()">编译</li>
-                <li @click="console()">控制台</li>
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
@@ -27,7 +26,7 @@
             <compile-tab class="tab" v-if="compileTabFlag"></compile-tab>
             <div class="main-right">
                 <editor class="editor"></editor>
-                <console class="console" v-if="consoleFlag"></console>
+                <console class="console"></console>
             </div>
         </div>
     </div>
@@ -54,7 +53,6 @@
                 compileTabFlag: false,
                 deployTabFlag: false,
                 runTabFlag: false,
-                consoleFlag: false
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -87,9 +85,6 @@
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
-            console() {
-                this.consoleFlag = !this.consoleFlag;
-            }
         },
         //生命周期函数
         created() {
@@ -124,7 +119,7 @@
         height: 100%;
     }
 
-    .header {
+    .header1 {
 			height: 50px;
 			line-height: 50px;
 			color: white;
