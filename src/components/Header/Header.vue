@@ -2,7 +2,7 @@
     <div class="header">
 
         <div>
-            <ul class="list">
+            <ul class="list" style="cursor:default" @click.stop='setTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
@@ -21,7 +21,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="https://www.baidu.com">帮助</a>
+                    帮助
                 </li>
             </ul>
 
@@ -56,7 +56,6 @@
         },
         methods: {
             setTab:function(e){
-                console.log(111111111111111)
                 if(e.target.innerText=='文件'){
                     console.log(1)
                     // this.fileVisible=true;
@@ -72,6 +71,7 @@
                     console.log(3);
                     this.editVisible=false;
                     this.fileVisible=false;
+
                 }
             },
             showFile () {
@@ -133,7 +133,7 @@
         //组件
         components: {
 
-        }
+        },
 
     }
 </script>
@@ -144,7 +144,7 @@
        height: @height;
        display: flex;
        flex-direction:row;
-       background-color:red;
+       background-color:#1b1b1b;
        color:#fff;
        .img{
         img{
@@ -159,7 +159,7 @@
         padding-left:0px;
         li{
             line-height: @height;
-            padding:0 30px 0 10px;
+            padding:0 30px;
             position: relative;
             ul{
                 position: absolute;
@@ -174,11 +174,16 @@
                     padding:0 20px;
                     span{
                         float:right;
+                        color:#999999;
                     }
                 }
                 .active{
                     background-color:gray;
                 }
+            }
+            &:hover{
+                background:gray;
+
             }
         }
        }

@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        编辑区
+        编辑区11111
     </div>
 </template>
 
@@ -44,7 +44,7 @@
         },
         //组件
         components: {
-            
+
         },
         //过滤器
         filters:{
@@ -58,5 +58,5 @@
 </script>
 
 <style lang="less" scoped>
-    
+
 </style>
