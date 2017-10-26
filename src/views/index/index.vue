@@ -23,7 +23,6 @@
             <files-tab class="tab" v-if="filesTabFlag"></files-tab>
             <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
             <run-tab class="tab" v-if="runTabFlag"></run-tab>
-            <compile-tab class="tab" v-if="compileTabFlag"></compile-tab>
             <div class="main-right">
                 <editor class="editor"></editor>
                 <console class="console"></console>
@@ -36,13 +35,13 @@
     //import  from ''
     import comHeader from "@/components/Header/Header.vue";
     import filesTab from "@/components/tabs/files-tab/";
-    import compileTab from "@/components/tabs/compile-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
     import runTab from "@/components/tabs/run-tab/";
     import console from "@/components/console/";
     import editor from "@/components/editor/";
-    //var child_process = require('child_process');
-
+    import compileService from '@/services/compile-exe/compile-service';
+    import consoleService from '@/services/compile-exe/console-service';
+    import {mapState, mapActions, mapGetters} from 'vuex';
     export default {
         //组件名
         name: "index",
@@ -50,7 +49,6 @@
         data() {
             return {
                 filesTabFlag: false,
-                compileTabFlag: false,
                 deployTabFlag: false,
                 runTabFlag: false,
             };
@@ -58,30 +56,29 @@
         //数组或对象，用于接收来自父组件的数据
         props: {},
         //计算
-        computed: {},
+        computed: {
+            ...mapGetters(['consoleFlag'])
+        },
         //方法
         methods: {
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
-                this.compileTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
             },
-            compileTab() {
-                this.compileTabFlag = !this.compileTabFlag;
+            compile() {
                 this.filesTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
+                consoleService.output(true,compileService.compiler());
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
-                this.compileTabFlag = false;
                 this.filesTabFlag = false;
                 this.runTabFlag = false;
             },
             runTab() {
                 this.runTabFlag = !this.runTabFlag;
-                this.compileTabFlag = false;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
@@ -98,7 +95,6 @@
         components: {
             comHeader,
             filesTab,
-            compileTab,
             deployTab,
             runTab,
             console,
@@ -183,15 +179,31 @@
     }
 
     .main-right {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
     .editor {
-        height: 70%;
+        /*height: 70%;*/
+        flex-grow:1;
     }
 
     .console {
-        height: 30%;
+        /*height: 30%;*/
+    }
+    .console-container{
+        align-items:flex-end;
+        h4{
+            padding:0 10px;
+            height:50px;
+            line-height:50px;
+            background-color: #000;
+            color:#fff;
+            .fr{
+               cursor:pointer;
+               float:right;
+            }
+        }
     }
 </style>
