@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-10-25 17:43:12
+ * @Last Modified time: 2017-10-26 11:38:12
  */
 
 //引入web3
@@ -14,7 +14,12 @@ class RunService {
 
     }
 
+    queryContract(address){
+        if(address){
 
+        }else{
+        }
+    }
 
 
 }
