@@ -169,7 +169,9 @@
 
     .tabs {
         width: 48px;
-        background: #eee;
+        background: #1b1b1b;
+        color: #fff;
+        text-align: center;
         >li {
             cursor: pointer;
         }
