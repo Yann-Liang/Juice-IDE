@@ -30,9 +30,9 @@
     import runTab from "@/components/tabs/run-tab/";
     import console from "@/components/console/";
     import editor from "@/components/editor/";
-    import compileService from '@/services/compile-exe/compile-service';
-    import consoleService from '@/services/compile-exe/console-service';
     import {mapState, mapActions, mapGetters} from 'vuex';
+    import consoleService from '@/services/console/console-service';
+    import compileService from '@/services/compile-exe/compile-service';
     export default {
         //组件名
         name: "index",
@@ -48,7 +48,7 @@
         props: {},
         //计算
         computed: {
-            ...mapGetters(['consoleFlag'])
+
         },
         //方法
         methods: {
@@ -72,9 +72,6 @@
                 this.runTabFlag = !this.runTabFlag;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
-            },
-            viewLog(){
-                consoleService.output(!this.consoleFlag);
             }
         },
         //生命周期函数
@@ -141,18 +138,4 @@
         flex-grow:1;
     }
 
-    .console-container{
-        align-items:flex-end;
-        h4{
-            padding:0 10px;
-            height:50px;
-            line-height:50px;
-            background-color: #000;
-            color:#fff;
-            .fr{
-               cursor:pointer;
-               float:right;
-            }
-        }
-    }
 </style>
