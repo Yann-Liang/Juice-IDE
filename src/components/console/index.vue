@@ -7,10 +7,14 @@
             </h4>
         </div>
         <div class="log-output" v-if="consoleFlag">
-            <p v-if="compileStatus > 0 && compileStatus < 4">[开始编译]</p>
-            <p v-if="compileStatus > 0 && compileStatus < 4">编译中...</p>
+            <p v-if="compileStatus > 0">[开始编译]</p>
+            <p v-if="compileStatus > 0">编译中...</p>
             <div class="compile-success" v-if="compileStatus == 2">
                 <p>Compiler Success</p>
+                <div>
+                    <div class="log-kind"></div>
+                    <div class="log-cont"></div>
+                </div>
             </div>
             <div class="compile-failed" v-if="compileStatus == 3">
                 <p>Compiler Failed</p>
@@ -37,7 +41,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileStatus','consoleFlag'])
+            ...mapGetters(['compileStatus','consoleFlag','compileResult'])
         },
         //方法
         methods: {
