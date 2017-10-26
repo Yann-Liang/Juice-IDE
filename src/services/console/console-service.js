@@ -6,8 +6,11 @@ class consoleServies {
     constructor() {
 
     }
-    output(bool,compileFn){
+    trigger(bool){
         store.dispatch('triggerConsoleFlag',bool);
+    }
+    output(compileFn){
+        this.trigger(true);
         if(compileFn && typeof(compileFn)=='function'){
             compileFn();
         }
