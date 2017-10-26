@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="editor-container">
         编辑区11111
     </div>
 </template>
@@ -58,5 +58,7 @@
 </script>
 
 <style lang="less" scoped>
+.editor-container{
 
+}
 </style>

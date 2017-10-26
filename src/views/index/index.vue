@@ -16,11 +16,7 @@
         <div class="main">
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
-<<<<<<< HEAD
-                <li @click="compile()">编译</li>
-=======
                 <li @click="compileTab()">编译</li>
->>>>>>> 30ac34fd97c457cc8a45999cde4d203fc1e8eda9
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
@@ -29,7 +25,6 @@
             <run-tab class="tab" v-if="runTabFlag"></run-tab>
             <div class="main-right">
                 <editor class="editor"></editor>
-<<<<<<< HEAD
                 <div class="console-container">
                     <h4>
                         <span>控制台</span>
@@ -37,10 +32,6 @@
                     </h4>
                     <console class="console" v-if="consoleFlag"></console>
                 </div>
-
-=======
-                <console class="console"></console>
->>>>>>> 30ac34fd97c457cc8a45999cde4d203fc1e8eda9
             </div>
         </div>
     </div>
@@ -65,11 +56,7 @@
             return {
                 filesTabFlag: false,
                 deployTabFlag: false,
-<<<<<<< HEAD
-                runTabFlag: false
-=======
                 runTabFlag: false,
->>>>>>> 30ac34fd97c457cc8a45999cde4d203fc1e8eda9
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -101,12 +88,9 @@
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
-<<<<<<< HEAD
             viewLog(){
                 consoleService.output(!this.consoleFlag);
             }
-=======
->>>>>>> 30ac34fd97c457cc8a45999cde4d203fc1e8eda9
         },
         //生命周期函数
         created() {
