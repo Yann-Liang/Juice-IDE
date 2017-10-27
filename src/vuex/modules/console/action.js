@@ -4,5 +4,8 @@
 export const consoleAction = {
     triggerConsoleFlag ({ commit, state },bool) {
         commit('TRIGGER_CONSOLE', bool);
+    },
+    updateConsoleDetail ({ commit, state },string) {
+        commit('UPDATE_CONSOLE', string);
     }
 }
