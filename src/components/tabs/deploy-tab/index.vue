@@ -3,8 +3,7 @@
         <el-form :label-position="'top'" label-width="220px" :model="form">
             <el-form-item label="选择需要部署的合约">
                 <el-select v-model="form.select" placeholder="选择合约文件">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
+                        <el-option v-for="(item,index) in contratList" :key="index" :label="item.name" :value="item.name"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="">
@@ -15,11 +14,8 @@
             </el-form-item>
         </el-form>
 
-        <el-button type="primay">查询合约</el-button>
-        <p>选择需要运行的函数</p>
-        <p>输入函数运行所需参数</p>
 
-        <el-button type="primay">运行</el-button>
+        <el-button class="tab-btn" type="primary" @click="deploy">部署合约</el-button>
     </div>
 </template>
 
@@ -34,6 +30,20 @@
             return {
                 form:{
                     select:''
+                },
+                contratList:{
+                    '1.sol':{
+                        name:'1.sol',
+                        data:[{
+                            aaaa:'1'
+                        }]
+                    },
+                    '2.sol':{
+                        name:'2.sol',
+                        data:[{
+                            aaaa:'2'
+                        }]
+                    }
                 }
             }
         },
@@ -47,7 +57,9 @@
         },
         //方法
         methods: {
-
+            deploy(){
+                console.log('deploy')
+            }
         },
         //生命周期函数
         created() {

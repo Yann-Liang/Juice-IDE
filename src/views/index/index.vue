@@ -1,18 +1,8 @@
 <template>
     <div class="index">
-        <header class="header1">
-            <i class="header-icon"></i>
-            <ul class="header-right fr" id="toolbar">
-                <li class="min"></li>
-                <li class="max"></li>
-                <li class="close"></li>
-            </ul>
-            <p>Juice IDE</p>
+        <com-title></com-title>
+        <com-header></com-header>
 
-        </header>
-        <com-header>
-
-        </com-header>
         <div class="main">
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
@@ -20,19 +10,25 @@
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
-            <files-tab class="tab" v-if="filesTabFlag"></files-tab>
-            <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
-            <run-tab class="tab" v-if="runTabFlag"></run-tab>
+            <div class="tab-box">
+                <files-tab class="tab" v-if="filesTabFlag"></files-tab>
+                <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
+                <run-tab class="tab" v-if="runTabFlag"></run-tab>
+                <i class="border" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+            </div>
             <div class="main-right">
                 <editor class="editor"></editor>
                 <console class="console"></console>
             </div>
+
         </div>
+        <div class="ghostbar" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
 <script>
     //import  from ''
+    import comTitle from "@/components/title/";
     import comHeader from "@/components/Header/Header.vue";
     import filesTab from "@/components/tabs/files-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
@@ -50,7 +46,9 @@
             return {
                 filesTabFlag: false,
                 deployTabFlag: false,
-                runTabFlag: false
+                runTabFlag: false,
+                ghostbarFlag:false,
+                ghostbarLeft:100,
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -81,7 +79,40 @@
                 this.runTabFlag = !this.runTabFlag;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
-            }
+            },
+            mousedown(event){
+                if (event.which === 1) {
+                    moveGhostbar(event)
+                    this.ghostbarFlag=true;
+                    document.addEventListener('mousemove', moveGhostbar)
+                    document.addEventListener('mouseup', removeGhostbar)
+                    document.addEventListener('keydown', cancelGhostbar);
+                    function cancelGhostbar (event) {
+                        if (event.keyCode === 27) {
+                        document.body.removeChild(ghostbar)
+                        document.removeEventListener('mousemove', moveGhostbar)
+                        document.removeEventListener('mouseup', removeGhostbar)
+                        document.removeEventListener('keydown', cancelGhostbar)
+                        }
+                    }
+                }
+                function getPosition (event) {
+                    var rhp = document.body.offsetWidth - window['righthand-panel'].offsetWidth
+                    var newpos = (event.pageX < limit) ? limit : event.pageX
+                    newpos = (newpos < (rhp - limit)) ? newpos : (rhp - limit)
+                    return newpos
+                }
+                function moveGhostbar (event) { // @NOTE VERTICAL ghostbar
+                    this.ghostbarLeft = getPosition(event) + 'px'
+                }
+                function removeGhostbar (event) {
+                    this.ghostbarFlag=false;
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    self.event.trigger('resize', [getPosition(event)])
+                }
+            },
         },
         //生命周期函数
         created() {
@@ -93,6 +124,7 @@
         watch: {},
         //组件
         components: {
+            comTitle,
             comHeader,
             filesTab,
             deployTab,
@@ -115,49 +147,6 @@
         height: 100%;
     }
 
-    .header1 {
-			height: 50px;
-			line-height: 50px;
-			color: white;
-			background: #0b8aee;
-			-webkit-app-region: drag;
-		}
-
-		.header-icon {
-			float: left;
-			margin: 9px;
-			width: 32px;
-			height: 32px;
-			background: url(./images/icon.png);
-			background-size: 100% 100%;
-		}
-
-		.header-right {
-			-webkit-app-region: no-drag;
-		}
-
-		.header-right>li {
-			cursor: pointer;
-			display: inline-block;
-			margin: 14px 15px 0px;
-			width: 16px;
-			height: 16px;
-			background-repeat: no-repeat;
-			background-size: 90%;
-		}
-
-		.min{
-			background: url(./images/shrink.png) 0 8px;
-		}
-
-		.max{
-			background: url(./images/magnify.png) 0 0;
-		}
-
-		.close{
-			background: url(./images/close.png);
-		}
-
     .main {
         display: flex;
         flex: 1;
@@ -166,7 +155,7 @@
     .tabs {
         width: 48px;
         min-width:48px;
-        background: #1b1b1b;
+        background: #0b8aee;
         color: #fff;
         text-align: center;
         >li {
@@ -174,9 +163,19 @@
         }
     }
 
+    .tab-box{
+        display: flex;
+    }
     .tab{
         width: 220px;
-        border-right: 1px solid #999;
+    }
+
+    .border{
+        width: 100px;
+        height: 100%;
+        background:#0b8aee;
+        cursor: col-resize;
+        //border-right: 1px solid ;
     }
 
     .main-right {
@@ -190,7 +189,15 @@
         flex-grow:1;
     }
 
-    .console {
-        /*height: 30%;*/
+    .ghostbar{
+        width             : 3px;
+        background-color  : #0b8aee;
+        opacity           : 0.5;
+        position          : absolute;
+        cursor            : col-resize;
+        z-index           : 9999;
+        top               : 100px;
+        bottom            : 0;
     }
+
 </style>

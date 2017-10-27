@@ -4,7 +4,7 @@
             <el-form-item label="查询需要运行的合约">
                 <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
             </el-form-item>
-            <el-button type="primary">查询合约</el-button>
+            <el-button class="tab-btn" type="primary" @click="queryContract">查询合约</el-button>
         </el-form>
         <el-form :label-position="'top'" label-width="80px" :model="form2">
             <el-select v-model="form2.select" placeholder="运行选择需要运行的函数">
@@ -19,7 +19,7 @@
              <el-form-item label="Value">
                 <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
             </el-form-item>
-            <el-button type="primary">运行</el-button>
+            <el-button class="tab-btn" type="primary" @click="run">运行</el-button>
         </el-form>
 
     </div>
@@ -53,7 +53,12 @@
         },
         //方法
         methods: {
-
+            queryContract(){
+                console.log('queryContract',this.form.input)
+            },
+            run(){
+                console.log(11)
+            },
         },
         //生命周期函数
         created() {
