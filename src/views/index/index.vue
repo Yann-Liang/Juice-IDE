@@ -70,7 +70,7 @@
                 this.filesTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
-                consoleService.output(true,compileService.compiler());
+                compileService.compiler();
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
@@ -165,6 +165,7 @@
 
     .tabs {
         width: 48px;
+        min-width:48px;
         background: #1b1b1b;
         color: #fff;
         text-align: center;

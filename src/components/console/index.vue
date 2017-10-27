@@ -6,18 +6,20 @@
                 <span class="fr" @click="viewLog()">trigger icon</span>
             </h4>
         </div>
-        <div class="log-output" v-if="consoleFlag">
-            <p v-if="compileStatus > 0">[开始编译]</p>
-            <p v-if="compileStatus > 0">编译中...</p>
-            <div class="compile-success" v-if="compileStatus == 2">
-                <p>Compiler Success</p>
-                <div>
-                    <div class="log-kind"></div>
-                    <div class="log-cont"></div>
-                </div>
-            </div>
-            <div class="compile-failed" v-if="compileStatus == 3">
-                <p>Compiler Failed</p>
+        <div class="log-output" v-if="consoleFlag" id="log-id">
+            <div class="log-detail">
+                <ul>
+                    <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
+                        <p v-if="typeof(item)=='string'">{{item}}</p>
+                        <p v-if="item.path">{{item.path}}:</p>
+                        <p v-if="item.error" class="error">{{item.error}}</p>
+                        <div v-if="item.data">
+                            <ul>
+                                <li class="log-item-title" v-for="(value,key) in item.data" :key="key"><span class="log-title">{{key}}</span>{{value}}</li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -41,7 +43,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileStatus','consoleFlag','compileResult'])
+            ...mapGetters(['compileStatus','consoleFlag','consoleDetail'])
         },
         //方法
         methods: {
@@ -49,19 +51,29 @@
                 consoleService.trigger(!this.consoleFlag);
             }
         },
-        //生命周期函数
-        created() {
-
-        },
-        beforeMount() {
-
-        },
         mounted() {
 
         },
-        //监视
         watch: {
+            consoleDetail:function(){
+                var container = this.$el.querySelector("#log-id");
+                var timer = setInterval(function(){
+                    if(container){
+                        var copy;
+                        if(container.scrollTop < container.scrollHeight){
+                            copy = container.scrollTop;
+                            container.scrollTop += 800;
+                            if(copy == container.scrollTop){
+                                clearInterval(timer);
+                            }
+                        }else{
+                            clearInterval(timer);
+                        }
 
+                    }
+
+                },100)
+            }
         },
         //组件
         components: {
@@ -94,9 +106,35 @@
         }
     }
     .log-output{
+        height:300px;
+        overflow-y: auto;
         padding:10px 15px;
-        line-height:30px;
+        line-height:24px;
         color:#fff;
         background-color: #222;
+    }
+    .log-item{
+        margin-bottom:15px;
+    }
+    .log-item-title{
+        margin-bottom:10px;
+    }
+    .error{
+        color:orange;
+    }
+    .success{
+        color:green;
+    }
+    .failed{
+        color:red;
+    }
+    .log-detail{
+        p,li{
+            word-break:break-all;
+        }
+    }
+    .log-title{
+        margin-right:30px;
+        color:#20a0ff;
     }
 </style>

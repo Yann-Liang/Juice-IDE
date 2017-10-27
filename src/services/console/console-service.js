@@ -9,11 +9,9 @@ class consoleServies {
     trigger(bool){
         store.dispatch('triggerConsoleFlag',bool);
     }
-    output(compileFn){
+    output(log){
         this.trigger(true);
-        if(compileFn && typeof(compileFn)=='function'){
-            compileFn();
-        }
+        store.dispatch('updateConsoleDetail',log);
     }
 }
 
