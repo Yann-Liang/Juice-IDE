@@ -1,6 +1,6 @@
 <template>
     <div class="editor-container">
-        编辑区11111
+
     </div>
 </template>
 

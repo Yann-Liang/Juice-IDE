@@ -8,13 +8,13 @@
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
                     <ul v-show='fileVisible' ref="filedata" >
-                        <li v-for="fileName in fileData" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == fileName}">{{fileName}}</li>
+                        <li v-for="fileName in fileData" :key="fileName" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == fileName}">{{fileName}}</li>
                     </ul>
                 </li>
                 <li>
                     编辑
                     <ul v-show='editVisible' ref="editdata" >
-                        <li v-for="(value,key) in editData" @mouseenter="showActive(value)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == value}" :data-type="value" @click.stop="clickEditEvent($event)">
+                        <li v-for="(value,key) in editData"  :key="value" @mouseenter="showActive(value)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == value}" :data-type="value" @click.stop="clickEditEvent($event)">
                             {{value}}
                             <span :data-type="value">{{key}}</span>
                         </li>
