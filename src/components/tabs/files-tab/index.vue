@@ -1,15 +1,15 @@
 <template>
     <div class="file">
         <ul class="tab-list">
-            <li>新建</li>
+            <li @click="newFile()">新建</li>
             <li>export</li>
             <li>new</li>
             <li>save</li>
-            <li>delete</li>
+            <li @click="removeFile()">delete</li>
         </ul>
-        <div class="file-content">
-            <item :model="treeData"></item>
-        </div>
+        <ul class="file-content">
+            <item v-for="(item,index) in treeData" :key="index" :filesList="item"></item>
+        </ul>
     </div>
 </template>
 
@@ -37,11 +37,24 @@
         },
         //方法
         methods: {
-
+            queryFileList(path){
+	            this.treeData = file.getFileList(path);
+            },
+            newFile(){
+	            file.newMkdir('D:/file-test/src/vuex','666',()=>{
+		            this.queryFileList("D:/file-test/src");
+            })
+            },
+	        removeFile(){
+		        file.removeFile('D:/file-test/src/vuex/666',()=>{
+			        this.queryFileList("D:/file-test/src");
+			        console.log('删除文件成功');
+		        })
+	        }
         },
         //生命周期函数
         created() {
-
+            this.queryFileList("D:/file-test/src");
         },
         beforeMount() {
 
@@ -73,6 +86,15 @@
         height:100%;
         min-width:200px;
         background:#666;
+        overflow:hidden;
+        position: relative;
+    }
+    .file-content{
+        position:absolute;
+        top:31px;
+        bottom:0;
+        width:100%;
+        overflow-y: auto;
     }
     .tab-list{
         border-bottom:1px solid #fff;
