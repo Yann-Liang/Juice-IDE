@@ -11,9 +11,9 @@
                 <li @click="runTab()">运行</li>
             </ul>
             <div class="tab-box">
-                <files-tab class="tab" v-if="filesTabFlag"></files-tab>
-                <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
-                <run-tab class="tab" v-if="runTabFlag"></run-tab>
+                <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
+                <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
+                <run-tab class="tab" v-if="runTabFlag" :style="{width:tabWidth+'px'}"></run-tab>
                 <i class="border" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
@@ -49,6 +49,7 @@
                 runTabFlag: false,
                 ghostbarFlag:false,
                 ghostbarLeft:100,
+                tabWidth:223,
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -80,38 +81,46 @@
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
+            hiddenTabs(){
+                this.runTabFlag = false;
+                this.deployTabFlag = false;
+                this.filesTabFlag = false;
+            },
             mousedown(event){
+                 const cancelGhostbar =(event)=> {
+                    if (event.keyCode === 27) {
+                    document.body.removeChild(ghostbar)
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    }
+                },getPosition =(event)=>  {
+                    return event.pageX;
+                },moveGhostbar  =(event)=>  { // @NOTE VERTICAL ghostbar
+                    this.ghostbarLeft = getPosition(event) + 'px'
+                },removeGhostbar =(event)=>  {
+                    this.ghostbarFlag=false;
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    let data=getPosition(event);
+                    window.console.log(data)
+                    if(data<223){
+                        this.tabWidth=223;
+                        this.hiddenTabs();
+                    }else{
+                        this.tabWidth=data;
+                    }
+                }
                 if (event.which === 1) {
                     moveGhostbar(event)
                     this.ghostbarFlag=true;
                     document.addEventListener('mousemove', moveGhostbar)
                     document.addEventListener('mouseup', removeGhostbar)
                     document.addEventListener('keydown', cancelGhostbar);
-                    function cancelGhostbar (event) {
-                        if (event.keyCode === 27) {
-                        document.body.removeChild(ghostbar)
-                        document.removeEventListener('mousemove', moveGhostbar)
-                        document.removeEventListener('mouseup', removeGhostbar)
-                        document.removeEventListener('keydown', cancelGhostbar)
-                        }
-                    }
+
                 }
-                function getPosition (event) {
-                    var rhp = document.body.offsetWidth - window['righthand-panel'].offsetWidth
-                    var newpos = (event.pageX < limit) ? limit : event.pageX
-                    newpos = (newpos < (rhp - limit)) ? newpos : (rhp - limit)
-                    return newpos
-                }
-                function moveGhostbar (event) { // @NOTE VERTICAL ghostbar
-                    this.ghostbarLeft = getPosition(event) + 'px'
-                }
-                function removeGhostbar (event) {
-                    this.ghostbarFlag=false;
-                    document.removeEventListener('mousemove', moveGhostbar)
-                    document.removeEventListener('mouseup', removeGhostbar)
-                    document.removeEventListener('keydown', cancelGhostbar)
-                    self.event.trigger('resize', [getPosition(event)])
-                }
+
             },
         },
         //生命周期函数
@@ -166,11 +175,11 @@
         display: flex;
     }
     .tab{
-        width: 220px;
+        width: 200px;
     }
 
     .border{
-        width: 100px;
+        width: 1px;
         height: 100%;
         background:#0b8aee;
         cursor: col-resize;
