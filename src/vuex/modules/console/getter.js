@@ -4,5 +4,8 @@
 export const consoleGetter = {
     consoleFlag(state){
         return state.consoleFlag
+    },
+    consoleDetail(state){
+        return state.consoleDetail
     }
 };

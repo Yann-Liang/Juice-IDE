@@ -69,7 +69,7 @@
                 this.filesTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
-                consoleService.output(true,compileService.compiler());
+                compileService.compiler();
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
@@ -163,6 +163,7 @@
 
     .tabs {
         width: 48px;
+        min-width:48px;
         background: #0b8aee;
         color: #fff;
         text-align: center;
@@ -195,6 +196,8 @@
     .editor {
         /*height: 70%;*/
         flex-grow:1;
+        display:flex;
+        flex-direction: column;
     }
 
     .ghostbar{

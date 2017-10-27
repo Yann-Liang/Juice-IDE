@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div id="javascript-editor" style="min-height:562px" class='editor'></div>
+        <div id="javascript-editor" class='editor'></div>
 
 
 
@@ -196,6 +196,7 @@
 }
 .editor{
     width:100%;
+    flex-grow:1;
 }
 
 </style>

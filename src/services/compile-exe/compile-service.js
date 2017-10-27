@@ -2,6 +2,7 @@
  * Created by 15236 on 2017/10/24.
  */
 import store from '@/vuex/store';
+import consoleService from '@/services/console/console-service';
 var fs = require('fs') ;
 class compileServies {
     constructor() {
@@ -9,8 +10,9 @@ class compileServies {
     }
     compiler(path = 'src/contract/Test.sol'){
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
-        console.info('开始编译....');
+        consoleService.output('[开始编译]');
         store.dispatch('compileWatch',1);
+        consoleService.output('编译中...');
         var falseData = {
             resource:fs.readFileSync(path,"utf-8"),
             name:name,
@@ -34,7 +36,6 @@ class compileServies {
                 //需判断以该合约命名的abi和bin文件是否存在
                 var dataABI,dataBIN;
                 fs.exists("output/"+name.slice(0,name.indexOf('.'))+'.abi', function(exists){
-                    console.info('exists:',exists);
                     if(exists){
                         dataABI = fs.readFileSync("output/"+name.slice(0,name.indexOf('.'))+'.abi',"utf-8");
                         dataBIN = fs.readFileSync("output/"+name.slice(0,name.indexOf('.'))+'.bin',"utf-8");
@@ -51,9 +52,13 @@ class compileServies {
                         key:fileId,
                         value:falseData
                     });
+                    consoleService.output('Compiler Success');
+                    consoleService.output(falseData);
                 });
             }else{
                 store.dispatch('compileWatch',3);
+                consoleService.output('Compiler Failed');
+                consoleService.output(falseData);
             }
         });
     }
