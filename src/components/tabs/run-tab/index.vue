@@ -1,12 +1,27 @@
 <template>
     <div class="run-index">
-        <p>查询需要运行的合约</p>
-        <input type="text">
-        <el-button type="primay">查询合约</el-button>
-        <p>选择需要运行的函数</p>
-        <p>输入函数运行所需参数</p>
+        <el-form :label-position="'top'" label-width="80px" :model="form">
+            <el-form-item label="查询需要运行的合约">
+                <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
+            </el-form-item>
+            <el-button class="tab-btn" type="primary" @click="queryContract">查询合约</el-button>
+        </el-form>
+        <el-form :label-position="'top'" label-width="80px" :model="form2">
+            <el-select v-model="form2.select" placeholder="运行选择需要运行的函数">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+                </el-select>
 
-        <el-button type="primay">运行</el-button>
+            <p>输入函数运行所需参数</p>
+             <el-form-item label="To">
+                <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
+            </el-form-item>
+             <el-form-item label="Value">
+                <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
+            </el-form-item>
+            <el-button class="tab-btn" type="primary" @click="run">运行</el-button>
+        </el-form>
+
     </div>
 </template>
 
@@ -20,7 +35,12 @@
         //实例的数据对象
         data() {
             return {
+                form:{
+                    input:''
+                },
+                form2:{
 
+                }
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -33,7 +53,12 @@
         },
         //方法
         methods: {
-
+            queryContract(){
+                console.log('queryContract',this.form.input)
+            },
+            run(){
+                console.log(11)
+            },
         },
         //生命周期函数
         created() {

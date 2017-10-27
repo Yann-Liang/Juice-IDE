@@ -4,8 +4,5 @@
 export const consoleGetter = {
     consoleFlag(state){
         return state.consoleFlag
-    },
-    compileStatus(state){
-        return state.compileStatus
     }
 };
