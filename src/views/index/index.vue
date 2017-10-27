@@ -10,14 +10,19 @@
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
-            <files-tab class="tab" v-if="filesTabFlag"></files-tab>
-            <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
-            <run-tab class="tab" v-if="runTabFlag"></run-tab>
+            <div class="tab-box">
+                <files-tab class="tab" v-if="filesTabFlag"></files-tab>
+                <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
+                <run-tab class="tab" v-if="runTabFlag"></run-tab>
+                <i class="border" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+            </div>
             <div class="main-right">
                 <editor class="editor"></editor>
                 <console class="console"></console>
             </div>
+
         </div>
+        <div class="ghostbar" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
@@ -41,7 +46,9 @@
             return {
                 filesTabFlag: false,
                 deployTabFlag: false,
-                runTabFlag: false
+                runTabFlag: false,
+                ghostbarFlag:false,
+                ghostbarLeft:100,
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -72,7 +79,40 @@
                 this.runTabFlag = !this.runTabFlag;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
-            }
+            },
+            mousedown(event){
+                if (event.which === 1) {
+                    moveGhostbar(event)
+                    this.ghostbarFlag=true;
+                    document.addEventListener('mousemove', moveGhostbar)
+                    document.addEventListener('mouseup', removeGhostbar)
+                    document.addEventListener('keydown', cancelGhostbar);
+                    function cancelGhostbar (event) {
+                        if (event.keyCode === 27) {
+                        document.body.removeChild(ghostbar)
+                        document.removeEventListener('mousemove', moveGhostbar)
+                        document.removeEventListener('mouseup', removeGhostbar)
+                        document.removeEventListener('keydown', cancelGhostbar)
+                        }
+                    }
+                }
+                function getPosition (event) {
+                    var rhp = document.body.offsetWidth - window['righthand-panel'].offsetWidth
+                    var newpos = (event.pageX < limit) ? limit : event.pageX
+                    newpos = (newpos < (rhp - limit)) ? newpos : (rhp - limit)
+                    return newpos
+                }
+                function moveGhostbar (event) { // @NOTE VERTICAL ghostbar
+                    this.ghostbarLeft = getPosition(event) + 'px'
+                }
+                function removeGhostbar (event) {
+                    this.ghostbarFlag=false;
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    self.event.trigger('resize', [getPosition(event)])
+                }
+            },
         },
         //生命周期函数
         created() {
@@ -122,9 +162,19 @@
         }
     }
 
+    .tab-box{
+        display: flex;
+    }
     .tab{
         width: 220px;
-        border-right: 1px solid #0b8aee;
+    }
+
+    .border{
+        width: 100px;
+        height: 100%;
+        background:#0b8aee;
+        cursor: col-resize;
+        //border-right: 1px solid ;
     }
 
     .main-right {
@@ -136,6 +186,17 @@
     .editor {
         /*height: 70%;*/
         flex-grow:1;
+    }
+
+    .ghostbar{
+        width             : 3px;
+        background-color  : #0b8aee;
+        opacity           : 0.5;
+        position          : absolute;
+        cursor            : col-resize;
+        z-index           : 9999;
+        top               : 100px;
+        bottom            : 0;
     }
 
 </style>
