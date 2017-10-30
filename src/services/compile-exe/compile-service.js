@@ -3,7 +3,7 @@
  */
 import store from '@/vuex/store';
 import consoleService from '@/services/console/console-service';
-var fs = require('fs') ;
+var fs = require('fs'), solc = require('solc/wrapper');
 class compileServies {
     constructor() {
 
@@ -12,6 +12,9 @@ class compileServies {
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
         consoleService.output('[开始编译]');
         store.dispatch('compileWatch',1);
+        this.grammarCheck(function(result, missingInputs, source){
+           
+        },path);
         consoleService.output('编译中...');
         var falseData = {
             resource:fs.readFileSync(path,"utf-8"),
@@ -61,6 +64,31 @@ class compileServies {
                 consoleService.output(falseData);
             }
         });
+    }
+    grammarCheck(cb,resource="src/contract/Test.sol"){
+        console.info(resource);
+        var source = {
+            sources:{
+                [resource]:fs.readFileSync(resource,"utf-8")
+            },
+            target:resource
+        };
+        var compiler = solc(window.Module);
+        var missingInputs = []
+        var missingInputsCallback = function (path) {
+            missingInputs.push(path)
+            return { error: 'Deferred import' }
+        }
+
+        var result
+        try {
+            result = compiler.compile(source, 0, missingInputsCallback)
+        } catch (exception) {
+            result = { error: 'Uncaught JavaScript exception:\n' + exception }
+        }
+        if(cb && typeof(cb)=='function'){
+            cb(result, missingInputs, source)
+        }
     }
 }
 
