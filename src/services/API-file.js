@@ -6,7 +6,7 @@
  */
 const [fs,path] = [require('fs-extra'),require('path')];
 
-
+// id标识文件的类型 save标识是否保存
 class file {
 	constructor() {
 	
@@ -20,11 +20,13 @@ class file {
 		let filesList = [{
 			name:path,
 			value:path,
-			children:[]
+			children:[],
+			id:1,
+			save:true
 		}]
 		let targetObj = {}
 		this.readFile(path,filesList[0].children,targetObj);
-		console.log(JSON.stringify(filesList))
+		// console.log(JSON.stringify(filesList))
 		return filesList;
 	}
 
@@ -37,17 +39,16 @@ class file {
 			if(states.isDirectory()){
 				var item ;
 				if(targetObj["children"]){
-					item = {name:file,children:[],value:filePath,save:true};
+					item = {name:file,children:[],value:filePath,id:1,save:true};
 					targetObj["children"].push(item);
 				}
 				else{
-					item = {name:file,children:[],value:filePath,save:true};
+					item = {name:file,children:[],value:filePath,id:1,save:true};
 					filesList.push(item);
 				}
 				
 				that.readFile(path+'/'+file,filesList,item);
-			}
-			else{
+			}else{
 				//创建一个对象保存信息
 				var obj = new Object();
 				obj.size = states.size;//文件大小，以字节为单位
@@ -55,11 +56,11 @@ class file {
 				obj.path = path+'/'+file; //文件绝对路径
 				
 				if(targetObj["children"]){
-					var item = {name:file,value:obj.path,save:true}
+					var item = {name:file,value:obj.path,id:2,save:true}
 					targetObj["children"].push(item);
 				}
 				else{
-					var item = {name:file,value:obj.path,save:true};
+					var item = {name:file,value:obj.path,id:2,save:true};
 					filesList.push(item);
 				}
 			}
@@ -137,6 +138,7 @@ class file {
 		}
 	}
 	
+	
 	//删除文件
 	removeFile(path,fn){
 		console.log(path);
@@ -147,8 +149,31 @@ class file {
 	}
 	
 	// 过滤未保存的文件
-	filterFile(path){
+	filterFile (data, id) {
+		const that = this;
+		console.log(data)
+		let newData = data.filter(x => {
+			console.log(x);
+			if(x.id === 1|| x.save === false){
+				return true
+			}
+		})
+		newData.forEach(x => x.children && (x.children = that.filterFile(x.children, id)))
+		return newData
+	}
 	
+	// 保存所有文件
+	saveAllFile(data){
+		data.forEach(x => {
+			if(x.children){
+				this.saveAllFile(x.children)
+			}else{
+				if(x.save === false){
+					// 保存文件
+					console.log('保存文件:'+ x.value);
+				}
+			}
+		})
 	}
 }
 

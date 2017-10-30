@@ -1,49 +1,44 @@
 <template>
     <div class="index">
-        <header class="header">
-            <i class="header-icon"></i>
-            <ul class="header-right fr" id="toolbar">
-                <li class="min"></li>
-                <li class="max"></li>
-                <li class="close"></li>
-            </ul>
-            <p>Juice IDE</p>
+        <com-title></com-title>
+        <com-header></com-header>
 
-        </header>
-        <com-header>
 
-        </com-header>
         <div class="main">
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
-                <li @click="compileTab()">编译</li>
-                <li @click="console()">控制台</li>
+                <li @click="compile()">编译</li>
                 <li @click="deployTab()">部署</li>
                 <li @click="runTab()">运行</li>
             </ul>
-            <files-tab class="tab" v-if="filesTabFlag"></files-tab>
-            <deploy-tab class="tab" v-if="deployTabFlag"></deploy-tab>
-            <run-tab class="tab" v-if="runTabFlag"></run-tab>
-            <compile-tab class="tab" v-if="compileTabFlag"></compile-tab>
+            <div class="tab-box">
+                <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
+                <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
+                <run-tab class="tab" v-if="runTabFlag" :style="{width:tabWidth+'px'}"></run-tab>
+                <i class="border" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+            </div>
             <div class="main-right">
                 <editor class="editor"></editor>
-                <console class="console" v-if="consoleFlag"></console>
+                <console class="console"></console>
             </div>
+
         </div>
+        <div class="ghostbar" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
 <script>
     //import  from ''
+    import comTitle from "@/components/title/";
     import comHeader from "@/components/Header/Header.vue";
     import filesTab from "@/components/tabs/files-tab/";
-    import compileTab from "@/components/tabs/compile-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
     import runTab from "@/components/tabs/run-tab/";
     import console from "@/components/console/";
     import editor from "@/components/editor/";
-    //var child_process = require('child_process');
-
+    import {mapState, mapActions, mapGetters} from 'vuex';
+    import consoleService from '@/services/console/console-service';
+    import compileService from '@/services/compile-exe/compile-service';
     export default {
         //组件名
         name: "index",
@@ -51,45 +46,83 @@
         data() {
             return {
                 filesTabFlag: false,
-                compileTabFlag: false,
                 deployTabFlag: false,
                 runTabFlag: false,
-                consoleFlag: false
+                ghostbarFlag:false,
+                ghostbarLeft:100,
+                tabWidth:223,
             };
         },
         //数组或对象，用于接收来自父组件的数据
         props: {},
         //计算
-        computed: {},
+        computed: {
+
+        },
         //方法
         methods: {
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
-                this.compileTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
             },
-            compileTab() {
-                this.compileTabFlag = !this.compileTabFlag;
+            compile() {
                 this.filesTabFlag = false;
                 this.deployTabFlag = false;
                 this.runTabFlag = false;
+                compileService.compiler();
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
-                this.compileTabFlag = false;
                 this.filesTabFlag = false;
                 this.runTabFlag = false;
             },
             runTab() {
                 this.runTabFlag = !this.runTabFlag;
-                this.compileTabFlag = false;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
-            console() {
-                this.consoleFlag = !this.consoleFlag;
-            }
+            hiddenTabs(){
+                this.runTabFlag = false;
+                this.deployTabFlag = false;
+                this.filesTabFlag = false;
+            },
+            mousedown(event){
+                 const cancelGhostbar =(event)=> {
+                    if (event.keyCode === 27) {
+                    document.body.removeChild(ghostbar)
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    }
+                },getPosition =(event)=>  {
+                    return event.pageX;
+                },moveGhostbar  =(event)=>  { // @NOTE VERTICAL ghostbar
+                    this.ghostbarLeft = getPosition(event) + 'px'
+                },removeGhostbar =(event)=>  {
+                    this.ghostbarFlag=false;
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    let data=getPosition(event);
+                    window.console.log(data)
+                    if(data<223){
+                        this.tabWidth=223;
+                        this.hiddenTabs();
+                    }else{
+                        this.tabWidth=data;
+                    }
+                }
+                if (event.which === 1) {
+                    moveGhostbar(event)
+                    this.ghostbarFlag=true;
+                    document.addEventListener('mousemove', moveGhostbar)
+                    document.addEventListener('mouseup', removeGhostbar)
+                    document.addEventListener('keydown', cancelGhostbar);
+
+                }
+
+            },
         },
         //生命周期函数
         created() {
@@ -101,9 +134,9 @@
         watch: {},
         //组件
         components: {
+            comTitle,
             comHeader,
             filesTab,
-            compileTab,
             deployTab,
             runTab,
             console,
@@ -174,26 +207,52 @@
 
     .tabs {
         width: 48px;
-        background: #eee;
+        min-width:48px;
+        background: #0b8aee;
+        color: #fff;
+        text-align: center;
         >li {
             cursor: pointer;
         }
     }
 
-    tab{
+    .tab-box{
+        display: flex;
+    }
+    .tab{
         width: 200px;
     }
 
+    .border{
+        width: 1px;
+        height: 100%;
+        background:#0b8aee;
+        cursor: col-resize;
+        //border-right: 1px solid ;
+    }
+
     .main-right {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
     .editor {
-        height: 70%;
+        /*height: 70%;*/
+        flex-grow:1;
+        display:flex;
+        flex-direction: column;
     }
 
-    .console {
-        height: 30%;
+    .ghostbar{
+        width             : 3px;
+        background-color  : #0b8aee;
+        opacity           : 0.5;
+        position          : absolute;
+        cursor            : col-resize;
+        z-index           : 9999;
+        top               : 100px;
+        bottom            : 0;
     }
+
 </style>

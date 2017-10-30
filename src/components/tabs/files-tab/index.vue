@@ -2,7 +2,7 @@
     <div class="file">
         <ul class="tab-list">
             <li @click="newFile()">新建</li>
-            <li>export</li>
+            <li>导入</li>
             <li>new</li>
             <li>save</li>
             <li @click="removeFile()">delete</li>
@@ -43,7 +43,7 @@
             newFile(){
 	            file.newMkdir('D:/file-test/src/vuex','666',()=>{
 		            this.queryFileList("D:/file-test/src");
-            })
+                })
             },
 	        removeFile(){
 		        file.removeFile('D:/file-test/src/vuex/666',()=>{
@@ -102,7 +102,7 @@
     }
     .tab-list li{
         float:left;
-        width:50px;
+        width:40px;
         height:30px;
         line-height:30px;
         cursor:pointer;
