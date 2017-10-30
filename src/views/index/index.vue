@@ -96,7 +96,7 @@
                     }
                 },getPosition =(event)=>  {
                     return event.pageX;
-                },moveGhostbar  =(event)=>  { // @NOTE VERTICAL ghostbar
+                },moveGhostbar  =(event)=>  {
                     this.ghostbarLeft = getPosition(event) + 'px'
                 },removeGhostbar =(event)=>  {
                     this.ghostbarFlag=false;
@@ -188,6 +188,7 @@
     }
 
     .main-right {
+        width:0px;
         flex-grow: 1;
         display: flex;
         flex-direction: column;

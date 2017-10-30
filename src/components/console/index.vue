@@ -3,16 +3,23 @@
         <div class="log-header">
             <h4>
                 <span>控制台</span>
-                <span class="fr" @click="viewLog()">trigger icon</span>
+                <span class="search">
+                    <input type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()">
+                    <span class="direction" @click="near(-1)">↑</span>
+                    <span class="direction" @click="near(1)">↓</span>
+                    <span class="icon" @click="viewLog()">trigger icon</span>
+                </span>
             </h4>
         </div>
-        <div class="log-output" v-if="consoleFlag" id="log-id">
+        <div class="log-output" v-show="consoleFlag" id="log-id">
             <div class="log-detail">
                 <ul>
                     <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
                         <p v-if="typeof(item)=='string'">{{item}}</p>
                         <p v-if="item.path">{{item.path}}:</p>
-                        <p v-if="item.error" class="error">{{item.error}}</p>
+                        <ul v-if="item.error" class="error">
+                            <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
+                        </ul>
                         <div v-if="item.data">
                             <ul>
                                 <li class="log-item-title" v-for="(value,key) in item.data" :key="key"><span class="log-title">{{key}}</span>{{value}}</li>
@@ -34,7 +41,10 @@
         //实例的数据对象
         data() {
             return {
-
+                inputValue:"",
+                htmlData:"",
+                current:0,
+                regList:[]
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -49,6 +59,32 @@
         methods: {
             viewLog(){
                 consoleService.trigger(!this.consoleFlag);
+            },
+            saveData(){
+                this.htmlData = document.getElementById('log-id').innerHTML;
+            },
+            searchFn(){
+                consoleService.trigger(true);
+                this.highlight(this.inputValue);
+            },
+            highlight(key) {
+                document.getElementById('log-id').innerHTML = data;
+                var data = JSON.parse(JSON.stringify(this.htmlData));
+                var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
+                //高亮显示
+                document.getElementById('log-id').innerHTML=data.replace(reg,'<span style="background-color:#0066cc;color:#fff" class="high-lighter">' +key+ '</span>' );
+                //滚动条定位
+                this.regList = document.getElementsByClassName('high-lighter');
+                var container = this.$el.querySelector("#log-id");
+                if(container && this.regList.length>0){
+                    container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
+                    this.current = 0;
+                }
+            },
+            near(dir){
+                if(this.regList.length>0){
+                    this.current = this.current+dir<0?0:this.current+dir>this.regList.length-1?this.regList.length-1:this.current+dir;
+                }
             }
         },
         mounted() {
@@ -72,6 +108,13 @@
                     }
 
                 },100)
+            },
+            current:function(){
+                var container = this.$el.querySelector("#log-id");
+                console.info(container.offsetTop);
+                if(container){
+                    container.scrollTop = this.regList[this.current].offsetTop-container.offsetTop;
+                }
             }
         },
         //组件
@@ -98,14 +141,26 @@
             line-height:50px;
             background-color: #000;
             color:#fff;
-            .fr{
-                cursor:pointer;
+            .search{
                 float:right;
+            }
+            .icon{
+                cursor:pointer;
+            }
+            input{
+                padding-left:10px;
+                width:180px;
+                height:28px;
+                line-height:28px;
+                border-style:none;
+                color:#bbb;
+                background-color: #333;
             }
         }
     }
     .log-output{
         height:300px;
+        overflow-x: hidden;
         overflow-y: auto;
         padding:10px 15px;
         line-height:24px;
@@ -128,12 +183,16 @@
         color:red;
     }
     .log-detail{
-        p,li{
+        p,li,span{
             word-break:break-all;
         }
     }
     .log-title{
         margin-right:30px;
         color:#20a0ff;
+    }
+    .direction{
+        padding:0 6px;
+        cursor:pointer;
     }
 </style>

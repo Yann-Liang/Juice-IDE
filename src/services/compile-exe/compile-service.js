@@ -12,9 +12,6 @@ class compileServies {
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
         consoleService.output('[开始编译]');
         store.dispatch('compileWatch',1);
-        this.grammarCheck(function(result, missingInputs, source){
-           
-        },path);
         consoleService.output('编译中...');
         var falseData = {
             resource:fs.readFileSync(path,"utf-8"),
@@ -25,13 +22,17 @@ class compileServies {
         var fileId = path;
         var spawn = require('child_process').spawn,free;
             free = spawn('src/services/compile-exe/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+        //保存语法错误
+        this.grammarCheck(function(result, missingInputs, source){
+            falseData.error = result.errors;
+        },path);
         // 捕获标准输出并将其打印到控制台
         free.stdout.on('data', function (data) {
 
         });
         // 捕获标准错误输出并将其打印到控制台
         free.stderr.on('data', function (data) {
-            falseData.error = data.toString();
+
         });
         // 注册子进程关闭事件
         free.on('exit', function (code, signal) {
@@ -65,8 +66,8 @@ class compileServies {
             }
         });
     }
+    //语法检查
     grammarCheck(cb,resource="src/contract/Test.sol"){
-        console.info(resource);
         var source = {
             sources:{
                 [resource]:fs.readFileSync(resource,"utf-8")
