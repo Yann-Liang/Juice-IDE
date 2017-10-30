@@ -7,9 +7,12 @@
                 :value="filesList.value"
                 @click="toggle(filesList)">
                 <!--@dblclick="changeType">-->
-                <img src="./images/icon-right.png" class="file-img"/>
-                <!--<img src="{{isFolder ? 'images/folder.png':'images/card.png'}}"/>-->
+                <i class="el-icon-date dir-icon" v-show="filesList.children"></i>
+                <i class="el-icon-document dir-icon" v-show="!filesList.children"></i>
                 {{filesList.name}}
+                <div class="wrap-delete">
+                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList.value)"></i>
+                </div>
             </div>
 
             <ul v-show="open" v-if="isFolder">
@@ -28,7 +31,8 @@
 <script>
 	//import  from ''
 	import file from '@/services/API-file'
-	
+	import {mapState, mapActions, mapGetters} from 'vuex';
+
 	export default {
 		//组件名
 		name: 'item',
@@ -36,7 +40,6 @@
 		data () {
 			return {
 				open: false,
-                activeFile:''
 			}
 		},
 		//数组或对象，用于接收来自父组件的数据
@@ -45,6 +48,7 @@
         },
 		//计算
 		computed: {
+            ...mapGetters(['activeFile']),
 			isFolder: function () {
 				return this.filesList.children &&
 					this.filesList.children.length
@@ -56,9 +60,10 @@
         },
 		//方法
 		methods: {
+			...mapActions(['queryFileListData','setActiveFile']),
 			toggle(itemInfo) {
-				console.log(itemInfo.value)
-				this.activeFile = itemInfo;
+				this.setActiveFile(itemInfo);
+				console.log(this.activeFile.value);
 				if (this.isFolder) {
 					this.open = !this.open
 				}else {
@@ -77,8 +82,9 @@
 					name: 'new stuff'
 				})
 			},
-            removeFile(){
-	            file.removeFile(activeFile,()=>{
+            removeFile(filePath){
+	            file.removeFile(filePath,()=>{
+		            this.queryFileListData();
 	            	console.log('删除文件成功');
                 })
             }
@@ -107,7 +113,7 @@
     }
     ul {
         padding-left: 13px;
-        line-height: 1.5em;
+        line-height: 23px;
         list-style-type:none;
     }
     .index{
@@ -120,5 +126,20 @@
     }
     .root-file{
         cursor: pointer;
+        position: relative;
+    }
+    .dir-icon{
+        color: #f0fffc;
+    }
+    .wrap-delete{
+        position: absolute;
+        right:10px;
+        top:0px;
+        width:16px;
+        height:15px;
+        display:none;
+    }
+    .root-file:hover .wrap-delete{
+        display:block;
     }
 </style>

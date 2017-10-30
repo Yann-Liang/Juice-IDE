@@ -121,6 +121,8 @@ class file {
 			const newFilePath = this.isDir(activePath) ?
 				activePath + '/'+fileName :
 				path.dirname(activePath) + '/'+fileName;
+			
+			alert(newFilePath)
 			if(this.exists(newFilePath)){
 				fn && fn({
 					code:1  // 文件已经存在
@@ -173,6 +175,16 @@ class file {
 					console.log('保存文件:'+ x.value);
 				}
 			}
+		})
+	}
+	
+	// 文件重命名
+	renameFile(oldpath,newpath,fn){
+		fs.rename(oldpath,newpath, function(err) {
+			if (err) {
+				throw err;
+			}
+			fn && fn();
 		})
 	}
 }

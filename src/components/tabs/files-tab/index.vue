@@ -8,7 +8,7 @@
             <li @click="removeFile()">delete</li>
         </ul>
         <ul class="file-content">
-            <item v-for="(item,index) in treeData" :key="index" :filesList="item"></item>
+            <item v-for="(item,index) in fileTreeData" :key="index" :filesList="item"></item>
         </ul>
     </div>
 </template>
@@ -17,6 +17,7 @@
     //import  from ''
     import item from '@/components/tree/tree.vue'
     import file from '@/services/API-file'
+    import {mapState, mapActions, mapGetters} from 'vuex';
 
     export default {
         //组件名
@@ -24,7 +25,7 @@
         //实例的数据对象
         data() {
 	        return {
-		        treeData:[]
+
 	        }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -33,28 +34,21 @@
         },
         //计算
         computed: {
-
+            ...mapGetters(['fileTreeData','activeFile'])
         },
         //方法
         methods: {
-            queryFileList(path){
-	            this.treeData = file.getFileList(path);
-            },
+            ...mapActions(['queryFileListData']),
             newFile(){
-	            file.newMkdir('D:/file-test/src/vuex','666',()=>{
-		            this.queryFileList("D:/file-test/src");
+            	console.log(this.activeFile.value)
+	            file.newMkdir(this.activeFile.value,'8999',()=>{
+		            this.queryFileListData();
                 })
-            },
-	        removeFile(){
-		        file.removeFile('D:/file-test/src/vuex/666',()=>{
-			        this.queryFileList("D:/file-test/src");
-			        console.log('删除文件成功');
-		        })
-	        }
+            }
         },
         //生命周期函数
         created() {
-            this.queryFileList("D:/file-test/src");
+	        this.queryFileListData();
         },
         beforeMount() {
 

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import console from './modules/console/module.js'
 import compile from './modules/compile/module.js'
+import file from './modules/file/module.js'
 //import chain from './modules/chain/module.js'
 //import node from './modules/node/module.js'
 
@@ -20,10 +21,9 @@ const mutations = {
 // 创建 store 实例
 export default new Vuex.Store({
 	modules: {
-	console,
-    compile
-//  node: node,
-//  chain: chain
+		console,
+	    compile,
+	    file
 	},
 	state
 })
