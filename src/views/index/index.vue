@@ -96,7 +96,7 @@
                     }
                 },getPosition =(event)=>  {
                     return event.pageX;
-                },moveGhostbar  =(event)=>  { // @NOTE VERTICAL ghostbar
+                },moveGhostbar  =(event)=>  {
                     this.ghostbarLeft = getPosition(event) + 'px'
                 },removeGhostbar =(event)=>  {
                     this.ghostbarFlag=false;
