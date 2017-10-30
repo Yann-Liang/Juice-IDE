@@ -1,6 +1,14 @@
 <template>
     <div class="">
         <div class="tabs">
+            <div class="files">
+                <ul>
+                    <li>文件一</li>
+                    <li>文件一</li>
+                    <li>文件一</li>
+                    <li>文件一</li>
+                </ul>
+            </div>
             <div class="tool">
                 <span class='save' @click='save'>保存当前文件</span>
                 <span class="search" @click='search'>搜索</span>
@@ -26,14 +34,7 @@
             </div>
         </div>
         <div id="javascript-editor" class='editor'></div>
-
-
-
-
     </div>
-
-
-
 </template>
 
 <script>
