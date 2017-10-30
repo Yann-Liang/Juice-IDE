@@ -3,7 +3,7 @@
  */
 import store from '@/vuex/store';
 import consoleService from '@/services/console/console-service';
-var fs = require('fs') ;
+var fs = require('fs'), solc = require('solc/wrapper');
 class compileServies {
     constructor() {
 
@@ -22,13 +22,17 @@ class compileServies {
         var fileId = path;
         var spawn = require('child_process').spawn,free;
             free = spawn('src/services/compile-exe/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+        //保存语法错误
+        this.grammarCheck(function(result, missingInputs, source){
+            falseData.error = result.errors;
+        },path);
         // 捕获标准输出并将其打印到控制台
         free.stdout.on('data', function (data) {
 
         });
         // 捕获标准错误输出并将其打印到控制台
         free.stderr.on('data', function (data) {
-            falseData.error = data.toString();
+
         });
         // 注册子进程关闭事件
         free.on('exit', function (code, signal) {
@@ -61,6 +65,31 @@ class compileServies {
                 consoleService.output(falseData);
             }
         });
+    }
+    //语法检查
+    grammarCheck(cb,resource="src/contract/Test.sol"){
+        var source = {
+            sources:{
+                [resource]:fs.readFileSync(resource,"utf-8")
+            },
+            target:resource
+        };
+        var compiler = solc(window.Module);
+        var missingInputs = []
+        var missingInputsCallback = function (path) {
+            missingInputs.push(path)
+            return { error: 'Deferred import' }
+        }
+
+        var result
+        try {
+            result = compiler.compile(source, 0, missingInputsCallback)
+        } catch (exception) {
+            result = { error: 'Uncaught JavaScript exception:\n' + exception }
+        }
+        if(cb && typeof(cb)=='function'){
+            cb(result, missingInputs, source)
+        }
     }
 }
 
