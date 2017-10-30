@@ -52,7 +52,6 @@
             }
         },
         mounted() {
-
         },
         watch: {
             consoleDetail:function(){

@@ -9,7 +9,7 @@ contract Ballot {
     }
     struct Proposal {
         uint voteCount;
-    }
+    }啊
 
     address chairperson;
     mapping(address => Voter) voters;
@@ -21,7 +21,7 @@ contract Ballot {
         voters[chairperson].weight = 1;
         proposals.length = _numProposals;
     }
-
+咦
     /// Give $(toVoter) the right to vote on this ballot.
     /// May only be called by $(chairperson).
     function giveRightToVote(address toVoter) public {
