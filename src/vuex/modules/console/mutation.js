@@ -7,5 +7,8 @@ export const consoleMutation = {
     },
     ['UPDATE_CONSOLE'] (state,string) {
         state.consoleDetail.push(string);
+    },
+    ['UPDATE_COMMAND'] (state,command) {
+        state.commandList.push(command);
     }
 };

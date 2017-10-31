@@ -7,5 +7,8 @@ export const consoleAction = {
     },
     updateConsoleDetail ({ commit, state },string) {
         commit('UPDATE_CONSOLE', string);
+    },
+    updateCommandList({ commit, state },command){
+        commit('UPDATE_COMMAND', command);
     }
 }
