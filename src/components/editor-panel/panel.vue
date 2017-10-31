@@ -59,13 +59,18 @@
             //设置值
             setValue:function(){
                 //读取文件中的值
-                fs.readFile(this.source,"utf-8",  (err, data)=> {
+                if(this.source){
+                    fs.readFile(this.source,"utf-8",  (err, data)=> {
                    if (err) {
                        return console.error(err);
                    }
                    // console.log("异步读取: " + data.toString());
                    this.editor.setValue(data.toString());
                 });
+                }else{
+                    this.editor.setValue("pragma solidity ^0.4.2");
+                }
+
                 // var data = fs.readFileSync(this.source,"utf-8");
                 // console.log("同步读取: " + data.toString());
 
