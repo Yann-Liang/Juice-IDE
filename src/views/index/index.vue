@@ -19,7 +19,7 @@
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
-                <console class="console"></console>
+                <console-ele class="console"></console-ele>
             </div>
 
         </div>
@@ -34,11 +34,12 @@
     import filesTab from "@/components/tabs/files-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
     import runTab from "@/components/tabs/run-tab/";
-    import console from "@/components/console/";
+    import consoleEle from "@/components/console/";
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
     import compileService from '@/services/compile-exe/compile-service';
+
     export default {
         //组件名
         name: "index",
@@ -105,7 +106,6 @@
                     document.removeEventListener('mouseup', removeGhostbar)
                     document.removeEventListener('keydown', cancelGhostbar)
                     let data=getPosition(event);
-                    window.console.log(data)
                     if(data<223){
                         this.tabWidth=223;
                         this.hiddenTabs();
@@ -139,7 +139,7 @@
             filesTab,
             deployTab,
             runTab,
-            console,
+            consoleEle,
             editor
         },
         //过滤器
@@ -156,49 +156,6 @@
         width: 100%;
         height: 100%;
     }
-
-    .header {
-			height: 50px;
-			line-height: 50px;
-			color: white;
-			background: #0b8aee;
-			-webkit-app-region: drag;
-		}
-
-		.header-icon {
-			float: left;
-			margin: 9px;
-			width: 32px;
-			height: 32px;
-			background: url(./images/icon.png);
-			background-size: 100% 100%;
-		}
-
-		.header-right {
-			-webkit-app-region: no-drag;
-		}
-
-		.header-right>li {
-			cursor: pointer;
-			display: inline-block;
-			margin: 14px 15px 0px;
-			width: 16px;
-			height: 16px;
-			background-repeat: no-repeat;
-			background-size: 90%;
-		}
-
-		.min{
-			background: url(./images/shrink.png) 0 8px;
-		}
-
-		.max{
-			background: url(./images/magnify.png) 0 0;
-		}
-
-		.close{
-			background: url(./images/close.png);
-		}
 
     .main {
         display: flex;
