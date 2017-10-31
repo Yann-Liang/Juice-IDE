@@ -8,7 +8,10 @@ import { fileMutation } from './mutation'
 export const file = {
     state: {
 	    treeData:[],
-	    url:'D:/file-test/src',
+	    url:[
+	    	    {value:'D:/file-test/src',name:'src'},
+		        {value:'E:/web/config',name:'config'}
+	    	],
 	    activeFile:'',
 	    editFile:''
     },
