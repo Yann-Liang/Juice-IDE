@@ -8,7 +8,7 @@ class compileServies {
     constructor() {
         this.contractName=null;
     }
-    compiler(path = 'src/contract/Test.sol'){
+    compiler(path = 'src/contract/FileServerManager.sol'){
         if(store.state.compile.compileStatus==1) return;
         var _this = this;
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
@@ -86,7 +86,7 @@ class compileServies {
         });
     }
     //语法检查
-    grammarCheck(cb,resource="src/contract/Test.sol"){
+    grammarCheck(cb,resource="src/contract/FileServerManager.sol"){
         var source = {
             sources:{
                 [resource]:fs.readFileSync(resource,"utf-8")
@@ -111,7 +111,7 @@ class compileServies {
         }
     }
     //获取合约名称
-    getContractName(path = 'src/contract/Test.sol'){
+    getContractName(path = 'src/contract/FileServerManager.sol'){
         var contractStrArr=[],contractList=[],_this = this;
         fs.exists(path, function(exists){
             if(exists){

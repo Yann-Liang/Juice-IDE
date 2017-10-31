@@ -37,7 +37,10 @@
                                     <p v-if="item.logError" class="failed">{{item.logError}}</p>
                                     <p v-else-if="item.logSuccess" class="success">{{item.logSuccess}}</p>
                                     <p v-else-if="item.logWarning" class="warning">{{item.logWarning}}</p>
-                                    <p v-else>{{item}}</p>
+                                    <p v-else v-for="(obj,objKey) in item" :key="objKey">
+                                        <span class="log-title">{{objKey}}</span>
+                                        <span >{{obj}}</span>
+                                    </p>
                                 </div>
                             </div>
                             <div v-else>
