@@ -108,8 +108,8 @@ class compileServies {
         fs.exists(path, function(exists){
             if(exists){
                var resource = fs.readFileSync(path,"utf-8");
-               contractStrArr = resource.match(/contract\s+\w+\s+{/gi);
-                if(contractStrArr.length>0){
+               contractStrArr = resource.match(/contract\s+\w+\s+/gi);
+                if(contractStrArr && contractStrArr.length>0){
                     contractStrArr.forEach(function(item){
                         contractList.push(item.slice(item.indexOf(' ')+1,item.lastIndexOf(' ')));
                     });
