@@ -16,21 +16,38 @@
                 <div class="log-detail">
                     <ul>
                         <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
-                            <p v-if="typeof(item)=='string'">{{item}}</p>
-                            <p v-if="item.path">{{item.path}}:</p>
-                            <ul v-if="item.error" class="error">
-                                <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
-                            </ul>
-                            <div v-if="item.data">
-                                <ul>
-                                    <li class="log-item-title" v-for="(value,key) in item.data" :key="key"><span class="log-title">{{key}}</span>{{value}}</li>
-                                </ul>
+                            <div v-if="typeof(item)=='object'">
+                                <div v-if="item.path">
+                                    <p v-if="item.path">{{item.path}}:</p>
+                                    <ul v-if="item.error" class="error">
+                                        <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
+                                    </ul>
+                                    <div v-if="item.data">
+                                        <ul>
+                                            <li v-for="(value,key) in item.data" :key="key" class="console-item">
+                                                <p v-for="(obj,objKey) in value" :key="objKey">
+                                                    <span class="log-title">{{objKey}}</span>
+                                                    <span >{{obj}}</span>
+                                                </p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <p v-if="item.logError" class="failed">{{item.logError}}</p>
+                                    <p v-else-if="item.logSuccess" class="success">{{item.logSuccess}}</p>
+                                    <p v-else-if="item.logWarning" class="warning">{{item.logWarning}}</p>
+                                    <p v-else>{{item}}</p>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <p>{{item}}</p>
                             </div>
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="command-line" id="command" contenteditable="true" @focus="command()" @blur="commandBlur" @keyup.13="comply($event)">
+            <div class="command-line" id="command" contenteditable="true" @focus="command()" @blur="commandBlur" @keyup.enter="comply($event)" @keyup.up="complyNear($event,-1)" @keyup.down="complyNear($event,1)">
                 请输入需要执行的命令
             </div>
         </div>
@@ -50,7 +67,8 @@
                 htmlData:"",
                 current:0,
                 regList:[],
-                hasMatch:true
+                hasMatch:true,
+                currentCommand:0
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -59,7 +77,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileStatus','consoleFlag','consoleDetail'])
+            ...mapGetters(['compileStatus','consoleFlag','consoleDetail','commandList'])
         },
         //方法
         methods: {
@@ -95,9 +113,9 @@
                     document.getElementById('log-id').innerHTML=data;
                 }
             },
-            near(dir){
+            near(dire){
                 if(this.regList.length>0){
-                    this.current = this.current+dir<0?0:this.current+dir>this.regList.length-1?this.regList.length-1:this.current+dir;
+                   this.current = (this.current+dire<0)?this.regList.length-1:(this.current+dire>this.regList.length-1)?0:this.current+dire;
                 }
             },
             command(){
@@ -108,10 +126,20 @@
                 var commandLine = this.$el.querySelector("#command");
                 commandLine.innerText=commandLine.innerText==""?"请输入需要执行的命令":commandLine.innerText;
             },
-            comply(){
+            comply(e){
+                e.preventDefault();
                 var commandLine = this.$el.querySelector("#command");
-                consoleService.command(commandLine.innerText);
-                commandLine.innerText='';
+                if(commandLine.innerText && !/^\s*$/.test(commandLine.innerText)){
+                    consoleService.command(commandLine.innerText);
+                    commandLine.innerText='';
+                    this.currentCommand = this.commandList.length;
+                }
+            },
+            complyNear(e,dire){
+                if(this.commandList.length==0)return;
+                this.currentCommand = (this.currentCommand+dire<0)?0:(this.currentCommand+dire>this.commandList.length-1)?this.commandList.length-1:this.currentCommand+dire;
+                var commandLine = this.$el.querySelector("#command");
+                commandLine.innerHTML = this.commandList[this.currentCommand];
             }
         },
         mounted() {
@@ -133,7 +161,6 @@
                         }
 
                     }
-
                 },100)
             },
             current:function(val,old){
@@ -199,18 +226,16 @@
         color:#fff;
         background-color: #222;
     }
-    .log-output::-webkit-scrollbar-track {
-        background-color: #222;
-        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.22);
-     }
     .log-output::-webkit-scrollbar {
-        width: 10px;
-        background-color: #222;
+        width:10px;
+        height:10px;
     }
-    .log-output::-webkit-scrollbar-thumb {
-        background-color: #555;
-        height:50px;
-        border-radius: 10px;
+    .log-output::-webkit-scrollbar-track-piece {
+        background:#333;
+    }
+    .log-output::-webkit-scrollbar-thumb{
+        background:#666;
+        border-radius:4px;
     }
     .log-item{
         margin-bottom:15px;
@@ -227,6 +252,9 @@
     .failed{
         color:red;
     }
+    .warning{
+        color:orange;
+    }
     .log-detail{
         p,li,span{
             word-break:break-all;
@@ -235,6 +263,9 @@
     .log-title{
         margin-right:30px;
         color:#20a0ff;
+    }
+    .console-item{
+        margin-bottom:10px;
     }
     .direction{
         padding:0 6px;
