@@ -11,6 +11,7 @@
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
+
     var fs = require('fs')
     export default {
         //组件名
@@ -62,7 +63,7 @@
                    if (err) {
                        return console.error(err);
                    }
-                   console.log("异步读取: " + data.toString());
+                   // console.log("异步读取: " + data.toString());
                    this.editor.setValue(data.toString());
                 });
                 // var data = fs.readFileSync(this.source,"utf-8");

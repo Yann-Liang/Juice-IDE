@@ -48,6 +48,7 @@
 <script>
     //import  from ''
     //brace
+    import {mapState, mapActions, mapGetters} from 'vuex';
     import Editor from '@/components/editor-panel/panel'
 
     export default {
@@ -81,7 +82,7 @@
         },
         //计算
         computed: {
-
+            ...mapGetters(['editFile'])
         },
         //方法
         methods: {
@@ -123,6 +124,9 @@
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
+                /*
+                    获取当前
+                */
             },
             //代码格式化
             format:function(){
@@ -174,7 +178,49 @@
             remove:function(){
 
             },
+            //判断两个对象是否相等
+            isObjectValueEqual:function(a, b){
+                console.log(111)
+                var aProps = Object.getOwnPropertyNames(a);
+                var bProps = Object.getOwnPropertyNames(b);
+                if (aProps.length != bProps.length) {
+                    return false;
+                }
+                for (var i = 0; i < aProps.length; i++) {
+                    var propName = aProps[i];
+                    console.log(a[propName])
+                    console.log(b[propName])
+                    if (a[propName] !== b[propName]) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            //push
+            pushArray:function(){
+                //遍历已有的数组，查看是否已经有相同，有的话则高亮显示当前，没有则push进数组并高亮显示当前
+                let blo = false;
+                this.fileData.forEach((item,index)=>{
+                    console.log()
+                    console.log(this.isObjectValueEqual(item,this.editFile))
+                    if(item.value == this.editFile.value || item.name == this.editFile.name){
+                        // console.log()
+                        //为true 高亮显示当前，并且不push
 
+                        this.select = index;
+                        this.currentView = index;
+                        this.source = this.editFile.value;
+                        blo = true;
+                    }
+                });
+                 //为false，push进数组，并高亮显示数组最后一个
+                if(blo == false){
+                    this.fileData.push(this.editFile);
+                    this.select = this.fileData.length - 1;
+                    this.currentView = this.fileData.length - 1;
+                    this.source = this.fileData[this.fileData.length - 1].value;
+                }
+            }
         },
         //生命周期函数
         created() {
@@ -188,7 +234,9 @@
         },
         //监视
         watch: {
-
+            editFile:function(){
+                this.pushArray();
+            }
         },
         //组件
         components: {
