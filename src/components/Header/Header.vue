@@ -168,6 +168,7 @@
                 left:0px;
                 padding:5px 0;
                 background-color:#1b1b1b;
+                z-index:1000;
                 .same{
                     height:35px;
                     line-height: 35px;

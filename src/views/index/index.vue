@@ -3,6 +3,7 @@
         <com-title></com-title>
         <com-header></com-header>
 
+
         <div class="main">
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
@@ -155,6 +156,49 @@
         width: 100%;
         height: 100%;
     }
+
+    .header {
+			height: 50px;
+			line-height: 50px;
+			color: white;
+			background: #0b8aee;
+			-webkit-app-region: drag;
+		}
+
+		.header-icon {
+			float: left;
+			margin: 9px;
+			width: 32px;
+			height: 32px;
+			background: url(./images/icon.png);
+			background-size: 100% 100%;
+		}
+
+		.header-right {
+			-webkit-app-region: no-drag;
+		}
+
+		.header-right>li {
+			cursor: pointer;
+			display: inline-block;
+			margin: 14px 15px 0px;
+			width: 16px;
+			height: 16px;
+			background-repeat: no-repeat;
+			background-size: 90%;
+		}
+
+		.min{
+			background: url(./images/shrink.png) 0 8px;
+		}
+
+		.max{
+			background: url(./images/magnify.png) 0 0;
+		}
+
+		.close{
+			background: url(./images/close.png);
+		}
 
     .main {
         display: flex;
