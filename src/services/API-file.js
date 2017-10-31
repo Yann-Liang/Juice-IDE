@@ -121,20 +121,23 @@ class file {
 			console.log(newFilePath);
 			if(this.exists(newFilePath)){
 				fn && fn({
-					code:1  // 文件已经存在
+					code:1, // 文件已经存在
+					value:newFilePath
 				});
 			}else{
 				this.writeFile(newFilePath,'',(err)=>{
 					if (err) throw err;
 					fn && fn({
-						code:0  // 文件不存在
+						code:0, // 文件不存在
+						value:newFilePath
 					});
 				});
 			}
 		}else{
 			// 更新路径数组的vuex状态
 			fn && fn({
-				code:2  // 文件已经存在
+				code:2,  // 没有路径
+				value:''
 			});
 		}
 	}
