@@ -6,53 +6,9 @@
                     <i>&lt;</i>
                 </div>
                 <ul class='files' ref='files'>
-                    <li class='file'>
-                        <span>文件1</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件2</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件3</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件4</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件5</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件6</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件7</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件8</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件9</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件10</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件11</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件12</span>
-                        <span class="remove">x</span>
+                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
+                        <span>{{item.name}}</span>
+                        <span class="remove" @click="remove">X</span>
                     </li>
                 </ul>
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
@@ -85,32 +41,38 @@
                 </div>
             </div>
         </div>
-        <div id="javascript-editor" class='editor'></div>
+        <v-editor :currentView='currentView' :source='source' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod"></v-editor>
     </div>
 </template>
 
 <script>
     //import  from ''
     //brace
-    import * as ace from 'brace';
-    import 'brace/mode/javascript';
-    import 'brace/theme/monokai';
-    import 'brace/ext/language_tools'
-    import '@/services/Mode-solidity'
-    import hotkeys from 'hotkeys-js'
+    import Editor from '@/components/editor-panel/panel'
+
     export default {
         //组件名
         name: 'index',
         //实例的数据对象
         data() {
             return {
-                editor:{},
                 form:{
                    search:"",
                 },
+                searchValue:"",
                 searchVisible:false,
                 vistual:200,
-
+                activeClass:"",
+                fileData:[
+                    {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
+                    {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
+                    {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
+                    {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
+                ],
+                fileTotal:10,
+                select:0,
+                currentView:0,
+                source:"E:/wamp/www/webapp/static/js/js/apply.js"
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -125,11 +87,13 @@
         methods: {
             //放大
             increase:function(){
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
+                this.$refs.childMethod.increase();
+                // this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+                this.$refs.childMethod.decrease();
+                // this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             //点击搜索
             search:function(){
@@ -138,16 +102,18 @@
             },
             //全局搜索
             onSearch:function(){
-                this.editor.find(this.form.search,{
-                    backwards: false,
-                    wrap: false,
-                    caseSensitive: true,
-                    wholeWord: false,
-                    regExp: false,
-                    range:""
-                });
-                this.editor.findNext();
-                this.editor.findPrevious();
+                this.searchValue = this.form.search;
+                this.$refs.childMethod.onSearch();
+                // this.editor.find(this.form.search,{
+                //     backwards: false,
+                //     wrap: false,
+                //     caseSensitive: true,
+                //     wholeWord: false,
+                //     regExp: false,
+                //     range:""
+                // });
+                // this.editor.findNext();
+                // this.editor.findPrevious();
             },
             //关闭弹窗
             offSearch:function(){
@@ -160,8 +126,9 @@
             },
             //代码格式化
             format:function(){
-                console.log('代码格式化')
-                this.editor.getSession().setTabSize(6);
+                console.log('代码格式化');
+                this.$refs.childMethod.format();
+                // this.editor.getSession().setTabSize(6);
             },
             //关闭所有窗口
             close:function(){
@@ -197,35 +164,26 @@
                     }
                 }
             },
+            //切换tab
+            selectProp: function (index,item) {
+                this.select = index;
+                this.currentView = index;
+                this.source = item.value;
+            },
+            //移除当前文件
+            remove:function(){
+
+            },
 
         },
         //生命周期函数
         created() {
-            hotkeys('ctrl+a', function(event,handler){
-                      alert(22223);
-            });
 
         },
         beforeMount() {
 
         },
         mounted() {
-            this.editor = ace.edit('javascript-editor');
-            console.log(this.editor);
-            this.editor.$blockScrolling = Infinity;
-            this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/monokai');
-            //启用提示菜单
-            ace.acequire('ace/ext/language_tools')
-            this.editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true
-            });
-            //字体大小
-            this.editor.setFontSize(14);
-            //自动换行,设置为off关闭
-            this.editor.setOption("wrap", "free");
-            this.editor.commands.addCommand({ name: 'myCommand', bindKey: {win: 'Ctrl-M', mac: 'Command-M'}, exec: function(editor) { alert(1111) }, readOnly: true  });
 
         },
         //监视
@@ -234,7 +192,7 @@
         },
         //组件
         components: {
-
+            "v-editor":Editor
         },
         //过滤器
         filters:{
@@ -290,12 +248,30 @@
             position: absolute;
             left:20px;
             overflow:hidden;
+            cursor: pointer;
             li{
                 width:100px;
                 border-right:1px solid #fff;
                 background-color:hsla(229, 100%, 97%, 1);
                 color:#000;
                 text-align: center;
+                span{
+                    display: inline-block;
+                    line-height: 30px;
+                    &:last-child{
+                        float:right;
+                        padding:0 10px;
+                        &:hover{
+                            background-color:gray
+                        }
+                    }
+                }
+            }
+            .li-active{
+                color: red;
+                font-weight: bold;
+                border-bottom: 0 none;
+
             }
         }
 
@@ -333,7 +309,7 @@
         margin-left: -230px;
     }
 }
-.editor{
+.javascript-editor{
     width:100%;
     flex-grow:1;
 }

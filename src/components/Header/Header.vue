@@ -2,7 +2,7 @@
     <div class="header">
 
         <div>
-            <ul class="list" style="cursor:default" @click='setHeaderTab($event)'>
+            <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
