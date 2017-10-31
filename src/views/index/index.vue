@@ -18,7 +18,7 @@
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
-                <console class="console"></console>
+                <console-ele class="console"></console-ele>
             </div>
 
         </div>
@@ -33,7 +33,7 @@
     import filesTab from "@/components/tabs/files-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
     import runTab from "@/components/tabs/run-tab/";
-    import console from "@/components/console/";
+    import consoleEle from "@/components/console/";
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
@@ -138,7 +138,7 @@
             filesTab,
             deployTab,
             runTab,
-            console,
+            consoleEle,
             editor
         },
         //过滤器
