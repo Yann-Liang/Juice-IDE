@@ -34,22 +34,31 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','activeFile','getUrl'])
+            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile']),
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
 		            	if(res.code === 0){
 				            this.queryFileListData();
+				            this.updateEditFile({
+					            name:name,
+					            value:res.value
+				            })
+                            console.log(this.editFile);
                         }else if(res.code === 1){
 				            this.tipOpen()
                         }else if(res.code === 2){
                             const url = this.getUrl;
                             url.push({value:'',name:name});
                             this.updateUrl(url);
+				            this.updateEditFile({
+					            name:name,
+					            value:res.value
+				            })
                         }
 		            })
                 });

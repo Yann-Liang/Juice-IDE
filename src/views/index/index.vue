@@ -39,6 +39,7 @@
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
     import compileService from '@/services/compile-exe/compile-service';
+    import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
 
     export default {
@@ -176,6 +177,7 @@
         },
         //生命周期函数
         created() {
+            contractServies.setProvider('http://10.10.8.220:6789')
 	        this.hotkeysFn();
         },
         beforeMount() {},

@@ -16,8 +16,6 @@
 let Web3 = require('web3');
 //EthereumTx = require('ethereumjs-tx');
 
-import KeyServies from './key-servise.js'
-
 //内置合约abi,地址
 const DEFAULT_ABI = [{
 		"constant": false,
@@ -516,37 +514,34 @@ class ContractServies {
 			}; //下删
 		console.log('txParams', txParams);
 		//钱包签名
-		KeyServies.sign(txParams, (serializedTxHex) => {
-			let hash = this.web3.eth.sendRawTransaction(serializedTxHex);
-			//this.watchEvent(contractName, eventName, hash, cb);
-			this.callbacks[hash] = {
-				cb: cb,
-				wrapCount: this.wrapCount,
-			};
-			this.getTransactionReceipt(hash);
-		})
-		/*
-		if(this.privateKey) {
-			//钱包返回的是buffer 不用Buffer.from了 跳过  假私钥
+		// this.privateKey = 'fcfd8ebca10b54b36cb6e47c61606b4ae355d78120ce3dd5e41ba6492b51d316';
+		// let privateKey = Buffer.from(this.privateKey, 'hex');
+		// tx.sign(privateKey);
 
-			//this.privateKey = '3cdae1f148dc5cf4ef551a39e256dc2f54838c636b063a0881d6527f4d325414';
-			//let privateKey = Buffer.from(this.privateKey, 'hex');
-			//console.log(privateKey)
-			//tx.sign(privateKey);
+		// const serializedTx = tx.serialize();
+		// let serializedTxHex = "0x" + serializedTx.toString('hex');
 
-			//真实的 以后用这个 然后把上面的假私钥注释
-			//tx.sign(this.privateKey);
-			let privateKey = Buffer.from(this.privateKey, 'hex');
-			tx.sign(privateKey);
+		// let hash = this.web3.eth.sendRawTransaction(serializedTxHex);
+		// this.callbacks[hash] = {
+		// 	cb: cb,
+		// 	wrapCount: this.wrapCount,
+		// }
+		// this.getTransactionReceipt(hash);
 
-			const serializedTx = tx.serialize();
-			let serializedTxHex = "0x" + serializedTx.toString('hex');
-
-			let hash = this.web3.eth.sendRawTransaction(serializedTxHex);
-			this.watchEvent(contractName, eventName, hash, cb);
-		} else {
-			console.warn('请设置私钥==>setPrivateKeyr');
-		}*/
+		window.Was.exec('wallet', 'sign', txParams, (res) => {
+			if (res.code == 0) {
+				const serializedTx = res.data;
+				let serializedTxHex = serializedTx.toString('hex');
+				let hash = this.web3.eth.sendRawTransaction(serializedTxHex);
+				this.callbacks[hash] = {
+					cb: cb,
+					wrapCount: this.wrapCount,
+				}
+				this.getTransactionReceipt(hash);
+			} else {
+				alert(res.msg);
+			}
+		});
 
 	}
 
@@ -574,13 +569,13 @@ class ContractServies {
 		let id = '',
 			result = this.web3.eth.getTransactionReceipt(hash),
 			data = {};
-		if (result && result.transactionHash&&hash == result.transactionHash) {
+		if (result && result.transactionHash && hash == result.transactionHash) {
 			clearTimeout(id);
-			if ( result.logs.length!=0) {
+			if (result.logs.length != 0) {
 				data = dealData(result.logs[0].data);
 				this.callbacks[hash].cb(data.code, data.data);
 				delete this.callbacks[hash];
-			}else{
+			} else {
 				this.callbacks[hash].cb(1001, '合约异常，失败');
 			}
 		} else {
