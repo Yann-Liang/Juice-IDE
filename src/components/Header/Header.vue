@@ -2,7 +2,7 @@
     <div class="header">
 
         <div>
-            <ul class="list" style="cursor:default" @click.stop='setTab($event)'>
+            <ul class="list" style="cursor:default" @click='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
@@ -55,7 +55,7 @@
 
         },
         methods: {
-            setTab:function(e){
+            setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log(1)
                     // this.fileVisible=true;
@@ -128,7 +128,7 @@
             this.hideEdit();
         },
         created() {
-
+            // alert(111)
         },
         //组件
         components: {

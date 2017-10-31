@@ -5,7 +5,7 @@
                 <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
                     <i>&lt;</i>
                 </div>
-                <ul class='files' ref='files' @click='setTab'>
+                <ul class='files' ref='files'>
                     <li class='file'>
                         <span>文件1</span>
                         <span class="remove">x</span>
@@ -59,6 +59,16 @@
                     <i>&gt;</i>
                 </div>
             </div>
+        </div>
+        <div class="tools">
+            <div class="tool">
+                <span class='save' @click='save'>保存</span>
+                <span class="search" @click='search'>搜索</span>
+                <span class='format' @click='format' >格式化</span>
+                <span class='increase' @click='increase'>放大</span>
+                <span class='decrease' @click='decrease'>缩小</span>
+                <span class='close' @click='close'>关所</span>
+            </div>
             <div class="search-model" v-if='searchVisible'>
                 <div class='search-content'>
                     <el-form :model="form"  :inline="true">
@@ -74,15 +84,6 @@
                     </el-form>
                 </div>
             </div>
-
-        </div>
-        <div class="tool">
-            <span class='save' @click='save'>保存</span>
-            <span class="search" @click='search'>搜索</span>
-            <span class='format' @click='format' >格式化</span>
-            <span class='increase' @click='increase'>放大</span>
-            <span class='decrease' @click='decrease'>缩小</span>
-            <span class='close' @click='close'>关所</span>
         </div>
         <div id="javascript-editor" class='editor'></div>
     </div>
@@ -96,7 +97,7 @@
     import 'brace/theme/monokai';
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
-
+    import hotkeys from 'hotkeys-js'
     export default {
         //组件名
         name: 'index',
@@ -196,13 +197,13 @@
                     }
                 }
             },
-            //files的tab切换
-            setTab:function(){
 
-            }
         },
         //生命周期函数
         created() {
+            hotkeys('ctrl+a', function(event,handler){
+                      alert(22223);
+            });
 
         },
         beforeMount() {
@@ -224,6 +225,7 @@
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
+            this.editor.commands.addCommand({ name: 'myCommand', bindKey: {win: 'Ctrl-M', mac: 'Command-M'}, exec: function(editor) { alert(1111) }, readOnly: true  });
 
         },
         //监视
@@ -298,7 +300,25 @@
         }
 
     }
+}
+.tools{
 
+    height:30px;
+    color:#fff;
+    background-color:#000;
+    position: relative;
+    width:100%;
+    .tool{
+        text-align: right;
+        span{
+            display: inline-block;
+            line-height: 25px;
+            padding:0 5px;
+            border:1px solid #000;
+            cursor: pointer;
+            border-left:1px solid #fff;
+        }
+    }
     .search-model{
         width: 460px;
         height: 40px;
@@ -309,23 +329,8 @@
         top: 30px;
         left: 50%;
         margin-left: -;
-        z-index: 1000;
+        z-index: 1000000;
         margin-left: -230px;
-    }
-
-}
-.tool{
-
-    height:30px;
-    color:#fff;
-    background-color:#000;
-    span{
-        float:right;
-        display: inline-block;
-        line-height: 25px;
-        padding:0 5px;
-        border:1px solid #000;
-        cursor: pointer;
     }
 }
 .editor{
