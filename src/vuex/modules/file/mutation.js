@@ -8,4 +8,10 @@ export const fileMutation = {
 	['SET_ACTIVE_FILE'] (state,activeFile) {
 		state.activeFile = activeFile
 	},
+	['UPDATE_URL'] (state,url) {
+		state.url = url
+	},
+	['UPDATE_EDIT_FILE'] (state,fileObj) {
+		state.editFile = fileObj
+	}
 };

@@ -7,5 +7,11 @@ export const fileGetter = {
 	},
 	activeFile(state){
 		return state.activeFile
+	},
+	getUrl(state){
+		return state.url
+	},
+	editFile(state){
+		return state.editFile
 	}
 };

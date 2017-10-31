@@ -7,5 +7,8 @@ export const consoleGetter = {
     },
     consoleDetail(state){
         return state.consoleDetail
+    },
+    commandList(state){
+        return state.commandList
     }
 };

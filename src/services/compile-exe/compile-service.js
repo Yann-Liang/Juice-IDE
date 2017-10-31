@@ -9,6 +9,7 @@ class compileServies {
         this.contractName=null;
     }
     compiler(path = 'src/contract/Test.sol'){
+        if(store.state.compile.compileStatus==1) return;
         var _this = this;
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
         consoleService.output('[开始编译]');
@@ -50,9 +51,9 @@ class compileServies {
                                 dataABI = fs.readFileSync("output/"+item+'.abi',"utf-8");
                                 dataBIN = fs.readFileSync("output/"+item+'.bin',"utf-8");
                                 falseData.data.push({
+                                    contractName:item,
                                     abi:JSON.parse(dataABI),
-                                    bin:dataBIN,
-                                    contractName:item
+                                    bin:dataBIN
                                 });
                             };
                         });
@@ -65,15 +66,22 @@ class compileServies {
                                 key:fileId,
                                 value:falseData
                             });
-                            consoleService.output('Compiler Success');
+                            consoleService.output({logSuccess:'Compiler Success'});
                             consoleService.output(falseData);
+                            _this.clearOutput();
                         }
                     },100)
+                }else{
+                    store.dispatch('compileWatch',3);
+                    consoleService.output({logError:'Compiler Failed'});
+                    consoleService.output(falseData);
+                    _this.clearOutput();
                 }
             }else{
                 store.dispatch('compileWatch',3);
-                consoleService.output('Compiler Failed');
+                consoleService.output({logError:'Compiler Failed'});
                 consoleService.output(falseData);
+                _this.clearOutput();
             }
         });
     }
@@ -120,7 +128,17 @@ class compileServies {
             }
         });
     }
-
+    //清空合约编译结果输出目录
+    clearOutput(dir='output'){
+        fs.exists(dir, function(exists) {
+            if(exists){
+                var dirList = fs.readdirSync(dir);
+                dirList.forEach(function(fileName){
+                    fs.unlinkSync(dir + '\\' + fileName);
+                });
+            }
+        });
+    }
 }
 
 export default new compileServies;
