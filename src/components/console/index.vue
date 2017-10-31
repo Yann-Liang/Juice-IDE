@@ -4,29 +4,34 @@
             <h4>
                 <span>控制台</span>
                 <span class="search">
-                    <input type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()">
+                    <input :style="{backgroundColor:hasMatch?'#333':'#6f3c37'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <span class="direction" @click="near(-1)">↑</span>
                     <span class="direction" @click="near(1)">↓</span>
                     <span class="icon" @click="viewLog()">trigger icon</span>
                 </span>
             </h4>
         </div>
-        <div class="log-output" v-show="consoleFlag" id="log-id">
-            <div class="log-detail">
-                <ul>
-                    <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
-                        <p v-if="typeof(item)=='string'">{{item}}</p>
-                        <p v-if="item.path">{{item.path}}:</p>
-                        <ul v-if="item.error" class="error">
-                            <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
-                        </ul>
-                        <div v-if="item.data">
-                            <ul>
-                                <li class="log-item-title" v-for="(value,key) in item.data" :key="key"><span class="log-title">{{key}}</span>{{value}}</li>
+        <div v-show="consoleFlag" class="log-area">
+            <div class="log-output" id="log-id">
+                <div class="log-detail">
+                    <ul>
+                        <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
+                            <p v-if="typeof(item)=='string'">{{item}}</p>
+                            <p v-if="item.path">{{item.path}}:</p>
+                            <ul v-if="item.error" class="error">
+                                <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
                             </ul>
-                        </div>
-                    </li>
-                </ul>
+                            <div v-if="item.data">
+                                <ul>
+                                    <li class="log-item-title" v-for="(value,key) in item.data" :key="key"><span class="log-title">{{key}}</span>{{value}}</li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="command-line" id="command" contenteditable="true" @focus="command()" @blur="commandBlur" @keyup.13="comply($event)">
+                请输入需要执行的命令
             </div>
         </div>
     </div>
@@ -44,7 +49,8 @@
                 inputValue:"",
                 htmlData:"",
                 current:0,
-                regList:[]
+                regList:[],
+                hasMatch:true
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -70,21 +76,42 @@
             highlight(key) {
                 document.getElementById('log-id').innerHTML = data;
                 var data = JSON.parse(JSON.stringify(this.htmlData));
-                var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
-                //高亮显示
-                document.getElementById('log-id').innerHTML=data.replace(reg,'<span style="background-color:#0066cc;color:#fff" class="high-lighter">' +key+ '</span>' );
-                //滚动条定位
-                this.regList = document.getElementsByClassName('high-lighter');
-                var container = this.$el.querySelector("#log-id");
-                if(container && this.regList.length>0){
-                    container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
-                    this.current = 0;
+                if(key && key.length>0){
+                    var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
+                    //高亮显示
+                    document.getElementById('log-id').innerHTML=data.replace(reg,'<span style="background-color:#2b5170;border:solid 1px #0066cc;color:#fff" class="high-lighter">' +key+ '</span>' );
+                    //滚动条定位
+                    this.regList = document.getElementsByClassName('high-lighter');
+                    var container = this.$el.querySelector("#log-id");
+                    if(container && this.regList.length>0){ //有匹配值
+                        container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
+                        this.current = 0;
+                        this.regList[0].style.backgroundColor="#0066cc";
+                        this.hasMatch = true;
+                    }else{ //无匹配值
+                        this.hasMatch = false;
+                    }
+                }else{
+                    document.getElementById('log-id').innerHTML=data;
                 }
             },
             near(dir){
                 if(this.regList.length>0){
                     this.current = this.current+dir<0?0:this.current+dir>this.regList.length-1?this.regList.length-1:this.current+dir;
                 }
+            },
+            command(){
+                var commandLine = this.$el.querySelector("#command");
+                commandLine.innerText = commandLine.innerText=='请输入需要执行的命令'?'':commandLine.innerText
+            },
+            commandBlur(){
+                var commandLine = this.$el.querySelector("#command");
+                commandLine.innerText=commandLine.innerText==""?"请输入需要执行的命令":commandLine.innerText;
+            },
+            comply(){
+                var commandLine = this.$el.querySelector("#command");
+                consoleService.command(commandLine.innerText);
+                commandLine.innerText='';
             }
         },
         mounted() {
@@ -109,11 +136,14 @@
 
                 },100)
             },
-            current:function(){
+            current:function(val,old){
                 var container = this.$el.querySelector("#log-id");
-                console.info(container.offsetTop);
+                this.regList[old].style.backgroundColor="#2b5170";
+                this.regList[old].style.borderColor="#0066cc";
                 if(container){
                     container.scrollTop = this.regList[this.current].offsetTop-container.offsetTop;
+                    this.regList[val].style.backgroundColor="#0066cc";
+                    this.regList[val].style.borderColor="#0b8aee";
                 }
             }
         },
@@ -154,9 +184,11 @@
                 line-height:28px;
                 border-style:none;
                 color:#bbb;
-                background-color: #333;
             }
         }
+    }
+    .log-area{
+        background-color: #222;
     }
     .log-output{
         height:300px;
@@ -166,6 +198,19 @@
         line-height:24px;
         color:#fff;
         background-color: #222;
+    }
+    .log-output::-webkit-scrollbar-track {
+        background-color: #222;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.22);
+     }
+    .log-output::-webkit-scrollbar {
+        width: 10px;
+        background-color: #222;
+    }
+    .log-output::-webkit-scrollbar-thumb {
+        background-color: #555;
+        height:50px;
+        border-radius: 10px;
     }
     .log-item{
         margin-bottom:15px;
@@ -194,5 +239,12 @@
     .direction{
         padding:0 6px;
         cursor:pointer;
+    }
+    .command-line{
+        margin-top:16px;
+        padding-left:20px;
+        line-height:34px;
+        color:#bbb;
+        background-color: #333;
     }
 </style>
