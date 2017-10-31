@@ -13,19 +13,40 @@ class file {
 	}
 	//遍历文件夹，获取所有文件夹里面的文件信息
 	/*
-	 * @param path 路径
+	 * @param pathArray 路径数组
 	 *
 	 */
-	getFileList(path){
-		let filesList = [{
-			name:path,
-			value:path,
-			children:[],
-			id:1,
-			save:true
-		}]
-		let targetObj = {}
-		this.readFile(path,filesList[0].children,targetObj);
+	getFileList(pathArray){
+		let filesList = [];
+		pathArray.forEach((item,index)=>{
+			let rootItem ;
+			if(this.isDir(item.value)){
+				rootItem = {
+					name:item.name,
+					value:item.value,
+					children:[],
+					id:1,
+					save:true
+				}
+			}else{
+				rootItem = {
+					name:item.name,
+					value:item.value,
+					id:2,
+					save:true
+				}
+			}
+			if(this.exists(item.value) || (!this.exists(item.value) && item.name)){
+				filesList.push(rootItem);
+			}
+		});
+		
+		filesList.forEach((item,index)=>{
+			let targetObj = {};
+			if(item.children){
+				this.readFile(item.value,item.children,targetObj);
+			}
+		});
 		// console.log(JSON.stringify(filesList))
 		return filesList;
 	}
@@ -111,7 +132,10 @@ class file {
 				});
 			}
 		}else{
-			console.log('待定')
+			// 更新路径数组的vuex状态
+			fn && fn({
+				code:2  // 文件已经存在
+			});
 		}
 	}
 	

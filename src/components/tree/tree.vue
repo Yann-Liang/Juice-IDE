@@ -1,31 +1,30 @@
 <template>
-    <!--<div >-->
+    <div >
         <li class="tree">
             <div
                 class="ellipsis root-file"
-                :class="{bold: isFolder}"
-                :value="filesList.value"
+                :class="{bold: isFolder,activeClass:filesList.value == activeFile.value && filesList.name ==  activeFile.name}"
                 @click="toggle(filesList)">
                 <!--@dblclick="changeType">-->
                 <i class="el-icon-date dir-icon" v-show="filesList.children"></i>
                 <i class="el-icon-document dir-icon" v-show="!filesList.children"></i>
                 {{filesList.name}}
                 <div class="wrap-delete">
-                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList.value)"></i>
+                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList)"></i>
                 </div>
             </div>
 
             <ul v-show="open" v-if="isFolder">
                 <item
-                        class="item ellipsis"
-                        v-for="(item,index) in filesList.children"
-                        :key="index"
-                        :value="item.value"
-                        :filesList="item">
+                    class="item ellipsis"
+                    v-for="(item,index) in filesList.children"
+                    :key="index"
+                    :value="item.value"
+                    :filesList="item">
                 </item>
             </ul>
         </li>
-    <!--</div>-->
+    </div>
 </template>
 
 <script>
@@ -48,7 +47,7 @@
         },
 		//计算
 		computed: {
-            ...mapGetters(['activeFile']),
+            ...mapGetters(['activeFile','getUrl','editFile']),
 			isFolder: function () {
 				return this.filesList.children &&
 					this.filesList.children.length
@@ -60,14 +59,16 @@
         },
 		//方法
 		methods: {
-			...mapActions(['queryFileListData','setActiveFile']),
+			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile']),
 			toggle(itemInfo) {
 				this.setActiveFile(itemInfo);
-				console.log(this.activeFile.value);
 				if (this.isFolder) {
 					this.open = !this.open
 				}else {
-//					alert(this.filesList.value);
+					this.updateEditFile({
+                        name:itemInfo.name,
+                        value:itemInfo.value
+                    })
 				}
 			},
 			changeType: function () {
@@ -82,11 +83,20 @@
 					name: 'new stuff'
 				})
 			},
-            removeFile(filePath){
-	            file.removeFile(filePath,()=>{
-		            this.queryFileListData();
-	            	console.log('删除文件成功');
-                })
+            removeFile(filesList){
+				if(filesList.value){
+					file.removeFile(filesList.value,()=>{
+						this.queryFileListData();
+						console.log('删除文件成功');
+					})
+                }else{
+					this.getUrl.forEach((item,index,data)=>{
+                        if(filesList.name == item.name){
+                        	data.splice(index,1);
+                            this.updateUrl(data)
+                        }
+                    })
+                }
             }
 		},
 		//生命周期函数
@@ -141,5 +151,8 @@
     }
     .root-file:hover .wrap-delete{
         display:block;
+    }
+    .activeClass{
+        background: #a8d9ff;
     }
 </style>

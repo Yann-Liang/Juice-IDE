@@ -39,6 +39,7 @@
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
     import compileService from '@/services/compile-exe/compile-service';
+    import hotkeys from 'hotkeys-js'
     export default {
         //组件名
         name: "index",
@@ -123,13 +124,64 @@
                 }
 
             },
+	        hotkeysFn(){
+            	// 注册快捷键
+
+                // 新建
+		        hotkeys('ctrl+n', function(event,handler){
+                    alert('ctrl+n');
+		        });
+
+		        // 新建文件夹
+		        hotkeys('ctrl+w', function(event,handler){
+			        alert('ctrl+w');
+		        });
+
+		        // 导入本地文件
+		        hotkeys('ctrl+shift+o', function(event,handler){
+			        alert('ctrl+shift+o');
+		        });
+
+		        // 导入本地文件夹
+		        hotkeys('ctrl+o', function(event,handler){
+			        alert('ctrl+o');
+		        });
+
+		        // 保存
+		        hotkeys('ctrl+s', function(event,handler){
+			        alert('ctrl+s');
+		        });
+
+		        // 另存为
+		        hotkeys('ctrl+shift+s', function(event,handler){
+			        alert('ctrl+shift+s');
+		        });
+
+		        // 全部保存
+		        hotkeys('ctrl+alt+s', function(event,handler){
+			        alert('ctrl+alt+s');
+		        });
+
+		        // 删除
+		        hotkeys('ctrl+delete', function(event,handler){
+			        alert('ctrl+delete');
+		        });
+
+		        // 删除所有文件
+		        hotkeys('ctrl+shift+delete', function(event,handler){
+			        alert('ctrl+shift+delete');
+		        });
+
+            }
         },
         //生命周期函数
         created() {
-
+	        this.hotkeysFn();
         },
         beforeMount() {},
-        mounted() {},
+        mounted() {
+
+        },
         //监视
         watch: {},
         //组件
