@@ -3,6 +3,7 @@
         <com-title></com-title>
         <com-header></com-header>
 
+
         <div class="main">
             <ul class="tabs">
                 <li @click="filesTab()">文件</li>
@@ -18,7 +19,7 @@
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
-                <console class="console"></console>
+                <console-ele class="console"></console-ele>
             </div>
 
         </div>
@@ -33,11 +34,12 @@
     import filesTab from "@/components/tabs/files-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
     import runTab from "@/components/tabs/run-tab/";
-    import console from "@/components/console/";
+    import consoleEle from "@/components/console/";
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
     import compileService from '@/services/compile-exe/compile-service';
+
     export default {
         //组件名
         name: "index",
@@ -96,7 +98,7 @@
                     }
                 },getPosition =(event)=>  {
                     return event.pageX;
-                },moveGhostbar  =(event)=>  { // @NOTE VERTICAL ghostbar
+                },moveGhostbar  =(event)=>  {
                     this.ghostbarLeft = getPosition(event) + 'px'
                 },removeGhostbar =(event)=>  {
                     this.ghostbarFlag=false;
@@ -104,7 +106,6 @@
                     document.removeEventListener('mouseup', removeGhostbar)
                     document.removeEventListener('keydown', cancelGhostbar)
                     let data=getPosition(event);
-                    window.console.log(data)
                     if(data<223){
                         this.tabWidth=223;
                         this.hiddenTabs();
@@ -138,7 +139,7 @@
             filesTab,
             deployTab,
             runTab,
-            console,
+            consoleEle,
             editor
         },
         //过滤器

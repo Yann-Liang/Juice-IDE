@@ -569,45 +569,6 @@ class ContractServies {
 		}
 	}
 
-	/*
-	 * 观察
-	 * contractName 合约名  来源：合约开发文档/合约代码
-	 * eventName 事件名  来源：合约开发文档/合约代码  问过吴wei妹子 默认为'Notify' 看返回参数是几个
-	 * hash 哈希   来源：调用sendRawTrasaction获得的hash
-	 * cb 回调函数
-	 */
-	watchEvent(contractName, eventName = 'Notify', hash, cb) {
-		console.log('watchEvent==>', contractName, eventName);
-
-		setTimeout(() => { //合约有点慢 等一下
-			const contractInstance = this.getContract(contractName).contract;
-			//创建合约事件
-			let MyEvent = contractInstance[eventName]({
-				_info: contractInstance.address
-			}, {
-				fromBlock: 0,
-				toBlock: 'latest'
-			});
-			MyEvent.watch(function (errorCode, result) {
-				if (result.transactionHash == hash) {
-					MyEvent.stopWatching();
-					let code = '';
-					//合约返回不统一  要判断error/errno
-					if (result.args._error !== undefined) {
-						//错误码
-						code = Number(result.args._error);
-					} else {
-						//错误码
-						code = Number(result.args._errno);
-					}
-					console.log(contractName + ' ' + eventName + '@result==》', code, result.args._info);
-					cb && cb(code, result.args._info);
-				}
-			});
-		}, 1000);
-
-	}
-
 	getTransactionReceipt(hash) {
 		console.log('getTransactionReceipt hash==>', hash);
 		let id = '',
@@ -635,14 +596,6 @@ class ContractServies {
 				delete this.callbacks[hash];
 			}
 		}
-	}
-
-	/*
-	 * 停止观察
-	 * 没有用到 没开发
-	 */
-	stopWatch(contractName, eventName) {
-
 	}
 
 }
