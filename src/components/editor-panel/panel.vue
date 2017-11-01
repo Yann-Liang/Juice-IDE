@@ -1,5 +1,9 @@
-<template>
+<template class="wrap">
+
     <div id="javascript-editor" class='javascript-editor'></div>
+   <!--  <div id="tips"  v-show='tipsVisible'></div> -->
+
+
 </template>
 
 <script>
@@ -60,13 +64,18 @@
             setValue:function(){
                 //读取文件中的值
                 if(this.source){
-                    fs.readFile(this.source,"utf-8",  (err, data)=> {
-                   if (err) {
-                       return console.error(err);
-                   }
-                   // console.log("异步读取: " + data.toString());
-                   this.editor.setValue(data.toString());
-                });
+                    if(this.source == 'readonly'){
+                        console.log('readonly')
+                        this.editor.setReadOnly(true);
+                    }else{
+                        fs.readFile(this.source,"utf-8",  (err, data)=> {
+                           if (err) {
+                               return console.error(err);
+                           }
+                           // console.log("异步读取: " + data.toString());
+                           this.editor.setValue(data.toString());
+                        });
+                    }
                 }else{
                     this.editor.setValue("pragma solidity ^0.4.2");
                 }
@@ -140,41 +149,14 @@
     描述：统一使用less,局部样式
 -->
 <style lang="less" scoped>
-.tools{
+.wrap{
 
-    height:30px;
-    color:#fff;
-    background-color:#000;
-    position: relative;
-    width:100%;
-    .tool{
-        text-align: right;
-        span{
-            display: inline-block;
-            line-height: 25px;
-            padding:0 5px;
-            border:1px solid #000;
-            cursor: pointer;
-            border-left:1px solid #fff;
-        }
-    }
-    .search-model{
-        width: 460px;
-        height: 40px;
-        padding: 5px;
-        border-radius: 10px;
-        background-color: #000;
-        position: absolute;
-        top: 30px;
-        left: 50%;
-        margin-left: -;
-        z-index: 1000000;
-        margin-left: -230px;
-    }
 }
 .javascript-editor{
     width:100%;
     flex-grow:1;
 }
+
+
 
 </style>

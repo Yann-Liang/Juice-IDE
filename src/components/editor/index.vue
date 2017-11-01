@@ -8,7 +8,7 @@
                 <ul class='files' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click="remove">X</span>
+                        <span class="remove" @click.stop="remove(index)">X</span>
                     </li>
                 </ul>
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
@@ -41,7 +41,10 @@
                 </div>
             </div>
         </div>
-        <v-editor :currentView='currentView' :source='source' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod"></v-editor>
+        <v-editor :currentView='currentView' :source='source' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible'></v-editor>
+        <div class="tips" v-if='tipsVisible'>
+            请在文件管理器面板中点击打开一个文件
+        </div>
     </div>
 </template>
 
@@ -57,23 +60,26 @@
         //实例的数据对象
         data() {
             return {
+                tipsVisible:false,
+                editorVisible:false,
                 form:{
                    search:"",
                 },
                 searchValue:"",
                 searchVisible:false,
+
                 vistual:200,
                 activeClass:"",
                 fileData:[
-                    {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
-                    {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
-                    {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
-                    {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
+                    // {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
                 ],
                 fileTotal:10,
-                select:0,
-                currentView:0,
-                source:"E:/wamp/www/webapp/static/js/js/apply.js"
+                select:"",
+                currentView:"",
+                source:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -89,12 +95,10 @@
             //放大
             increase:function(){
                 this.$refs.childMethod.increase();
-                // this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
                 this.$refs.childMethod.decrease();
-                // this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             //点击搜索
             search:function(){
@@ -105,16 +109,6 @@
             onSearch:function(){
                 this.searchValue = this.form.search;
                 this.$refs.childMethod.onSearch();
-                // this.editor.find(this.form.search,{
-                //     backwards: false,
-                //     wrap: false,
-                //     caseSensitive: true,
-                //     wholeWord: false,
-                //     regExp: false,
-                //     range:""
-                // });
-                // this.editor.findNext();
-                // this.editor.findPrevious();
             },
             //关闭弹窗
             offSearch:function(){
@@ -150,7 +144,7 @@
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight}px`
                     }
                 }
             },
@@ -174,36 +168,87 @@
                 this.currentView = index;
                 this.source = item.value;
             },
-            //移除当前文件
-            remove:function(){
+            //关闭当前窗口
+            remove:function(index){
+                console.log(index);
+                /*
+                    如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
+                */
+                console.log("数组长度")
+                console.log(this.fileData.length)
+                if(this.fileData.length == 1){
+                    //提示用户打开文件
+                    //不显示tab
+                    // this.select = "";
+                    // this.currentView = "";
+                    this.source = "readonly";
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                }else{
+                    this.editorVisible = true;
+                    this.tipsVisible = false;
+                    if(this.select == index){
+                        console.log('高亮与删除相同')
+                        this.fileData.splice(index,1);
+                        //如果当前高亮为0
+                        if(this.select == 0){
+                            this.select = index ;
+                            this.currentView = index ;
+                            this.source = this.fileData[index].value;
+                        }else{
+                            this.select = index - 1;
+                            this.currentView = index - 1;
+                            this.source = this.fileData[index - 1].value;
+                        }
 
-            },
-            //判断两个对象是否相等
-            isObjectValueEqual:function(a, b){
-                console.log(111)
-                var aProps = Object.getOwnPropertyNames(a);
-                var bProps = Object.getOwnPropertyNames(b);
-                if (aProps.length != bProps.length) {
-                    return false;
-                }
-                for (var i = 0; i < aProps.length; i++) {
-                    var propName = aProps[i];
-                    console.log(a[propName])
-                    console.log(b[propName])
-                    if (a[propName] !== b[propName]) {
-                        return false;
+                    }else if(this.select > index){
+                        console.log('高亮>删除相同')
+                        this.fileData.splice(index,1);
+                        this.select = this.select - 1;
+                        this.currentView = this.select - 1;
+                        this.source = this.fileData[this.select].value;
+                    }else if(this.select < index){
+                        console.log('高亮<删除相同')
+                        this.fileData.splice(index,1);
+                        this.select = this.select;
+                        this.currentView = this.select;
+                        this.source = this.fileData[this.select].value;
                     }
                 }
-                return true;
+
+
+            },
+            //初始化fileData
+            init:function(){
+                /*
+                    判断fileData是否为空，
+                    为空：则不显示tab，并且编辑区显示为不可编辑状态     不为空：则默认显示第一个为高亮，且编辑区显示的为高亮tab下的代码
+                */
+                if(this.fileData.length == 0){
+                    //不显示tab
+                    this.select = "";
+                    this.currentView = "";
+                    this.source = "readonly";
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                }else{
+                    //默认显示第一个高亮，且编辑区显示的为高亮tab下的代码
+                    this.select = 0;
+                    this.currentView = 0;
+                    this.source = this.fileData[0].value;
+                    this.editorVisible = true;
+                    this.tipsVisible = false;
+                }
             },
             //push
             pushArray:function(){
+                this.editorVisible = true;
+                this.tipsVisible = false;
                 //遍历已有的数组，查看是否已经有相同，有的话则高亮显示当前，没有则push进数组并高亮显示当前
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
-                    console.log()
-                    console.log(this.isObjectValueEqual(item,this.editFile))
-                    if(item.value == this.editFile.value || item.name == this.editFile.name){
+                    if(item.value == this.editFile.value && item.name == this.editFile.name){
+                        console.log('不push进数组')
                         // console.log()
                         //为true 高亮显示当前，并且不push
 
@@ -215,6 +260,7 @@
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
+                    console.log('push进数组')
                     this.fileData.push(this.editFile);
                     this.select = this.fileData.length - 1;
                     this.currentView = this.fileData.length - 1;
@@ -224,7 +270,7 @@
         },
         //生命周期函数
         created() {
-
+            this.init();
         },
         beforeMount() {
 
@@ -298,7 +344,7 @@
             overflow:hidden;
             cursor: pointer;
             li{
-                width:100px;
+                padding:0 0 0 10px;
                 border-right:1px solid #fff;
                 background-color:hsla(229, 100%, 97%, 1);
                 color:#000;
@@ -360,6 +406,16 @@
 .javascript-editor{
     width:100%;
     flex-grow:1;
+}
+
+.tips{
+    display: -webkit-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    flex-grow:1;
+
+    // background-color:#000;
 }
 
 </style>

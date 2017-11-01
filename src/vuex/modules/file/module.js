@@ -9,7 +9,7 @@ export const file = {
     state: {
 	    treeData:[],
 	    url:[
-	    	    {"value":"E:/wamp/www/webapp/static/js/js","name":"js"}
+
 	    	],
 	    activeFile:'',
 	    editFile:''
