@@ -12,7 +12,7 @@ class consoleServies {
     }
     output(log){
         //输出内容log,log如果需要颜色变化需要规定key值，否则直接传字符串
-        //绿色：logSuccess,eg:consoleServies.output({logSuccess:'你想输出什么'}),红色:logError,警告色:logWarning
+        //绿色：logSuccess,eg:consoleServies.output({logSuccess:'你想输出什么'}),红色:logError,警告色:logWarning,info色:logInfo
         this.trigger(true);
         store.dispatch('updateConsoleDetail',log);
     }
