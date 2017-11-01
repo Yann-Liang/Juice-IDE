@@ -27,7 +27,7 @@
 
                 <p>输入函数运行所需参数</p>
                 <el-form-item v-for="(item,index) in form2.selectFn.inputs" :key="index" :label="item.name">
-                    <el-input v-model="form2.input" :placeholder="item.type"></el-input>
+                    <el-input v-model="form2.agrs[index]" :placeholder="item.type"></el-input>
                 </el-form-item>
 
                 <el-button class="tab-btn" type="primary" @click="run">运行</el-button>
@@ -58,6 +58,7 @@
                     selectFn:{
                         inputs:[]
                     },
+                    args:[]
                 },
                 flag:false,
             }
