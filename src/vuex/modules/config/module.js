@@ -15,4 +15,4 @@ export const config = {
     mutations: configMutation
 };
 
-export default console;
+export default config;

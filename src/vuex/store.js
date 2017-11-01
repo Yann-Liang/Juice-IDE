@@ -3,8 +3,7 @@ import Vuex from 'vuex'
 import console from './modules/console/module.js'
 import compile from './modules/compile/module.js'
 import file from './modules/file/module.js'
-//import chain from './modules/chain/module.js'
-//import node from './modules/node/module.js'
+import deploy from './modules/deploy/module.js'
 
 Vue.use(Vuex)
 
@@ -23,7 +22,9 @@ export default new Vuex.Store({
 	modules: {
 		console,
 	    compile,
-	    file
+		file,
+		deploy,
+
 	},
 	state
 })

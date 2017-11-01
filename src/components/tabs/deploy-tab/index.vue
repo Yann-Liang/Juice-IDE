@@ -13,14 +13,34 @@
             </el-form-item>
         </el-form>
 
-        <el-button class="tab-btn" type="primary" @click="deploy">部署合约</el-button>
+        <el-button class="tab-btn" type="primary" @click="deploy" :disabled="disabled">部署合约</el-button>
+        <div v-if="flag">
+            <el-form :label-position="'top'" label-width="80px" :model="form2">
+                <el-select v-model="form2.selectDeployData" placeholder="选择合约文件">
+                    <el-option v-for="(item,index) in deployedData" :key="index" :label="item.contractAddress" :value="item.contractAddress"></el-option>
+                </el-select>
+            </el-form>
+            <el-form :label-position="'top'" label-width="80px" :model="form2">
+                <el-select v-model="form2.selectFn" placeholder="运行选择需要运行的函数">
+                    <el-option v-for="(item,index) in contractFn" :key="index" :label="item.name" :value="item"></el-option>
+                </el-select>
+
+                <p>输入函数运行所需参数</p>
+                <el-form-item v-for="(item,index) in form2.selectFn.inputs" :key="index" :label="item.name">
+                    <el-input v-model="form2.agrs[index]" :placeholder="item.type"></el-input>
+                </el-form-item>
+
+                <el-button class="tab-btn" type="primary" @click="run">运行</el-button>
+            </el-form>
+
+        </div>
     </div>
 </template>
 
 <script>
     //import  from ''
     import {mapState, mapActions, mapGetters} from 'vuex';
-    import contractServies from '@/services/contract-servies';
+    import deployServies from '@/services/deploy-servies';
 
     export default {
         //组件名
@@ -31,7 +51,16 @@
                 form:{
                     select:'',
                     contractItem:'',
+                    input:''
                 },
+                form2:{
+                    selectDeployData:'',
+                    selectFn:{
+                        inputs:[]
+                    },
+                    args:[]
+                },
+                flag:false,
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -40,39 +69,31 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileResult',])
+            ...mapGetters(['compileResult','deployedData']),
+            disabled:function(){
+                return !(this.form.select && this.form.contractItem);
+            },
+            contractFn:function() {
+                console.log(this.deployedData[this.form2.selectDeployData])
+                return this.deployedData[this.form2.selectDeployData].abi
+            }
         },
         //方法
         methods: {
             deploy(){
                 let item=this.form.contractItem;
-                let deployeAddr='0x268bb04bd0ce585a7fffda8fe0ddc27f89252359';
-                let calcContract = contractServies.web3.eth.contract(item.abi),
-                    deployCode = item.bin;
-                 console.log('deployCode',deployCode,'from',deployeAddr,contractServies.web3.eth.accounts[0])
-                let myContractReturned = calcContract.new({
-                    data: deployCode,
-                    from: deployeAddr
-                }, function(err, myContract) {console.log('err, myContract',err, myContract)
-                    if (!err) {
-                        if (!myContract.address) {
-                            console.log("contract deploy transaction hash: " + myContract.transactionHash) //部署合约的交易哈希值
-                        } else {
-                            console.log("contract deploy address: " + myContract.address) // 合约的部署地址
-
-                            //使用transaction方式调用，写入到区块链上
-                            myContract.add.sendTransaction(1, 2,{
-                                from: deployeAddr
-                            });
-
-                            console.log("after contract deploy, call:" + myContract.getCount.call());
-                        }
-                    }
-                });
-
-                //注意，异步执行，此时还是没有地址的。
-                console.log("returned deployed didn't have address now: " + myContractReturned.address);
-            }
+                deployServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x268bb04bd0ce585a7fffda8fe0ddc27f89252359').then((address)=>{
+                    console.log(deployServies.data)
+                    this.form2.selectDeployData=address;
+                    this.flag=true;
+                })
+            },
+            queryContract(){
+                console.log('queryContract',this.form.input)
+            },
+            run(){
+                console.log(11)
+            },
         },
         //生命周期函数
         created() {
