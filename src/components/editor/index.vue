@@ -10,7 +10,9 @@
                         <span>{{item.name}}</span>
                         <span class="remove" @click.stop="remove(index)">X</span>
                     </li>
+                    <li class='new-file' @click='newFile'>+</li>
                 </ul>
+                <!-- <div class='new-file' @click='newFile'>+</div> -->
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
                     <i>&gt;</i>
                 </div>
@@ -53,7 +55,7 @@
     //brace
     import {mapState, mapActions, mapGetters} from 'vuex';
     import Editor from '@/components/editor-panel/panel'
-
+    import file from '@/services/API-file'
     export default {
         //组件名
         name: 'index',
@@ -88,10 +90,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl'])
         },
         //方法
         methods: {
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile']),
             //放大
             increase:function(){
                 this.$refs.childMethod.increase();
@@ -218,6 +221,44 @@
                 this.tipsVisible = true;
                 this.source = "readonly";
                 this.fileData = [];
+            },
+            //新建文件
+            newFile(){
+                this.open((name)=>{
+                    file.newFile("",name,(res)=>{
+                        if(res.code === 0){
+                            this.queryFileListData();
+                            this.updateEditFile({
+                                name:name,
+                                value:res.value
+                            })
+                            console.log(this.editFile);
+                        }else if(res.code === 1){
+                            this.tipOpen()
+                        }else if(res.code === 2){
+                            const url = this.getUrl;
+                            url.push({value:'',name:name});
+                            this.updateUrl(url);
+                            this.updateEditFile({
+                                name:name,
+                                value:res.value
+                            })
+                        }
+                    })
+                });
+            },
+            open(fn) {
+                this.$prompt('请输入邮箱', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    fn && fn(value)
+                })
+            },
+            tipOpen() {
+                this.$alert('文件已存在，请更换文件名', '提示', {
+                    confirmButtonText: '确定',
+                });
             },
             //初始化fileData
             init:function(){
@@ -371,6 +412,10 @@
                 border-bottom: 0 none;
 
             }
+
+        }
+        .new-file{
+
         }
 
     }
