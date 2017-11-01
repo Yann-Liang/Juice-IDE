@@ -128,10 +128,6 @@
                 this.$refs.childMethod.format();
                 // this.editor.getSession().setTabSize(6);
             },
-            //关闭所有窗口
-            close:function(){
-                console.log('关闭所有窗口')
-            },
             //向右滑动
             scrollRight:function(e){
                 var rightArrow = this.$refs.rightbar;
@@ -144,7 +140,7 @@
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight}px`
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
                     }
                 }
             },
@@ -178,13 +174,12 @@
                 console.log(this.fileData.length)
                 if(this.fileData.length == 1){
                     //提示用户打开文件
-                    //不显示tab
-                    // this.select = "";
-                    // this.currentView = "";
-                    this.source = "readonly";
                     this.editorVisible = false;
                     this.tipsVisible = true;
+                    this.source = "readonly";
+                    this.fileData = [];
                 }else{
+                    console.log("hahahahah")
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
@@ -200,7 +195,6 @@
                             this.currentView = index - 1;
                             this.source = this.fileData[index - 1].value;
                         }
-
                     }else if(this.select > index){
                         console.log('高亮>删除相同')
                         this.fileData.splice(index,1);
@@ -217,6 +211,13 @@
                 }
 
 
+            },
+            //关闭所有窗口
+            close:function(){
+                this.editorVisible = false;
+                this.tipsVisible = true;
+                this.source = "readonly";
+                this.fileData = [];
             },
             //初始化fileData
             init:function(){
@@ -240,7 +241,7 @@
                     this.tipsVisible = false;
                 }
             },
-            //push
+            //push对象进数组
             pushArray:function(){
                 this.editorVisible = true;
                 this.tipsVisible = false;
@@ -343,17 +344,20 @@
             left:20px;
             overflow:hidden;
             cursor: pointer;
+            background-color:#000;
+            color:#fff;
             li{
-                padding:0 0 0 10px;
+                padding:0 10px;
                 border-right:1px solid #fff;
-                background-color:hsla(229, 100%, 97%, 1);
-                color:#000;
-                text-align: center;
+                display: flex;
+                flex-wrap:nowrap;
+                flex-direction:row;
+                justify-content:flex-end;
                 span{
                     display: inline-block;
-                    line-height: 30px;
+                    white-space: nowrap;
                     &:last-child{
-                        float:right;
+                        // float:right;
                         padding:0 10px;
                         &:hover{
                             background-color:gray
