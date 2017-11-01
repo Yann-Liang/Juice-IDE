@@ -15,6 +15,8 @@
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
+    import {mapState, mapActions, mapGetters} from 'vuex';
+    var beautify = require('js-beautify').js_beautify
 
     var fs = require('fs')
     export default {
@@ -31,7 +33,7 @@
         props: ["currentView","source","searchValue"],
         //计算
         computed: {
-            // this.select = this.fileTotal;
+            ...mapGetters(['actionCode'])
         },
         //方法
         methods: {
@@ -58,7 +60,8 @@
             },
             //代码格式化
             format:function(){
-                this.editor.getSession().setTabSize(6);
+                this.editor.setValue(beautify(this.editor.getValue()));
+                //引用了js-beautify库
             },
             //设置值
             setValue:function(){
@@ -93,6 +96,7 @@
 
         },
         mounted() {
+            var _this = this;
             console.log(11)
             console.log(this.currentView);
             console.log(this.source);
@@ -116,6 +120,16 @@
             this.editor.clearSelection();
             //设置值
             this.setValue();
+
+            this.editor.commands.addCommand({
+                name: 'myCommand',
+                bindKey: {win: 'Ctrl-L',  mac: 'Command-L'},
+                exec: function(editor) {
+                    _this.format();
+                    //...
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
         },
         //监视
         watch: {
@@ -126,6 +140,13 @@
             source:function(){
                 console.log(this.source);
                 this.setValue();
+            },
+            actionCode:function(){
+                switch(this.actionCode){
+                    case 8:
+                        this.format();
+                        break;
+                }
             }
         },
         //组件
