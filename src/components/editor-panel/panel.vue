@@ -15,7 +15,7 @@
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
-
+    // import {mapState, mapActions, mapGetters} from 'vuex';
     var fs = require('fs')
     export default {
         //组件名
@@ -116,6 +116,11 @@
             this.editor.clearSelection();
             //设置值
             this.setValue();
+            //检测编辑区的change事件
+            this.editor.getSession().on('change', function(e) {
+                // e.type, etc
+                console.log(e)
+            });
         },
         //监视
         watch: {
