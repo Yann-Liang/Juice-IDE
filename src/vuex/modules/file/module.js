@@ -8,11 +8,14 @@ import { fileMutation } from './mutation'
 export const file = {
     state: {
 	    treeData:[],
-	    url:[
-                {"value":"E:/wamp/www/webapp/static/js/js","name":"js"}
-	    	],
+	    url:[],
 	    activeFile:'',
-	    editFile:''
+	    editFile:'',
+	    position:{
+	    	x:0,
+		    y:0
+	    },
+	    rightMenuBlock:false
     },
     actions: fileAction,
     getters: fileGetter,

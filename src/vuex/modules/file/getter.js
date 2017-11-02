@@ -13,5 +13,11 @@ export const fileGetter = {
 	},
 	editFile(state){
 		return state.editFile
+	},
+	position(state){
+		return state.position
+	},
+	rightMenuBlock(state){
+		return state.rightMenuBlock
 	}
 };

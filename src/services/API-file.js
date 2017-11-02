@@ -5,6 +5,7 @@
  * Created by zjw on 2017/5/26.
  */
 const [fs,path] = [require('fs-extra'),require('path')];
+const{dialog} = require('electron').remote;
 
 // id标识文件的类型 save标识是否保存
 class file {
@@ -47,7 +48,7 @@ class file {
 				this.readFile(item.value,item.children,targetObj);
 			}
 		});
-		// console.log(JSON.stringify(filesList))
+		console.log(JSON.stringify(filesList))
 		return filesList;
 	}
 
@@ -112,13 +113,18 @@ class file {
 		return this.exists(path) && fs.statSync(path).isDirectory();
 	}
 	
+	// 通过路径获取文件名
+	basename(filePath){
+		const name = path.basename(filePath);
+		return name;
+	}
+	
 	//编辑器新建文件
 	newFile (activePath,fileName,fn){
 		if(activePath){
 			const newFilePath = this.isDir(activePath) ?
 				activePath + '/'+fileName+'.sol':
 				path.dirname(activePath) + '/'+fileName+'.sol';
-			console.log(newFilePath);
 			if(this.exists(newFilePath)){
 				fn && fn({
 					code:1, // 文件已经存在
@@ -148,8 +154,6 @@ class file {
 			const newFilePath = this.isDir(activePath) ?
 				activePath + '/'+fileName :
 				path.dirname(activePath) + '/'+fileName;
-			
-			alert(newFilePath)
 			if(this.exists(newFilePath)){
 				fn && fn({
 					code:1  // 文件已经存在
@@ -191,18 +195,64 @@ class file {
 		return newData
 	}
 	
+	// 保存文件
+	saveFile(path,name,source,fn){
+		if(path){
+			this.writeFile(path,source,fn)
+		}else{
+			dialog.showSaveDialog({
+				defaultPath:name
+			},(filename)=>{
+				const filepath = filename ? filename.replace(/\\/g,'/') :'';
+				if(filepath){
+					this.writeFile(filepath,source,fn)
+				}
+			})
+		}
+	}
+	
+	
 	// 保存所有文件
-	saveAllFile(data){
-		data.forEach(x => {
+	saveAllHaveFile(fileData,fn){
+		fileData.forEach(x => {
 			if(x.children){
-				this.saveAllFile(x.children)
+				this.saveAllHaveFile(x.children)
 			}else{
 				if(x.save === false){
 					// 保存文件
-					console.log('保存文件:'+ x.value);
+					this.saveFile(x.value,x.name,'2222333',(err)=>{
+						fn && fn(err);
+						if(err){
+							console.log('保存失败'+ x.value)
+						}else{
+							console.log('保存成功'+ x.value)
+						}
+					});
 				}
 			}
 		})
+	}
+	
+	saveAllNoFile(dialogFile){
+		console.log(dialogFile);
+		if(dialogFile.length>0){
+			dialog.showSaveDialog({
+				defaultPath:dialogFile[0].name
+			},(filename)=>{
+				const filepath = filename ? filename.replace(/\\/g,'/') :'';
+				if(filepath){
+					this.writeFile(filepath,'dsa222',(err)=>{
+						if(err){
+						
+						}else{
+						
+						}
+					})
+				}
+				dialogFile.splice(0,1);
+				this.saveAllNoFile(dialogFile)
+			})
+		}
 	}
 	
 	// 文件重命名
@@ -213,6 +263,38 @@ class file {
 			}
 			fn && fn();
 		})
+	}
+	
+	// 导入文件
+	exportFile(type,fn){
+		let properties;
+		if(type == 'dir'){
+			properties = ['openFile', 'openDirectory', 'multiSelections']
+		}else if(type == 'file'){
+			properties = []
+		}
+		dialog.showOpenDialog({
+			properties:properties,
+			filters:[{name: 'Custom File Type', extensions: ['js']},]
+		},(filename)=>{
+			const filepath = filename ? path.normalize(filename[0]).replace(/\\/g,'/') :'';
+			fn && fn(filepath)
+		})
+	}
+	
+	// 更新文件的状态
+	updateFile(data,value,name,save){
+		const that = this;
+		data.forEach((item,index)=>{
+			if(!item.children){
+				if(value == item.value && name === item.name){
+					item.save = save;
+					return false;
+				}
+			}
+		})
+		data.forEach(x => x.children && (x.children = that.updateFile(x.children, value,name,save)))
+		return data;
 	}
 }
 
