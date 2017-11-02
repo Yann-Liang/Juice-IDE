@@ -46,7 +46,7 @@
                     "Ctrl+V":"粘贴",
                     "Ctrl+F":"查找",
                     "Ctrl+H":"替换",
-                    "":"格式化",
+                    "Ctrl+L":"格式化",
                 },
 
             }
@@ -118,8 +118,14 @@
             },
             //编辑每个li的点击事件
             clickEditEvent:function(e){
+                var _this = this;
                 this.editVisible = false
                 console.log(e.target.getAttribute("data-type"));
+                switch(e.target.getAttribute("data-type")){
+                    case '格式化':
+                        _this.$store.commit('UPDATE_ACTION_CODE',8);
+                        break;
+                }
             }
 
         },

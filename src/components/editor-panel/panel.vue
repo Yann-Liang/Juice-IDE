@@ -15,7 +15,8 @@
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
-    // import {mapState, mapActions, mapGetters} from 'vuex';
+    import {mapState, mapActions, mapGetters} from 'vuex';
+    var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
     export default {
         //组件名
@@ -31,7 +32,7 @@
         props: ["currentView","source","searchValue"],
         //计算
         computed: {
-            // this.select = this.fileTotal;
+            ...mapGetters(['actionCode'])
         },
         //方法
         methods: {
@@ -58,11 +59,14 @@
             },
             //代码格式化
             format:function(){
-                this.editor.getSession().setTabSize(6);
+                this.editor.setValue(beautify(this.editor.getValue()));
+                //引用了js-beautify库
             },
             //设置值
             setValue:function(){
                 //读取文件中的值
+                console.log('this.source');
+                console.log(this.source)
                 if(this.source){
                     if(this.source == 'readonly'){
                         console.log('readonly')
@@ -93,6 +97,7 @@
 
         },
         mounted() {
+            var _this = this;
             console.log(11)
             console.log(this.currentView);
             console.log(this.source);
@@ -114,12 +119,21 @@
             //设置事件处理程序
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.editor.clearSelection();
-            //设置值
             this.setValue();
-            //检测编辑区的change事件
+            //监听编辑区的change事件
             this.editor.getSession().on('change', function(e) {
                 // e.type, etc
-                console.log(e)
+                console.log(e);
+            });
+            //设置格式化
+            this.editor.commands.addCommand({
+                name: 'myCommand',
+                bindKey: {win: 'Ctrl-L',  mac: 'Command-L'},
+                exec: function(editor) {
+                    _this.format();
+                    //...
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
             });
         },
         //监视
@@ -131,6 +145,13 @@
             source:function(){
                 console.log(this.source);
                 this.setValue();
+            },
+            actionCode:function(){
+                switch(this.actionCode){
+                    case 8:
+                        this.format();
+                        break;
+                }
             }
         },
         //组件
