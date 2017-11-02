@@ -4,5 +4,13 @@
 export const editorGetter = {
     actionCode(state){
         return state.actionCode
+    },
+    saveCode(state){
+        return state.saveCode
+    },
+    editData(state){
+        console.log(typeof state.editData,state.editData)
+        return state.editData
+
     }
 };
