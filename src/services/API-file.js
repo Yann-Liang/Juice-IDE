@@ -281,6 +281,21 @@ class file {
 			fn && fn(filepath)
 		})
 	}
+	
+	// 更新文件的状态
+	updateFile(data,value,name,save){
+		const that = this;
+		data.forEach((item,index)=>{
+			if(!item.children){
+				if(value == item.value && name === item.name){
+					item.save = save;
+					return false;
+				}
+			}
+		})
+		data.forEach(x => x.children && (x.children = that.updateFile(x.children, value,name,save)))
+		return data;
+	}
 }
 
 

@@ -10,6 +10,16 @@
         </ul>
         <ul class="file-content">
             <item v-for="(item,index) in fileTreeData" :key="index" :filesList="item"></item>
+            <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
+                <ul class="wrap-menu-list">
+                    <li @click="newFile()" @mousedown.stop="">新建文件</li>
+                    <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
+                    <li @click="saveFile()" @mousedown.stop="">保存</li>
+                    <li @click="" @mousedown.stop="">另存为</li>
+                    <li @click="rename" @mousedown.stop="">重命名</li>
+                    <li @click="removeFileFn" @mousedown.stop="">删除</li>
+                </ul>
+            </div>
         </ul>
     </div>
 </template>
@@ -35,11 +45,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile'])
+            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','position','rightMenuBlock'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock','updateTreeData']),
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
@@ -61,6 +71,7 @@
 					            value:res.value
 				            })
                         }
+			            this.updateRightMenuBlock(false);
 		            })
                 });
             },
@@ -74,6 +85,7 @@
 				        }else if(res.code === 2){
 
 				        }
+				        this.updateRightMenuBlock(false);
 			        })
 		        });
             },
@@ -115,7 +127,7 @@
 	        			console.log('删除文件'+item.value+'成功');
 				        this.updateUrlFn(item)
                     })
-                })
+               })
             },
 	        saveFile(){
 	        	file.saveFile('','123456','2222',()=>{
@@ -129,11 +141,28 @@
 		        const dialogFile = this.getUrl.filter((item)=>{
 			        return !item.value;
 		        });
-		        console.log(fileData);
+		        console.log(this.fileTreeData);
 		        console.log(dialogFile);
 		        file.saveAllHaveFile(fileData,()=>{});
 		        file.saveAllNoFile(dialogFile);
-	        }
+	        },
+	        removeFileFn(){
+		        if(this.activeFile.value){
+		        	console.log(this.activeFile.value);
+			        file.removeFile(this.activeFile.value,()=>{
+				        this.updateUrlFn(this.activeFile);
+				        this.queryFileListData();
+				        console.log('删除文件成功');
+			        })
+		        }else{
+			        this.updateUrlFn(this.activeFile);
+		        }
+		        this.updateRightMenuBlock(false);
+		        return false;
+	        },
+            rename(){
+
+            }
         },
         //生命周期函数
         created() {
@@ -190,5 +219,26 @@
         line-height:30px;
         cursor:pointer;
         color:blue;
+    }
+    .right-menu{
+        position:fixed;
+        left:0px;
+        top:0px;
+        width:200px;
+        padding-bottom:20px;
+        background:#ccc;
+        z-index:100
+    }
+    .wrap-menu-list{
+        li{
+            height:35px;
+            line-height:35px;
+            text-align: center;
+            border-bottom:1px solid #fff;
+            cursor:pointer;
+        }
+        li:hover{
+            background:#fff;
+        }
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="index">
+    <div class="index" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
 
@@ -64,6 +64,7 @@
         },
         //方法
         methods: {
+	        ...mapActions(['updateRightMenuBlock']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -123,7 +124,6 @@
                     document.addEventListener('keydown', cancelGhostbar);
 
                 }
-
             },
 	        hotkeysFn(){
             	// 注册快捷键
@@ -173,6 +173,9 @@
 			        alert('ctrl+shift+delete');
 		        });
 
+            },
+	        topFn(){
+		        this.updateRightMenuBlock(false);
             }
         },
         //生命周期函数
