@@ -2,7 +2,7 @@
     <div class="header">
 
         <div>
-            <ul class="list" style="cursor:default" @click.stop='setTab($event)'>
+            <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
@@ -46,7 +46,7 @@
                     "Ctrl+V":"粘贴",
                     "Ctrl+F":"查找",
                     "Ctrl+H":"替换",
-                    "":"格式化",
+                    "Ctrl+L":"格式化",
                 },
 
             }
@@ -55,7 +55,7 @@
 
         },
         methods: {
-            setTab:function(e){
+            setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log(1)
                     // this.fileVisible=true;
@@ -118,8 +118,14 @@
             },
             //编辑每个li的点击事件
             clickEditEvent:function(e){
+                var _this = this;
                 this.editVisible = false
                 console.log(e.target.getAttribute("data-type"));
+                switch(e.target.getAttribute("data-type")){
+                    case '格式化':
+                        _this.$store.commit('UPDATE_ACTION_CODE',8);
+                        break;
+                }
             }
 
         },
@@ -128,7 +134,7 @@
             this.hideEdit();
         },
         created() {
-
+            // alert(111)
         },
         //组件
         components: {

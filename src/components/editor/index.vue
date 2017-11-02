@@ -5,59 +5,27 @@
                 <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
                     <i>&lt;</i>
                 </div>
-                <ul class='files' ref='files' @click='setTab'>
-                    <li class='file'>
-                        <span>文件1</span>
-                        <span class="remove">x</span>
+                <ul class='files' ref='files'>
+                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
+                        <span>{{item.name}}</span>
+                        <span class="remove" @click.stop="remove(index)">X</span>
                     </li>
-                    <li class='file'>
-                        <span>文件2</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件3</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件4</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件5</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件6</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件7</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件8</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件9</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件10</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件11</span>
-                        <span class="remove">x</span>
-                    </li>
-                    <li class='file'>
-                        <span>文件12</span>
-                        <span class="remove">x</span>
-                    </li>
+                    <li class='new-file' @click='newFile'>+</li>
                 </ul>
+                <!-- <div class='new-file' @click='newFile'>+</div> -->
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
                     <i>&gt;</i>
                 </div>
+            </div>
+        </div>
+        <div class="tools">
+            <div class="tool">
+                <span class='save' @click='save'>保存</span>
+                <span class="search" @click='search'>搜索</span>
+                <span class='format' @click='format' >格式化</span>
+                <span class='increase' @click='increase'>放大</span>
+                <span class='decrease' @click='decrease'>缩小</span>
+                <span class='close' @click='close'>关所</span>
             </div>
             <div class="search-model" v-if='searchVisible'>
                 <div class='search-content'>
@@ -74,42 +42,46 @@
                     </el-form>
                 </div>
             </div>
-
         </div>
-        <div class="tool">
-            <span class='save' @click='save'>保存</span>
-            <span class="search" @click='search'>搜索</span>
-            <span class='format' @click='format' >格式化</span>
-            <span class='increase' @click='increase'>放大</span>
-            <span class='decrease' @click='decrease'>缩小</span>
-            <span class='close' @click='close'>关所</span>
+        <v-editor :currentView='currentView' :source='source' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible'></v-editor>
+        <div class="tips" v-if='tipsVisible'>
+            请在文件管理器面板中点击打开一个文件
         </div>
-        <div id="javascript-editor" class='editor'></div>
     </div>
 </template>
 
 <script>
     //import  from ''
     //brace
-    import * as ace from 'brace';
-    import 'brace/mode/javascript';
-    import 'brace/theme/monokai';
-    import 'brace/ext/language_tools'
-    import '@/services/Mode-solidity'
-
+    import {mapState, mapActions, mapGetters} from 'vuex';
+    import Editor from '@/components/editor-panel/panel'
+    import file from '@/services/API-file'
     export default {
         //组件名
         name: 'index',
         //实例的数据对象
         data() {
             return {
-                editor:{},
+                tipsVisible:false,
+                editorVisible:false,
                 form:{
                    search:"",
                 },
+                searchValue:"",
                 searchVisible:false,
-                vistual:200,
 
+                vistual:200,
+                activeClass:"",
+                fileData:[
+                    // {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
+                    // {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
+                ],
+                fileTotal:10,
+                select:"",
+                currentView:"",
+                source:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -118,17 +90,18 @@
         },
         //计算
         computed: {
-
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl'])
         },
         //方法
         methods: {
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile']),
             //放大
             increase:function(){
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
+                this.$refs.childMethod.increase();
             },
             //缩小
             decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+                this.$refs.childMethod.decrease();
             },
             //点击搜索
             search:function(){
@@ -137,16 +110,8 @@
             },
             //全局搜索
             onSearch:function(){
-                this.editor.find(this.form.search,{
-                    backwards: false,
-                    wrap: false,
-                    caseSensitive: true,
-                    wholeWord: false,
-                    regExp: false,
-                    range:""
-                });
-                this.editor.findNext();
-                this.editor.findPrevious();
+                this.searchValue = this.form.search;
+                this.$refs.childMethod.onSearch();
             },
             //关闭弹窗
             offSearch:function(){
@@ -156,15 +121,15 @@
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
+                /*
+                    获取当前
+                */
             },
             //代码格式化
             format:function(){
-                console.log('代码格式化')
-                this.editor.getSession().setTabSize(6);
-            },
-            //关闭所有窗口
-            close:function(){
-                console.log('关闭所有窗口')
+                console.log('代码格式化');
+                this.$refs.childMethod.format();
+                // this.editor.getSession().setTabSize(6);
             },
             //向右滑动
             scrollRight:function(e){
@@ -178,7 +143,7 @@
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
                     }
                 }
             },
@@ -196,43 +161,174 @@
                     }
                 }
             },
-            //files的tab切换
-            setTab:function(){
+            //切换tab
+            selectProp: function (index,item) {
+                this.select = index;
+                this.currentView = index;
+                this.source = item.value;
+            },
+            //关闭当前窗口
+            remove:function(index){
+                console.log(index);
+                /*
+                    如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
+                */
+                console.log("数组长度")
+                console.log(this.fileData.length)
+                if(this.fileData.length == 1){
+                    //提示用户打开文件
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.source = "readonly";
+                    this.fileData = [];
+                }else{
+                    console.log("hahahahah")
+                    this.editorVisible = true;
+                    this.tipsVisible = false;
+                    if(this.select == index){
+                        console.log('高亮与删除相同')
+                        this.fileData.splice(index,1);
+                        //如果当前高亮为0
+                        if(this.select == 0){
+                            this.select = index ;
+                            this.currentView = index ;
+                            this.source = this.fileData[index].value;
+                        }else{
+                            this.select = index - 1;
+                            this.currentView = index - 1;
+                            this.source = this.fileData[index - 1].value;
+                        }
+                    }else if(this.select > index){
+                        console.log('高亮>删除相同')
+                        this.fileData.splice(index,1);
+                        this.select = this.select - 1;
+                        this.currentView = this.select - 1;
+                        this.source = this.fileData[this.select].value;
+                    }else if(this.select < index){
+                        console.log('高亮<删除相同')
+                        this.fileData.splice(index,1);
+                        this.select = this.select;
+                        this.currentView = this.select;
+                        this.source = this.fileData[this.select].value;
+                    }
+                }
 
+
+            },
+            //关闭所有窗口
+            close:function(){
+                this.editorVisible = false;
+                this.tipsVisible = true;
+                this.source = "readonly";
+                this.fileData = [];
+            },
+            //新建文件
+            newFile(){
+                this.open((name)=>{
+                    file.newFile("",name,(res)=>{
+                        if(res.code === 0){
+                            this.queryFileListData();
+                            this.updateEditFile({
+                                name:name,
+                                value:res.value
+                            })
+                            console.log(this.editFile);
+                        }else if(res.code === 1){
+                            this.tipOpen()
+                        }else if(res.code === 2){
+                            const url = this.getUrl;
+                            url.push({value:'',name:name});
+                            this.updateUrl(url);
+                            this.updateEditFile({
+                                name:name,
+                                value:res.value
+                            })
+                        }
+                    })
+                });
+            },
+            open(fn) {
+                this.$prompt('请输入邮箱', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    fn && fn(value)
+                })
+            },
+            tipOpen() {
+                this.$alert('文件已存在，请更换文件名', '提示', {
+                    confirmButtonText: '确定',
+                });
+            },
+            //初始化fileData
+            init:function(){
+                /*
+                    判断fileData是否为空，
+                    为空：则不显示tab，并且编辑区显示为不可编辑状态     不为空：则默认显示第一个为高亮，且编辑区显示的为高亮tab下的代码
+                */
+                if(this.fileData.length == 0){
+                    //不显示tab
+                    this.select = "";
+                    this.currentView = "";
+                    this.source = "readonly";
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                }else{
+                    //默认显示第一个高亮，且编辑区显示的为高亮tab下的代码
+                    this.select = 0;
+                    this.currentView = 0;
+                    this.source = this.fileData[0].value;
+                    this.editorVisible = true;
+                    this.tipsVisible = false;
+                }
+            },
+            //push对象进数组
+            pushArray:function(){
+                this.editorVisible = true;
+                this.tipsVisible = false;
+                //遍历已有的数组，查看是否已经有相同，有的话则高亮显示当前，没有则push进数组并高亮显示当前
+                let blo = false;
+                this.fileData.forEach((item,index)=>{
+                    if(item.value == this.editFile.value && item.name == this.editFile.name){
+                        console.log('不push进数组')
+                        // console.log()
+                        //为true 高亮显示当前，并且不push
+
+                        this.select = index;
+                        this.currentView = index;
+                        this.source = this.editFile.value;
+                        blo = true;
+                    }
+                });
+                 //为false，push进数组，并高亮显示数组最后一个
+                if(blo == false){
+                    console.log('push进数组')
+                    this.fileData.push(this.editFile);
+                    this.select = this.fileData.length - 1;
+                    this.currentView = this.fileData.length - 1;
+                    this.source = this.fileData[this.fileData.length - 1].value;
+                }
             }
         },
         //生命周期函数
         created() {
-
+            this.init();
         },
         beforeMount() {
 
         },
         mounted() {
-            this.editor = ace.edit('javascript-editor');
-            console.log(this.editor);
-            this.editor.$blockScrolling = Infinity;
-            this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/monokai');
-            //启用提示菜单
-            ace.acequire('ace/ext/language_tools')
-            this.editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true
-            });
-            //字体大小
-            this.editor.setFontSize(14);
-            //自动换行,设置为off关闭
-            this.editor.setOption("wrap", "free");
 
         },
         //监视
         watch: {
-
+            editFile:function(){
+                this.pushArray();
+            }
         },
         //组件
         components: {
-
+            "v-editor":Editor
         },
         //过滤器
         filters:{
@@ -288,17 +384,60 @@
             position: absolute;
             left:20px;
             overflow:hidden;
+            cursor: pointer;
+            background-color:#000;
+            color:#fff;
             li{
-                width:100px;
+                padding:0 10px;
                 border-right:1px solid #fff;
-                background-color:hsla(229, 100%, 97%, 1);
-                color:#000;
-                text-align: center;
+                display: flex;
+                flex-wrap:nowrap;
+                flex-direction:row;
+                justify-content:flex-end;
+                span{
+                    display: inline-block;
+                    white-space: nowrap;
+                    &:last-child{
+                        // float:right;
+                        padding:0 10px;
+                        &:hover{
+                            background-color:gray
+                        }
+                    }
+                }
             }
+            .li-active{
+                color: red;
+                font-weight: bold;
+                border-bottom: 0 none;
+
+            }
+
+        }
+        .new-file{
+
         }
 
     }
+}
+.tools{
 
+    height:30px;
+    color:#fff;
+    background-color:#000;
+    position: relative;
+    width:100%;
+    .tool{
+        text-align: right;
+        span{
+            display: inline-block;
+            line-height: 25px;
+            padding:0 5px;
+            border:1px solid #000;
+            cursor: pointer;
+            border-left:1px solid #fff;
+        }
+    }
     .search-model{
         width: 460px;
         height: 40px;
@@ -309,28 +448,23 @@
         top: 30px;
         left: 50%;
         margin-left: -;
-        z-index: 1000;
+        z-index: 1000000;
         margin-left: -230px;
     }
-
 }
-.tool{
-
-    height:30px;
-    color:#fff;
-    background-color:#000;
-    span{
-        float:right;
-        display: inline-block;
-        line-height: 25px;
-        padding:0 5px;
-        border:1px solid #000;
-        cursor: pointer;
-    }
-}
-.editor{
+.javascript-editor{
     width:100%;
     flex-grow:1;
+}
+
+.tips{
+    display: -webkit-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    flex-grow:1;
+
+    // background-color:#000;
 }
 
 </style>

@@ -229,9 +229,12 @@
 
     .tab-box{
         display: flex;
+        flex-direction:column;
+        overflow-y:scroll;
     }
     .tab{
-        width: 200px;
+        width: 223px;
+
     }
 
     .border{
