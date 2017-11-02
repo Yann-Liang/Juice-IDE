@@ -2,10 +2,11 @@
     <div class="file">
         <ul class="tab-list">
             <li @click="newFile()">新建</li>
-            <li>导入</li>
-            <li>new</li>
-            <li>save</li>
-            <li @click="removeFile()">delete</li>
+            <li @click="exportFile('file')">导入</li>
+            <li @click="exportFile('dir')">dir</li>
+            <li @click="newDir()">nD</li>
+            <li @click="saveAllFile()">save</li>
+            <li @click="removeAllFile()">delete</li>
         </ul>
         <ul class="file-content">
             <item v-for="(item,index) in fileTreeData" :key="index" :filesList="item"></item>
@@ -45,7 +46,7 @@
 		            	if(res.code === 0){
 				            this.queryFileListData();
 				            this.updateEditFile({
-					            name:name,
+					            name:name+'.sol',
 					            value:res.value
 				            })
                             console.log(this.editFile);
@@ -53,15 +54,28 @@
 				            this.tipOpen()
                         }else if(res.code === 2){
                             const url = this.getUrl;
-                            url.push({value:'',name:name});
+                            url.push({value:'',name:name+'.sol'});
                             this.updateUrl(url);
 				            this.updateEditFile({
-					            name:name,
+					            name:name+'.sol',
 					            value:res.value
 				            })
                         }
 		            })
                 });
+            },
+	        newDir(){
+		        this.open((name)=>{
+			        file.newMkdir(this.activeFile.value,name,(res)=>{
+				        if(res.code === 0){
+					        this.queryFileListData();
+				        }else if(res.code === 1){
+					        this.tipOpen()
+				        }else if(res.code === 2){
+
+				        }
+			        })
+		        });
             },
 	        open(fn) {
 		        this.$prompt('请输入邮箱', '提示', {
@@ -75,7 +89,51 @@
 	            this.$alert('文件已存在，请更换文件名', '提示', {
 		            confirmButtonText: '确定',
 	            });
-            }
+            },
+	        exportFile(type){
+            	file.exportFile(type,(filename)=>{
+            		if(filename){
+			            const url = this.getUrl;
+			            console.log(file.basename(filename));
+			            url.push({value:filename,name:file.basename(filename)});
+			            this.updateUrl(url);
+                    }
+                });
+            },
+	        updateUrlFn(filesList){
+		        this.getUrl.forEach((item,index,data)=>{
+			        if(filesList.name == item.name && filesList.value == item.value){
+				        data.splice(index,1);
+				        this.updateUrl(data)
+			        }
+		        })
+	        },
+	        removeAllFile(){
+		        const arr = this.getUrl;
+		        arr.forEach((item,index)=>{
+	        		file.removeFile(item.value,()=>{
+	        			console.log('删除文件'+item.value+'成功');
+				        this.updateUrlFn(item)
+                    })
+                })
+            },
+	        saveFile(){
+	        	file.saveFile('','123456','2222',()=>{
+
+                })
+            },
+	        saveAllFile(){
+		        const fileData = this.fileTreeData.filter((item)=>{
+			        return item.value;
+		        });
+		        const dialogFile = this.getUrl.filter((item)=>{
+			        return !item.value;
+		        });
+		        console.log(fileData);
+		        console.log(dialogFile);
+		        file.saveAllHaveFile(fileData,()=>{});
+		        file.saveAllNoFile(dialogFile);
+	        }
         },
         //生命周期函数
         created() {
@@ -127,7 +185,7 @@
     }
     .tab-list li{
         float:left;
-        width:40px;
+        width:35px;
         height:30px;
         line-height:30px;
         cursor:pointer;

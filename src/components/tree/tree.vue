@@ -83,19 +83,23 @@
 					name: 'new stuff'
 				})
 			},
+            updateUrlFn(filesList){
+	            this.getUrl.forEach((item,index,data)=>{
+		            if(filesList.name == item.name){
+			            data.splice(index,1);
+			            this.updateUrl(data)
+		            }
+	            })
+            },
             removeFile(filesList){
 				if(filesList.value){
 					file.removeFile(filesList.value,()=>{
+						this.updateUrlFn(filesList);
 						this.queryFileListData();
 						console.log('删除文件成功');
 					})
                 }else{
-					this.getUrl.forEach((item,index,data)=>{
-                        if(filesList.name == item.name){
-                        	data.splice(index,1);
-                            this.updateUrl(data)
-                        }
-                    })
+					this.updateUrlFn(filesList);
                 }
             }
 		},
