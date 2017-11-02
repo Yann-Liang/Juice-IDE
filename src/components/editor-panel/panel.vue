@@ -36,7 +36,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData']),
+            ...mapActions(['saveCode','updateData','updateTreeData']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -90,13 +90,24 @@
                         this.editor.setValue("pragma solidity ^0.4.2");
                     }
                 }
+
+
             },
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                this.editor.getSession().on('change', (e)=> {
-                    this.initChange();
+                this.editor.on('focus',()=>{
+                    console.log(1111111111)
+                    this.editor.getSession().on('change', (e)=> {
+                        this.updateTreeData({value:this.value,name:this.name,save:false});
+                        this.initChange();
+                    });
                 });
+                // this.editor.on("blur",()=>{
+                //     this.editor.getSession().on('change', (e)=> {
+                //         alert('重新change')
+                //     });
+                // });
             },
             initChange:function(){
                 console.log('changeeeee',this.value)
@@ -162,14 +173,16 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
             //监听键盘按下事件
-
+            // this.editor.on("focus",function(){
+            //     console.log(1111)
+            // })
         },
         //监视
         watch: {
             name:function(){
                 console.log('this.name',this.name);
                 this.setValue();
-                this.change();
+                // this.change();
                 // this.change();
             },
             // value:function(){
