@@ -230,7 +230,7 @@
     .tab-box{
         display: flex;
         flex-direction:column;
-        overflow-y:scroll;
+        overflow-y:auto;
     }
     .tab{
         width: 223px;

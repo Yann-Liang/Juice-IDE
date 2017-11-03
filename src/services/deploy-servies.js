@@ -2,12 +2,13 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-01 15:42:40
+ * @Last Modified time: 2017-11-02 17:53:56
  */
 
 import contractServies from '@/services/contract-servies';
 import consoleService from '@/services/console/console-service';
-import store from '@/vuex/store';
+import APIServies from '@/services/API-servies';
+//import store from '@/vuex/store';
 
 function Storage (prefix) {
     this.exists = function (name) {
@@ -77,17 +78,19 @@ class DeployService {
         }
 
         this.data = {};
-    }
 
+        this.time = '';
+    }
+    //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
-        this.start(fileName,contractName);
+        this.deployStart(fileName,contractName);
         this.result = {
             contractAddress: '',
             TxHash: '',
             From: userAddress,
         };
         return new Promise((resolve, reject) => {
-
+            this.deployRunning();
             let calcContract = contractServies.web3.eth.contract(abi);
             let myContractReturned = calcContract.new({
                 data: bin,
@@ -105,15 +108,14 @@ class DeployService {
                         this.result.contractAddress = myContract.address;
                         this.data[myContract.address] = {
                             contractAddress: this.result.contractAddress,
-                            TxHash: this.result.TxHash,
-                            From: this.result.From,
+                            from: this.result.From,
                             fileName: fileName,
                             contractName: contractName,
-                            abi:abi,
+                            contract:myContract
                         };
-                        store.dispatch('addDeployedData',this.data[myContract.address]);
+                        //store.dispatch('addDeployedData',this.data[myContract.address]);
 
-                        this.finish();
+                        this.deployFinish();
                         resolve(myContract.address);
                     }
                 }
@@ -123,7 +125,7 @@ class DeployService {
     }
 
 
-    start(fileName,contractName) {
+    deployStart(fileName,contractName) {
         consoleService.output(new Date().Format("yyyy-MM-dd HH:mm:ss"));
         consoleService.output('[开始部署]');
         consoleService.output(`${fileName}:${contractName}合约正在部署`);
@@ -131,18 +133,63 @@ class DeployService {
 
         })
     }
-    running() {
+    deployRunning() {
         return new Promise((resolve, reject) => {
 
         })
     }
 
-    finish() {
+    deployFinish() {
         consoleService.output('[部署结果]');
         consoleService.output({ logSuccess: 'Deploy Success' });
         consoleService.output(this.result);
         return new Promise((resolve, reject) => {
 
+        })
+    }
+
+    run(contractAddress) {
+        console.log(arguments);
+        console.log(this.data[contractAddress]);
+        this.getContractLog();
+    }
+
+    getContractLog(nodeId='192.168.9.36',time='2017-10-25T03:20:09.516Z') {
+        APIServies.log.search({
+            "_source": [ "address", "fields.ip" ,"message","@timestamp"],
+            "query": {
+                "bool": {
+                "must": [
+                    {
+                    "term": {
+                        "address": "0xa7aecd267cdc0995cf7be374c26e394e385252a1"
+                    }
+                    },
+                    {
+                    "term": {
+                        "fields.ip":nodeId
+                    }
+                    }
+                ],
+                "must_not": [],
+                "should": [],
+                "filter": {
+                    "range": {
+                    "@timestamp":{
+                        "gt":time
+                        }
+                    }
+                }
+                }
+            },
+            "from": 0,
+            "size": 10000,
+            "sort": [
+                {"@timestamp": { "order": "desc" }}
+            ],
+            "aggs": {}
+        }).then((res)=>{
+            console.log('res',res)
         })
     }
 }
