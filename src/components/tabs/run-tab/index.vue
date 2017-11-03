@@ -27,7 +27,6 @@
 
 <script>
     //import  from ''
-    import RunService from '@/services/run-service.js'
 
     export default {
         //组件名
