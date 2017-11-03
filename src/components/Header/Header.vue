@@ -114,7 +114,13 @@
             },
             //文件每个li的点击事件
             clickFileEvent:function(e){
+                var _this = this;
                 console.log(e.target.innerText);
+                switch(e.target.innerText){
+                    case '保存':
+                        _this.$store.commit('UPDATE_ACTION_CODE',9);
+                        break;
+                }
             },
             //编辑每个li的点击事件
             clickEditEvent:function(e){

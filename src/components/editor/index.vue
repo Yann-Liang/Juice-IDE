@@ -128,11 +128,8 @@
                 /*
                     获取当前文件
                 */
-                console.log(this.$refs.childMethod.getValue());
-                file.saveFile(this.value,this.name,this.$refs.childMethod.getValue(),()=>{
-                    alert("保存当前文件成功")
-                    this.updateTreeData({value:this.value,name:this.name,save:true});
-                });
+                // console.log(this.$refs.childMethod.getValue());
+                this.$refs.childMethod.saveFile();
             },
             //代码格式化
             format:function(){
@@ -309,7 +306,6 @@
                         console.log('不push进数组')
                         // console.log()
                         //为true 高亮显示当前，并且不push
-
                         this.select = index;
                         this.currentView = index;
                         this.value = this.editFile.value;

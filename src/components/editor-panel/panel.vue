@@ -16,6 +16,7 @@
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
+    import file from '@/services/API-file'
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
     export default {
@@ -129,6 +130,13 @@
             //获取当前值
             getValue:function(){
                 return this.editor.getValue();
+            },
+            //保存当期文件
+            saveFile:function(){
+                file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
+                    alert("保存当前文件成功")
+                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                });
             }
         },
         //生命周期函数
@@ -177,7 +185,17 @@
             this.editor.on("focus",()=>{
                 console.log("focusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocus")
                 this.updateTreeData({value:this.value,name:this.name,save:false});
-            })
+            });
+            //设置ctrl+s 保存当前
+            this.editor.commands.addCommand({
+                name: 'myCommand',
+                bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+                exec: function(editor) {
+                    _this.saveFile();
+                    //...
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
 
         },
         //监视
@@ -197,6 +215,9 @@
                 switch(this.actionCode){
                     case 8:
                         this.format();
+                        break;
+                    case 9:
+                        this.saveFile();
                         break;
                 }
             },
