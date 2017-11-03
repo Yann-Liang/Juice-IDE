@@ -98,7 +98,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData']),
             //放大
             increase:function(){
                 this.$refs.childMethod.increase();
@@ -126,14 +126,18 @@
             save:function(){
                 console.log('保存当前文件')
                 /*
-                    获取当前
+                    获取当前文件
                 */
+                console.log(this.$refs.childMethod.getValue());
+                file.saveFile(this.value,this.name,this.$refs.childMethod.getValue(),()=>{
+                    alert("保存当前文件成功")
+                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                });
             },
             //代码格式化
             format:function(){
                 console.log('代码格式化');
                 this.$refs.childMethod.format();
-                // this.editor.getSession().setTabSize(6);
             },
             //向右滑动
             scrollRight:function(e){

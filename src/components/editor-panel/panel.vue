@@ -125,6 +125,10 @@
                 }
                 data.push(item);
                 this.updateData(data);
+            },
+            //获取当前值
+            getValue:function(){
+                return this.editor.getValue();
             }
         },
         //生命周期函数
