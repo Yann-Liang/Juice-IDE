@@ -96,22 +96,19 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                this.editor.on('focus',()=>{
-                    console.log(1111111111)
-                    this.editor.getSession().on('change', (e)=> {
-                        this.updateTreeData({value:this.value,name:this.name,save:false});
-                        this.initChange();
-                    });
+                this.editor.getSession().on('change', (e)=> {
+                    console.log("changechangechangechangechangechangechangechangechangechangechangechangechangechange")
+                    this.initChange();
                 });
-                // this.editor.on("blur",()=>{
+                // this.editor.on('focus',()=>{
+                //     console.log(1111111111)
                 //     this.editor.getSession().on('change', (e)=> {
-                //         alert('重新change')
+                //         this.updateTreeData({value:this.value,name:this.name,save:false});
+                //         this.initChange();
                 //     });
                 // });
             },
             initChange:function(){
-                console.log('changeeeee',this.value)
-                console.log('内容>>>>',this.editor.getValue());
                 const data = this.editData;
                 const item = {
                     value:this.value,
@@ -172,10 +169,12 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
-            //监听键盘按下事件
-            // this.editor.on("focus",function(){
-            //     console.log(1111)
-            // })
+            //监听鼠标获得焦点
+            this.editor.on("focus",()=>{
+                console.log("focusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocus")
+                this.updateTreeData({value:this.value,name:this.name,save:false});
+            })
+
         },
         //监视
         watch: {
