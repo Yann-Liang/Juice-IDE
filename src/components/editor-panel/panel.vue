@@ -17,7 +17,6 @@
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
     var beautify = require('js-beautify').js_beautify
-
     var fs = require('fs')
     export default {
         //组件名
@@ -30,13 +29,14 @@
             }
         },
         //数组或对象，用于接收来自父组件的数据
-        props: ["currentView","source","searchValue"],
+        props: ["currentView","value","searchValue",'name'],
         //计算
         computed: {
-            ...mapGetters(['actionCode'])
+            ...mapGetters(['actionCode','editData','editFile'])
         },
         //方法
         methods: {
+            ...mapActions(['saveCode','updateData','updateTreeData']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -65,41 +65,78 @@
             },
             //设置值
             setValue:function(){
-                //读取文件中的值
-                if(this.source){
-                    if(this.source == 'readonly'){
-                        console.log('readonly')
-                        this.editor.setReadOnly(true);
-                    }else{
-                        fs.readFile(this.source,"utf-8",  (err, data)=> {
-                           if (err) {
-                               return console.error(err);
-                           }
-                           // console.log("异步读取: " + data.toString());
-                           this.editor.setValue(data.toString());
-                        });
-                    }
+                console.log("this.editData",this.editData)
+                let arr = this.editData.filter((item)=>{
+                    return item.name === this.name && item.value === this.value
+                });
+                console.log(arr);
+                if(arr.length != 0){
+                    console.log('读取缓存中的值并设置')
+                    this.editor.setValue(arr[0].source);
                 }else{
-                    this.editor.setValue("pragma solidity ^0.4.2");
+                    console.log('通过文件fs读取文件内容')
+                    if(this.value){
+                        if(this.value == 'readonly'){
+                            this.editor.setReadOnly(true);
+                        }else{
+                           fs.readFile(this.value,"utf-8",  (err, data)=> {
+                                if (err) {
+                                    return console.error(err);
+                                }
+                                this.editor.setValue(data.toString());
+                            });
+                        }
+                    }else{
+                        this.editor.setValue("pragma solidity ^0.4.2");
+                    }
                 }
 
-                // var data = fs.readFileSync(this.source,"utf-8");
-                // console.log("同步读取: " + data.toString());
 
+            },
+            //编辑区的change事件
+            change:function(){
+                //监听编辑区的change事件
+                this.editor.getSession().on('change', (e)=> {
+                    console.log("changechangechangechangechangechangechangechangechangechangechangechangechangechange")
+                    this.initChange();
+                });
+                // this.editor.on('focus',()=>{
+                //     console.log(1111111111)
+                //     this.editor.getSession().on('change', (e)=> {
+                //         this.updateTreeData({value:this.value,name:this.name,save:false});
+                //         this.initChange();
+                //     });
+                // });
+            },
+            initChange:function(){
+                const data = this.editData;
+                const item = {
+                    value:this.value,
+                    name:this.name,
+                    source:this.editor.getValue()
+                }
+                console.log("当前item为",item);
+                for (let i = data.length - 1; i >= 0; i--) {
+                    if(item.value === data[i].value && item.name === data[i].name){
+                        data[i].source = item.source
+                        this.updateData(data);
+                        return false;
+                    }
+                }
+                data.push(item);
+                this.updateData(data);
             }
-
         },
         //生命周期函数
         created() {
+
         },
         beforeMount() {
 
         },
         mounted() {
+            console.log(this.editData)
             var _this = this;
-            console.log(11)
-            console.log(this.currentView);
-            console.log(this.source);
             this.editor = ace.edit('javascript-editor');
             console.log(this.editor);
             this.editor.$blockScrolling = Infinity;
@@ -118,9 +155,11 @@
             //设置事件处理程序
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.editor.clearSelection();
-            //设置值
-            this.setValue();
+            // this.setValue();
 
+            this.setValue();
+            this.change();
+            //设置格式化
             this.editor.commands.addCommand({
                 name: 'myCommand',
                 bindKey: {win: 'Ctrl-L',  mac: 'Command-L'},
@@ -130,24 +169,38 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
+            //监听鼠标获得焦点
+            this.editor.on("focus",()=>{
+                console.log("focusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocus")
+                this.updateTreeData({value:this.value,name:this.name,save:false});
+            })
+
         },
         //监视
         watch: {
-            currentView:function(){
-                console.log(this.currentView);
+            name:function(){
+                console.log('this.name',this.name);
                 this.setValue();
+                // this.change();
+                // this.change();
             },
-            source:function(){
-                console.log(this.source);
-                this.setValue();
-            },
+            // value:function(){
+            //     console.log(this.value,this.name);
+            //     this.setValue();
+            //     // this.change();
+            // },
             actionCode:function(){
                 switch(this.actionCode){
                     case 8:
                         this.format();
                         break;
                 }
-            }
+            },
+            // editFile:function(){
+            //     console.log(1111)
+            //     // this.pushArray();
+            //     this.initChange();
+            // }
         },
         //组件
         components: {

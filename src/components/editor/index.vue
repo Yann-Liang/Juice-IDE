@@ -8,7 +8,8 @@
                 <ul class='files' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index)">X</span>
+                        <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
+                        <span class="remove" v-if='dian'>...</span>
                     </li>
                     <li class='new-file' @click='newFile'>+</li>
                 </ul>
@@ -43,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <v-editor :currentView='currentView' :source='source' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible'></v-editor>
+        <v-editor :currentView='currentView' :value='value' :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible'></v-editor>
         <div class="tips" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
@@ -62,6 +63,8 @@
         //实例的数据对象
         data() {
             return {
+                cha:true,
+                dian:false,
                 tipsVisible:false,
                 editorVisible:false,
                 form:{
@@ -81,7 +84,8 @@
                 fileTotal:10,
                 select:"",
                 currentView:"",
-                source:""
+                value:"",
+                name:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -90,11 +94,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData']),
             //放大
             increase:function(){
                 this.$refs.childMethod.increase();
@@ -165,7 +169,9 @@
             selectProp: function (index,item) {
                 this.select = index;
                 this.currentView = index;
-                this.source = item.value;
+                this.value = item.value;
+                this.name = item.name;
+                // this.$refs.childMethod.change();
             },
             //关闭当前窗口
             remove:function(index){
@@ -179,7 +185,7 @@
                     //提示用户打开文件
                     this.editorVisible = false;
                     this.tipsVisible = true;
-                    this.source = "readonly";
+                    this.value = "readonly";
                     this.fileData = [];
                 }else{
                     console.log("hahahahah")
@@ -192,24 +198,28 @@
                         if(this.select == 0){
                             this.select = index ;
                             this.currentView = index ;
-                            this.source = this.fileData[index].value;
+                            this.value = this.fileData[index].value;
+                            this.name = this.fileData[index].name;
                         }else{
                             this.select = index - 1;
                             this.currentView = index - 1;
-                            this.source = this.fileData[index - 1].value;
+                            this.value = this.fileData[index - 1].value;
+                            this.name = this.fileData[index - 1].name;
                         }
                     }else if(this.select > index){
                         console.log('高亮>删除相同')
                         this.fileData.splice(index,1);
                         this.select = this.select - 1;
                         this.currentView = this.select - 1;
-                        this.source = this.fileData[this.select].value;
+                        this.value= this.fileData[this.select].value;
+                        this.name = this.fileData[this.select].name;
                     }else if(this.select < index){
                         console.log('高亮<删除相同')
                         this.fileData.splice(index,1);
                         this.select = this.select;
                         this.currentView = this.select;
-                        this.source = this.fileData[this.select].value;
+                        this.value = this.fileData[this.select].value;
+                        this.name = this.fileData[this.select].name;
                     }
                 }
 
@@ -219,7 +229,7 @@
             close:function(){
                 this.editorVisible = false;
                 this.tipsVisible = true;
-                this.source = "readonly";
+                this.value = "readonly";
                 this.fileData = [];
             },
             //新建文件
@@ -270,14 +280,16 @@
                     //不显示tab
                     this.select = "";
                     this.currentView = "";
-                    this.source = "readonly";
+                    this.value = "readonly";
+                    this.name='';
                     this.editorVisible = false;
                     this.tipsVisible = true;
                 }else{
                     //默认显示第一个高亮，且编辑区显示的为高亮tab下的代码
                     this.select = 0;
                     this.currentView = 0;
-                    this.source = this.fileData[0].value;
+                    this.value = this.fileData[0].value;
+                    this.name = this.fileData[0].name;
                     this.editorVisible = true;
                     this.tipsVisible = false;
                 }
@@ -296,7 +308,8 @@
 
                         this.select = index;
                         this.currentView = index;
-                        this.source = this.editFile.value;
+                        this.value = this.editFile.value;
+                        this.name = this.editFile.name;
                         blo = true;
                     }
                 });
@@ -306,7 +319,8 @@
                     this.fileData.push(this.editFile);
                     this.select = this.fileData.length - 1;
                     this.currentView = this.fileData.length - 1;
-                    this.source = this.fileData[this.fileData.length - 1].value;
+                    this.value = this.fileData[this.fileData.length - 1].value;
+                    this.name = this.fileData[this.fileData.length - 1].name;
                 }
             }
         },
@@ -319,12 +333,24 @@
         },
         mounted() {
 
+            // console.log(this.saveCode)
         },
         //监视
         watch: {
             editFile:function(){
                 this.pushArray();
-            }
+                // this.$refs.childMethod.initChange();
+                // this.$refs.childMethod.change();
+            },
+            // saveCode:function(){
+            //     console.log(11111)
+            //     switch(this.saveCode){
+            //         case 0:
+            //             this.cha = false;
+            //             this.dian = true;
+            //             break;
+            //     }
+            // }
         },
         //组件
         components: {
