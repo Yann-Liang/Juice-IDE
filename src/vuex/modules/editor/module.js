@@ -14,9 +14,16 @@ import { editorMutation } from './mutation'
 //6 查找
 //7 替换
 //8 格式化
+//9 保存当前文件
+//saveCode:监听是否change
+//0 执行change 未保存
+//1 未执行change
+//editData : 更新所有发生change事件的文件
 export const editor = {
     state: {
-        actionCode:0
+        actionCode:0,
+        saveCode:"",
+        editData:[],
     },
     actions: editorAction,
     getters: editorGetter,

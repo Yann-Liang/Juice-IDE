@@ -13,5 +13,11 @@ export const fileMutation = {
 	},
 	['UPDATE_EDIT_FILE'] (state,fileObj) {
 		state.editFile = fileObj
-	}
+	},
+	['UPDATE_POSITION'] (state,position) {
+		state.position = position
+	},
+	['UPDATE_RIGHT_MENU_BLOCK'] (state,blo) {
+		state.rightMenuBlock = blo
+	},
 };

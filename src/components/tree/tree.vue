@@ -4,11 +4,13 @@
             <div
                 class="ellipsis root-file"
                 :class="{bold: isFolder,activeClass:filesList.value == activeFile.value && filesList.name ==  activeFile.name}"
+                @mousedown.stop="rightMenu(filesList, $event)"
                 @click="toggle(filesList)">
                 <!--@dblclick="changeType">-->
                 <i class="el-icon-date dir-icon" v-show="filesList.children"></i>
                 <i class="el-icon-document dir-icon" v-show="!filesList.children"></i>
                 {{filesList.name}}
+                <span class="no-save" v-if="!filesList.save">未保存</span>
                 <div class="wrap-delete">
                     <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList)"></i>
                 </div>
@@ -49,8 +51,7 @@
 		computed: {
             ...mapGetters(['activeFile','getUrl','editFile']),
 			isFolder: function () {
-				return this.filesList.children &&
-					this.filesList.children.length
+				return this.filesList.children
 			},
             imgPath(){
 	           const path = open ?  './images/icon-right.png':'./images/icon-right.png'
@@ -59,7 +60,7 @@
         },
 		//方法
 		methods: {
-			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile']),
+			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock']),
 			toggle(itemInfo) {
 				this.setActiveFile(itemInfo);
 				if (this.isFolder) {
@@ -100,6 +101,20 @@
 					})
                 }else{
 					this.updateUrlFn(filesList);
+                }
+            },
+			rightMenu(filesList,e){
+            	console.log(filesList)
+            	console.log(e)
+            	if(e.button === 2){
+		            this.setActiveFile(filesList);
+                    const position = {
+                    	x:e.clientX,
+                        y:e.clientY,
+                        item:filesList
+                    };
+                    this.updatePosition(position)
+		            this.updateRightMenuBlock(true)
                 }
             }
 		},
@@ -158,5 +173,9 @@
     }
     .activeClass{
         background: #a8d9ff;
+    }
+    .no-save{
+        color:red;
+        margin-left:20px;
     }
 </style>

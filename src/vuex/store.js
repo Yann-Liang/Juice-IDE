@@ -25,7 +25,7 @@ export default new Vuex.Store({
 	    compile,
 		file,
 		deploy,
-		editor
+        editor
 	},
 	state
 })

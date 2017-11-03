@@ -10,7 +10,12 @@ export const file = {
 	    treeData:[],
 	    url:[],
 	    activeFile:'',
-	    editFile:''
+	    editFile:'',
+	    position:{
+	    	x:0,
+		    y:0
+	    },
+	    rightMenuBlock:false
     },
     actions: fileAction,
     getters: fileGetter,

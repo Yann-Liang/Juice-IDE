@@ -21,5 +21,15 @@ export const fileAction = {
 	updateEditFile({ commit, state },fileObj){
 		commit('UPDATE_EDIT_FILE', fileObj);
 		console.log(state.editFile)
+	},
+	updatePosition({ commit, state },position){
+		commit('UPDATE_POSITION', position);
+	},
+	updateRightMenuBlock({ commit, state },blo){
+		commit('UPDATE_RIGHT_MENU_BLOCK', blo);
+	},
+	updateTreeData({ commit, state },OBJ){
+		const data = file.updateFile(state.treeData,OBJ.value,OBJ.name,OBJ.save)
+		commit('UPDATE_FILE_DATA', data);
 	}
 }
