@@ -64,7 +64,7 @@
         },
         //方法
         methods: {
-	        ...mapActions(['updateRightMenuBlock']),
+	        ...mapActions(['updateRightMenuBlock','saveEditorFile']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -127,7 +127,7 @@
             },
 	        hotkeysFn(){
             	// 注册快捷键
-
+                const that = this;
                 // 新建
 		        hotkeys('ctrl+n', function(event,handler){
                     alert('ctrl+n');
@@ -150,7 +150,8 @@
 
 		        // 保存
 		        hotkeys('ctrl+s', function(event,handler){
-			        alert('ctrl+s');
+		        	console.log('ctrl+s')
+			        that.saveEditorFile()
 		        });
 
 		        // 另存为

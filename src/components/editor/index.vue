@@ -98,7 +98,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile']),
             //放大
             increase:function(){
                 this.$refs.childMethod.increase();
@@ -125,11 +125,7 @@
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
-                /*
-                    获取当前文件
-                */
-                // console.log(this.$refs.childMethod.getValue());
-                this.$refs.childMethod.saveFile();
+                this.saveEditorFile();
             },
             //代码格式化
             format:function(){
@@ -172,6 +168,10 @@
                 this.currentView = index;
                 this.value = item.value;
                 this.name = item.name;
+                this.updateEditFile({
+	                name:this.name,
+	                value:this.value
+                })
                 // this.$refs.childMethod.change();
             },
             //关闭当前窗口
@@ -339,6 +339,19 @@
         watch: {
             editFile:function(){
                 this.pushArray();
+                // 保存当前激活的文件
+//                console.log(this.$refs.childMethod.getValue());
+//                const editorData = {
+//	                value: this.editFile.value,
+//	                name: this.editFile.name,
+//	                source: this.$refs.childMethod.getValue()
+//                }
+//                console.log(editorData);
+//	            this.updateActiveEditor(editorData);
+
+
+
+
                 // this.$refs.childMethod.initChange();
                 // this.$refs.childMethod.change();
             },

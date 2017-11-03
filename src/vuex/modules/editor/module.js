@@ -24,6 +24,7 @@ export const editor = {
         actionCode:0,
         saveCode:"",
         editData:[],
+	    activeEditor:{}
     },
     actions: editorAction,
     getters: editorGetter,
