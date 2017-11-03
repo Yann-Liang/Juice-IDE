@@ -98,6 +98,10 @@ class file {
 		fs.writeFile(fileName,data,'utf-8',fn);
 	}
 	
+	fsReadFile(fileName,fn){
+		fs.readFile(fileName,'utf-8',fn);
+	}
+	
 	// 文件是否存在
 	exists(filePath){
 		return fs.existsSync(filePath);

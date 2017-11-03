@@ -11,5 +11,7 @@ export const editorMutation = {
     ['UPLOAD_EDIT_FILEDATA'](state,data){
         state.editData = data
     },
-
+	['UPDATE_ACTION_EDITOR'](state,data){
+		state.activeEditor = data
+	}
 };

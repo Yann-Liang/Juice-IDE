@@ -164,7 +164,15 @@
 
             },
 	        saveOtherPath(){
-            	file.saveFile(this.activeFile.value,)
+		        file.fsReadFile(this.activeFile.value,(err,data)=>{
+		        	if(!err){
+				        file.saveFile('',this.activeFile.name,data,()=>{
+
+                        })
+                    }else{
+
+                    }
+                });
             }
         },
         //生命周期函数

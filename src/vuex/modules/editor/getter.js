@@ -11,6 +11,8 @@ export const editorGetter = {
     editData(state){
         console.log(typeof state.editData,state.editData)
         return state.editData
-
-    }
+    },
+	activeEditor(state){
+    	return state.activeEditor
+	}
 };
