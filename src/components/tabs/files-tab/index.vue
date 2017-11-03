@@ -15,7 +15,7 @@
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
                     <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
                     <li @click="saveFile()" @mousedown.stop="">保存</li>
-                    <li @click="" @mousedown.stop="">另存为</li>
+                    <li @click="saveOtherPath()" @mousedown.stop="">另存为</li>
                     <li @click="rename" @mousedown.stop="">重命名</li>
                     <li @click="removeFileFn" @mousedown.stop="">删除</li>
                 </ul>
@@ -162,6 +162,9 @@
 	        },
             rename(){
 
+            },
+	        saveOtherPath(){
+            	file.saveFile(this.activeFile.value,)
             }
         },
         //生命周期函数
