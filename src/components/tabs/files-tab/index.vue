@@ -137,16 +137,24 @@
                 })
             },
 	        saveAllFile(){
-		        const fileData = this.fileTreeData.filter((item)=>{
+		        let fileData = this.fileTreeData.filter((item)=>{
+		        	console.log(item)
 			        return item.value;
 		        });
-		        const dialogFile = this.getUrl.filter((item)=>{
+		        let dialogFile = this.getUrl.filter((item)=>{
 			        return !item.value;
 		        });
-		        console.log(this.fileTreeData);
+		        console.log(fileData);
 		        console.log(dialogFile);
-		        file.saveAllHaveFile(fileData,()=>{});
-		        file.saveAllNoFile(dialogFile);
+		        file.saveAllHaveFile(fileData,(fileObj)=>{
+		        	alert(1111)
+		        	console.log('dsafsafsafasfsaf:')
+		        	console.log(fileObj);
+//		        	file.writeFile()
+                });
+		        file.saveAllNoFile(dialogFile,()=>{
+
+                });
 	        },
 	        removeFileFn(){
 		        if(this.activeFile.value){

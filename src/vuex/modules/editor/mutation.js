@@ -13,5 +13,8 @@ export const editorMutation = {
     },
 	['UPDATE_ACTION_EDITOR'](state,data){
 		state.activeEditor = data
-	}
+	},
+	['UPDATE_File_DATA'](state,data){
+		state.fileData = data
+	},
 };

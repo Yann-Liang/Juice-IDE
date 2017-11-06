@@ -310,6 +310,9 @@ class file {
 					for (var key in obj){
 						item[key] = obj[key]
 					}
+					if(item.value){
+						item.keyId = this.keyIdFn(item.value)
+					}
 					return false;
 				}
 			}

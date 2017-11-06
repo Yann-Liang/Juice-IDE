@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-02 17:53:56
+ * @Last Modified time: 2017-11-03 18:25:46
  */
 
 import contractServies from '@/services/contract-servies';
@@ -83,6 +83,7 @@ class DeployService {
     }
     //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
+        console.log(abi)
         this.deployStart(fileName,contractName);
         this.result = {
             contractAddress: '',
@@ -91,14 +92,17 @@ class DeployService {
         };
         return new Promise((resolve, reject) => {
             this.deployRunning();
+
             let calcContract = contractServies.web3.eth.contract(abi);
+            console.log('contractServies.web3', contractServies.web3, calcContract.new)
+            debugger;
             let myContractReturned = calcContract.new({
                 data: bin,
                 from: userAddress,
                 gasPrice: 21000000000,
                 gasLimit: 843314949521407,
             },  (err, myContract)=> {
-                console.log('err, myContract', err, myContract)
+                console.log('err', err)
                 if (!err) {
                     if (!myContract.address) {
                         this.result.TxHash = myContract.transactionHash;

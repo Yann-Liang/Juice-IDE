@@ -14,5 +14,8 @@ export const editorGetter = {
     },
 	activeEditor(state){
     	return state.activeEditor
+	},
+	fileData(state){
+		return state.fileData
 	}
 };

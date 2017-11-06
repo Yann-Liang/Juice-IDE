@@ -48,17 +48,49 @@
                 this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             //全局搜索
-            onSearch:function(){
-                this.editor.find(this.searchValue,{
+            onSearch:function(name){
+                this.editor.find(name,{
                     backwards: false,
                     wrap: false,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
-                    range:""
+                    range:"",
+                    start:{row:1,column:1}
                 });
-                this.editor.findNext();
-                this.editor.findPrevious();
+                // this.editor.findNext(false);
+                this.onSearchUp();
+                this.onSearchDown();
+            },
+            //向上搜索
+            onSearchUp:function(){
+
+                this.editor.findPrevious(true);
+            },
+            //向下搜索
+            onSearchDown:function(){
+                this.editor.findNext(false);
+            },
+            //单个替换
+            replaceSign:function(oldValue,newValue){
+                this.editor.find(oldValue);
+                this.editor.replace(newValue);
+            },
+            //全部替换
+            replaceAll:function(oldValue,newValue){
+                this.editor.find(oldValue,{
+                    backwards: false,
+                    wrap: false,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    start:{row:1,column:1}
+                });
+                // this.editor.findNext(false);
+                this.onSearchUp();
+                this.onSearchDown();
+                this.editor.replaceAll(newValue);
             },
             //代码格式化
             format:function(){
@@ -67,17 +99,13 @@
             },
             //设置值
             setValue:function(){
-                console.log("this.editData",this.editData);
                 let arr = this.editData.filter((item)=>{
                     return item.keyId === this.keyId
                 });
-                console.log(arr);
                 if(arr.length != 0){
-                    console.log('读取缓存中的值并设置')
                     this.editor.setValue(arr[0].source);
                     this.setActiveEditor();
                 }else{
-                    console.log('通过文件fs读取文件内容')
                     if(this.value){
                         if(this.value == 'readonly'){
                             this.editor.setReadOnly(true);
@@ -113,13 +141,6 @@
                 this.editor.getSession().on('change', (e)=> {
                     this.initChange();
                 });
-                // this.editor.on('focus',()=>{
-                //     console.log(1111111111)
-                //     this.editor.getSession().on('change', (e)=> {
-                //         this.updateTreeData({value:this.value,name:this.name,save:false});
-                //         this.initChange();
-                //     });
-                // });
             },
             initChange:function(){
                 const data = this.editData;
@@ -130,7 +151,6 @@
                     source:this.editor.getValue()
                 }
 	            this.setActiveEditor();
-                console.log("当前item为",item);
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.keyId === data[i].keyId){
                         data[i].source = item.source
@@ -144,6 +164,44 @@
             //获取当前值
             getValue:function(){
                 return this.editor.getValue();
+            },
+            //保存当期文件
+            saveFile:function(){
+                file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
+                    // alert("保存当前文件成功")
+                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                    this.editor.blur();
+                });
+            },
+            //失去焦点
+            loseBlur:function(){
+                this.editor.on('blur',()=>{
+                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                });
+            },
+            //copy事件
+            copy:function(){
+                if(this.editor.getCopyText()){
+                    this.editor.once("copy",()=>{
+                        this.editor.selection.clearSelection();
+                    })
+                }
+            },
+            //paste事件
+            paste:function(){
+                this.editor.insert(this.editor.getCopyText());
+            },
+            //撤销事件
+            repeal:function(){
+
+            },
+            //恢复事件
+            renew:function(){
+
+            },
+            //剪切事件
+            cut:function(){
+
             }
         },
         //生命周期函数
@@ -154,10 +212,8 @@
 
         },
         mounted() {
-            console.log(this.editData)
             var _this = this;
             this.editor = ace.edit('javascript-editor');
-            console.log(this.editor);
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
             this.editor.setTheme('ace/theme/monokai');
@@ -175,7 +231,7 @@
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.editor.clearSelection();
             // this.setValue();
-
+            // this.onSearch();
             this.setValue();
             this.change();
             //设置格式化
@@ -194,11 +250,31 @@
             });
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({
-                name: 'myCommand',
+                name: 'save',
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
                     _this.saveEditorFile()
 	                _this.editor.blur();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定搜索
+            this.editor.commands.addCommand({
+                name: 'find',
+                bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
+                exec: function(editor) {
+                    _this.$emit("findFunction",true);
+                    // _this.format();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定替换
+            this.editor.commands.addCommand({
+                name: 'replace',
+                bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
+                exec: function(editor) {
+                    _this.$emit("replaceFunction",true);
+                    // _this.format();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
@@ -207,7 +283,6 @@
         //监视
         watch: {
             name:function(){
-                console.log('this.name',this.name);
                 this.setValue();
                 // this.change();
                 // this.change();
@@ -218,12 +293,17 @@
             //     // this.change();
             // },
             actionCode:function(){
+                console.log(this.actionCode)
                 switch(this.actionCode){
                     case 8:
                         this.format();
                         break;
                 }
             },
+            searchValue:function(){
+                console.log(this.searchValue);
+                // this.onSearch();
+            }
             // editFile:function(){
             //     console.log(1111)
             //     // this.pushArray();
