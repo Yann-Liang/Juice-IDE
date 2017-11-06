@@ -37,7 +37,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData','updateTreeData']),
+            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -108,6 +108,7 @@
                 if(arr.length != 0){
                     console.log('读取缓存中的值并设置')
                     this.editor.setValue(arr[0].source);
+                    this.setActiveEditor();
                 }else{
                     console.log('通过文件fs读取文件内容')
                     if(this.value){
@@ -119,20 +120,29 @@
                                     return console.error(err);
                                 }
                                 this.editor.setValue(data.toString());
+	                           this.setActiveEditor();
                             });
                         }
                     }else{
                         this.editor.setValue("pragma solidity ^0.4.2");
+	                    this.setActiveEditor();
                     }
                 }
 
 
             },
+            setActiveEditor(){
+	            const editorData = {
+		            value: this.editFile.value,
+		            name: this.editFile.name,
+		            source: this.getValue()
+	            }
+	            this.updateActiveEditor(editorData);
+            },
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
                 this.editor.getSession().on('change', (e)=> {
-                    console.log("changechangechangechangechangechangechangechangechangechangechangechangechangechange")
                     this.initChange();
                 });
             },
@@ -143,6 +153,7 @@
                     name:this.name,
                     source:this.editor.getValue()
                 }
+	            this.setActiveEditor();
                 console.log("当前item为",item);
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.value === data[i].value && item.name === data[i].name){
@@ -243,7 +254,6 @@
             });
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
-                console.log("focusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocusfocus")
                 this.updateTreeData({value:this.value,name:this.name,save:false});
             });
             //设置ctrl+s 保存当前
@@ -251,8 +261,8 @@
                 name: 'save',
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
-                    _this.saveFile();
-                    //...
+                    _this.saveEditorFile()
+	                _this.editor.blur();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });

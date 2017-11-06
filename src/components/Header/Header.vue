@@ -29,6 +29,7 @@
     </div>
 </template>
 <script>
+	import {mapState, mapActions, mapGetters} from 'vuex';
     export default {
         name: 'header',
         data() {
@@ -55,6 +56,7 @@
 
         },
         methods: {
+	        ...mapActions(['saveEditorFile']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log(1)
@@ -118,7 +120,7 @@
                 console.log(e.target.innerText);
                 switch(e.target.innerText){
                     case '保存':
-                        _this.$store.commit('UPDATE_ACTION_CODE',9);
+                        this.saveEditorFile();
                         break;
                 }
             },

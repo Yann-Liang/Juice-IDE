@@ -29,7 +29,9 @@ export const fileAction = {
 		commit('UPDATE_RIGHT_MENU_BLOCK', blo);
 	},
 	updateTreeData({ commit, state },OBJ){
+		console.log(OBJ);
 		const data = file.updateFile(state.treeData,OBJ.value,OBJ.name,OBJ.save)
+		console.log(JSON.stringify(data))
 		commit('UPDATE_FILE_DATA', data);
 	}
 }
