@@ -47,20 +47,54 @@
                 this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             //全局搜索
-            onSearch:function(){
-                this.editor.find(this.searchValue,{
+            onSearch:function(name){
+                console.log(name)
+                this.editor.find(name,{
                     backwards: false,
                     wrap: false,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
-                    range:""
+                    range:"",
+                    start:{row:1,column:1}
                 });
-                this.editor.findNext();
-                this.editor.findPrevious();
+                // this.editor.findNext(false);
+                this.onSearchUp();
+                this.onSearchDown();
+            },
+            //向上搜索
+            onSearchUp:function(){
+
+                this.editor.findPrevious(true);
+            },
+            //向下搜索
+            onSearchDown:function(){
+                this.editor.findNext(false);
+            },
+            //单个替换
+            replaceSign:function(oldValue,newValue){
+                this.editor.find(oldValue);
+                this.editor.replace(newValue);
+            },
+            //全部替换
+            replaceAll:function(oldValue,newValue){
+                this.editor.find(oldValue,{
+                    backwards: false,
+                    wrap: false,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    start:{row:1,column:1}
+                });
+                // this.editor.findNext(false);
+                this.onSearchUp();
+                this.onSearchDown();
+                this.editor.replaceAll(newValue);
             },
             //代码格式化
             format:function(){
+                console.log('设置格式化')
                 this.editor.setValue(beautify(this.editor.getValue()));
                 //引用了js-beautify库
             },
@@ -101,13 +135,6 @@
                     console.log("changechangechangechangechangechangechangechangechangechangechangechangechangechange")
                     this.initChange();
                 });
-                // this.editor.on('focus',()=>{
-                //     console.log(1111111111)
-                //     this.editor.getSession().on('change', (e)=> {
-                //         this.updateTreeData({value:this.value,name:this.name,save:false});
-                //         this.initChange();
-                //     });
-                // });
             },
             initChange:function(){
                 const data = this.editData;
@@ -134,9 +161,42 @@
             //保存当期文件
             saveFile:function(){
                 file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
-                    alert("保存当前文件成功")
+                    // alert("保存当前文件成功")
+                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                    this.editor.blur();
+                });
+            },
+            //失去焦点
+            loseBlur:function(){
+                this.editor.on('blur',()=>{
+                    console.log("blurblurblurblurblurblur")
                     this.updateTreeData({value:this.value,name:this.name,save:true});
                 });
+            },
+            //copy事件
+            copy:function(){
+                if(this.editor.getCopyText()){
+                    this.editor.once("copy",()=>{
+                        this.editor.selection.clearSelection();
+                    })
+                }
+            },
+            //paste事件
+            paste:function(){
+                this.editor.insert(this.editor.getCopyText());
+                console.log(this.editor.insert(this.editor.getCopyText()))
+            },
+            //撤销事件
+            repeal:function(){
+
+            },
+            //恢复事件
+            renew:function(){
+
+            },
+            //剪切事件
+            cut:function(){
+
             }
         },
         //生命周期函数
@@ -168,7 +228,7 @@
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.editor.clearSelection();
             // this.setValue();
-
+            // this.onSearch();
             this.setValue();
             this.change();
             //设置格式化
@@ -188,11 +248,33 @@
             });
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({
-                name: 'myCommand',
+                name: 'save',
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
                     _this.saveFile();
                     //...
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定搜索
+            this.editor.commands.addCommand({
+                name: 'find',
+                bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
+                exec: function(editor) {
+                    console.log("finddddddd")
+                    _this.$emit("findFunction",true);
+                    // _this.format();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定替换
+            this.editor.commands.addCommand({
+                name: 'replace',
+                bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
+                exec: function(editor) {
+                    console.log("replaceeeeeeeeeee")
+                    _this.$emit("replaceFunction",true);
+                    // _this.format();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
@@ -212,15 +294,22 @@
             //     // this.change();
             // },
             actionCode:function(){
+                console.log(this.actionCode)
                 switch(this.actionCode){
                     case 8:
+                    console.log("咯咯咯咯咯gege")
                         this.format();
                         break;
                     case 9:
+                    console.log("宝爸爸爸爸爸爸爱吧")
                         this.saveFile();
                         break;
                 }
             },
+            searchValue:function(){
+                console.log(this.searchValue);
+                // this.onSearch();
+            }
             // editFile:function(){
             //     console.log(1111)
             //     // this.pushArray();
