@@ -30,7 +30,7 @@ export const fileAction = {
 	},
 	updateTreeData({ commit, state },OBJ){
 		console.log(OBJ);
-		const data = file.updateFile(state.treeData,OBJ.value,OBJ.name,OBJ.save)
+		const data = file.updateFile(state.treeData,OBJ)
 		console.log(JSON.stringify(data))
 		commit('UPDATE_FILE_DATA', data);
 	}

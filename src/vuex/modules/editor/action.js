@@ -20,11 +20,15 @@ export const editorAction = {
 	},
 	saveEditorFile({dispatch,commit,state}){
 		console.log(state.activeEditor)
-		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err)=>{
+		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
 			if(err){
 			
 			}else{
-				dispatch('updateTreeData',{value:state.activeEditor.value,name:state.activeEditor.name,save:true},{ root: true });
+				if(filepath){
+					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
+				}else{
+					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
+				}
 			}
 		})
 	}

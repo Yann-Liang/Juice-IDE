@@ -53,24 +53,26 @@
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
-		            	if(res.code === 0){
+			            if(res.code === 0){
 				            this.queryFileListData();
 				            this.updateEditFile({
-					            name:name+'.sol',
-					            value:res.value
+					            name:file.uffixName(name),
+					            value:res.value,
+					            keyId:res.keyId
 				            })
-                            console.log(this.editFile);
-                        }else if(res.code === 1){
+				            console.log(this.editFile);
+			            }else if(res.code === 1){
 				            this.tipOpen()
-                        }else if(res.code === 2){
-                            const url = this.getUrl;
-                            url.push({value:'',name:name+'.sol'});
-                            this.updateUrl(url);
+			            }else if(res.code === 2){
+				            const url = this.getUrl;
+				            url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+				            this.updateUrl(url);
 				            this.updateEditFile({
-					            name:name+'.sol',
-					            value:res.value
+					            name:file.uffixName(name),
+					            value:res.value,
+					            keyId:res.keyId
 				            })
-                        }
+			            }
 			            this.updateRightMenuBlock(false);
 		            })
                 });
@@ -114,7 +116,7 @@
             },
 	        updateUrlFn(filesList){
 		        this.getUrl.forEach((item,index,data)=>{
-			        if(filesList.name == item.name && filesList.value == item.value){
+			        if(filesList.keyId == item.keyId){
 				        data.splice(index,1);
 				        this.updateUrl(data)
 			        }

@@ -68,7 +68,8 @@
 				}else {
 					this.updateEditFile({
                         name:itemInfo.name,
-                        value:itemInfo.value
+                        value:itemInfo.value,
+                        keyId:itemInfo.keyId
                     })
 				}
 			},
@@ -86,7 +87,7 @@
 			},
             updateUrlFn(filesList){
 	            this.getUrl.forEach((item,index,data)=>{
-		            if(filesList.name == item.name){
+		            if(filesList.keyId === item.keyId){
 			            data.splice(index,1);
 			            this.updateUrl(data)
 		            }

@@ -16,6 +16,7 @@
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
+
     import file from '@/services/API-file'
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
@@ -30,7 +31,7 @@
             }
         },
         //数组或对象，用于接收来自父组件的数据
-        props: ["currentView","value","searchValue",'name'],
+        props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
             ...mapGetters(['actionCode','editData','editFile'])
@@ -66,9 +67,9 @@
             },
             //设置值
             setValue:function(){
-                console.log("this.editData",this.editData)
+                console.log("this.editData",this.editData);
                 let arr = this.editData.filter((item)=>{
-                    return item.name === this.name && item.value === this.value
+                    return item.keyId === this.keyId
                 });
                 console.log(arr);
                 if(arr.length != 0){
@@ -101,6 +102,7 @@
 	            const editorData = {
 		            value: this.editFile.value,
 		            name: this.editFile.name,
+		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
 	            this.updateActiveEditor(editorData);
@@ -124,12 +126,13 @@
                 const item = {
                     value:this.value,
                     name:this.name,
+                    keyId:this.keyId,
                     source:this.editor.getValue()
                 }
 	            this.setActiveEditor();
                 console.log("当前item为",item);
                 for (let i = data.length - 1; i >= 0; i--) {
-                    if(item.value === data[i].value && item.name === data[i].name){
+                    if(item.keyId === data[i].keyId){
                         data[i].source = item.source
                         this.updateData(data);
                         return false;
@@ -187,7 +190,7 @@
             });
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
-                this.updateTreeData({value:this.value,name:this.name,save:false});
+                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
             });
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({

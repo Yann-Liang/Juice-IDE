@@ -20,21 +20,24 @@ class file {
 	getFileList(pathArray){
 		let filesList = [];
 		pathArray.forEach((item,index)=>{
-			let rootItem ;
+			let rootItem , keyId ;
+			keyId = this.keyIdFn(item.value,item.keyId);
 			if(this.isDir(item.value)){
 				rootItem = {
 					name:item.name,
 					value:item.value,
 					children:[],
 					id:1,
-					save:true
+					save:true,
+					keyId:keyId
 				}
 			}else{
 				rootItem = {
 					name:item.name,
 					value:item.value,
 					id:2,
-					save:true
+					save:true,
+					keyId:keyId
 				}
 			}
 			if(this.exists(item.value) || (!this.exists(item.value) && item.name)){
@@ -58,14 +61,15 @@ class file {
 		function walk(file){
 			const states = fs.statSync(path+'/'+file);
 			const filePath = path+'/'+file;
+			const preId = states.ino;
 			if(states.isDirectory()){
 				var item ;
 				if(targetObj["children"]){
-					item = {name:file,children:[],value:filePath,id:1,save:true};
+					item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
 					targetObj["children"].push(item);
 				}
 				else{
-					item = {name:file,children:[],value:filePath,id:1,save:true};
+					item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
 					filesList.push(item);
 				}
 				
@@ -78,11 +82,11 @@ class file {
 				obj.path = path+'/'+file; //文件绝对路径
 				
 				if(targetObj["children"]){
-					var item = {name:file,value:obj.path,id:2,save:true}
+					var item = {name:file,value:obj.path,id:2,save:true,keyId:preId}
 					targetObj["children"].push(item);
 				}
 				else{
-					var item = {name:file,value:obj.path,id:2,save:true};
+					var item = {name:file,value:obj.path,id:2,save:true,keyId:preId};
 					filesList.push(item);
 				}
 			}
@@ -126,28 +130,35 @@ class file {
 	//编辑器新建文件
 	newFile (activePath,fileName,fn){
 		if(activePath){
-			const newFilePath = this.isDir(activePath) ?
-				activePath + '/'+fileName+'.sol':
-				path.dirname(activePath) + '/'+fileName+'.sol';
+			let newFilePath = this.isDir(activePath) ?
+				activePath + '/'+fileName:
+				path.dirname(activePath) + '/'+fileName;
+			newFilePath = this.uffixName(newFilePath);
 			if(this.exists(newFilePath)){
+				const stat = this.fileDetail(newFilePath);
 				fn && fn({
 					code:1, // 文件已经存在
-					value:newFilePath
+					value:newFilePath,
+					keyId:stat.ino
 				});
 			}else{
 				this.writeFile(newFilePath,'',(err)=>{
 					if (err) throw err;
+					const stat = this.fileDetail(newFilePath);
 					fn && fn({
 						code:0, // 文件不存在
-						value:newFilePath
+						value:newFilePath,
+						keyId:stat.ino
 					});
 				});
 			}
 		}else{
 			// 更新路径数组的vuex状态
+			const keyId = this.keyIdFn(activePath);
 			fn && fn({
 				code:2,  // 没有路径
-				value:''
+				value:'',
+				keyId:keyId
 			});
 		}
 	}
@@ -202,14 +213,18 @@ class file {
 	// 保存文件
 	saveFile(path,name,source,fn){
 		if(path){
-			this.writeFile(path,source,fn)
+			this.writeFile(path,source,(err)=>{
+				fn && fn(err,'')
+			})
 		}else{
 			dialog.showSaveDialog({
 				defaultPath:name
 			},(filename)=>{
 				const filepath = filename ? filename.replace(/\\/g,'/') :'';
 				if(filepath){
-					this.writeFile(filepath,source,fn)
+					this.writeFile(filepath,source,(err)=>{
+						fn && fn(err,filepath)
+					})
 				}
 			})
 		}
@@ -287,18 +302,50 @@ class file {
 	}
 	
 	// 更新文件的状态
-	updateFile(data,value,name,save){
+	updateFile(data,obj){
 		const that = this;
 		data.forEach((item,index)=>{
 			if(!item.children){
-				if(value == item.value && name === item.name){
-					item.save = save;
+				if(obj.keyId == item.keyId){
+					for (var key in obj){
+						item[key] = obj[key]
+					}
 					return false;
 				}
 			}
 		})
-		data.forEach(x => x.children && (x.children = that.updateFile(x.children, value,name,save)))
+		data.forEach(x => x.children && (x.children = that.updateFile(x.children, obj)))
 		return data;
+	}
+	
+	// 获取文件的信息
+	fileDetail(path){
+		const stat = fs.statSync(path);
+		return stat
+	}
+	
+	// 获取时间戳
+	timestampFn(){
+		const timestamp=new Date().getTime()
+		return timestamp
+	}
+	
+	//添加文件名后缀
+	uffixName(name,suffix){
+		suffix = suffix || '.sol';
+		name = name + suffix;
+		return name;
+	}
+	
+	keyIdFn(path,id){
+		let keyId;
+		if(path){
+			const stat = this.fileDetail(path)
+			keyId = stat.ino
+		}else{
+			keyId =  id || this.timestampFn();
+		}
+		return keyId;
 	}
 }
 
