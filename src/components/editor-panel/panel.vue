@@ -144,23 +144,49 @@
                     console.log("ccccccccc")
                     this.initChange();
                     //语法检查
-                    compileService.grammarCheck(function(result, missingInputs, source){
+                    compileService.grammarCheck((result, missingInputs, source)=>{
                         console.log('语法检查',result)
+                        // let css='',rowId=[],tips=[];
+                        var row = this.editor.session.getBreakpoints();
+                        console.log(row);
                         if(result.errors && result.errors.length>0){
                             // falseData.error = result.errors;
                             // console.log("result",result.errors);
                             /*
                                 语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
                             */
-                            result.errors.forEach(function(error){
+                            let css='';
+                            result.errors.forEach((error)=>{
                                 var errorId = error.match(/\w+\.sol\:[0-9]+/i);
-                                console.log(errorId.input,errorId.index);
+                                console.log(errorId[0],errorId.input);
+                                var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
+                                var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
+                                console.log(rowId[1],tips[1]);
+                                if(tips[1] == 'Warning'){
+                                    css = 'ace_warning'
+                                }else{
+                                    css = 'ace_error'
+                                }
+                                this.setBreakpoint(rowId[1]-1,css)
                             });
+                        }else{
+                            // console.log(css);
+                            console.log(1111)
+                            this.editor.session.clearBreakpoints();
                         }
                     },this.value);
                 });
 
 
+            },
+            //设置错误警示css
+            setBreakpoint:function(row,css){
+                console.log(row,css)
+                this.editor.session.setBreakpoint(row,css);
+            },
+            //移除错误警示css
+            removeGutterDecoration:function(row,css){
+                this.editor.session.removeGutterDecoration(row,css);
             },
             // change:function(){
             //     this.editor.getSession().selection.on('changeCursor', (e)=> {
@@ -244,7 +270,7 @@
         mounted() {
 
             // console.log(consoleService)
-            console.log(this.editData)
+            console.log(this.keyId)
             this.editor = ace.edit('javascript-editor');
             console.log(this.editor);
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
@@ -326,7 +352,8 @@
         },
         //监视
         watch: {
-            name:function(){
+            keyId:function(){
+                console.log(this.keyId);
                 this.setValue();
                 // this.change();
                 // this.change();

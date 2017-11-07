@@ -128,7 +128,9 @@
             copy:function(event){
                 console.log('发生复制事件');
                 console.log(this.editor)
-                this.editor.commands.bindKeys({ 'ctrl-z': 'undo' })
+                // this.editor.commands.bindKeys({ 'ctrl-z': 'undo' })
+                this.editor.onCommandKey()
+                console.log()
             },
             //paste事件
             paste:function(event){
