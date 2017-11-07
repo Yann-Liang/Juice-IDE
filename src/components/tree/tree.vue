@@ -62,13 +62,16 @@
 		methods: {
 			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock']),
 			toggle(itemInfo) {
+				console.log('正在点击的→→→→→→→→→→→→→→→→');
+				console.log(itemInfo);
 				this.setActiveFile(itemInfo);
 				if (this.isFolder) {
 					this.open = !this.open
 				}else {
 					this.updateEditFile({
                         name:itemInfo.name,
-                        value:itemInfo.value
+                        value:itemInfo.value,
+                        keyId:itemInfo.keyId
                     })
 				}
 			},
@@ -86,7 +89,7 @@
 			},
             updateUrlFn(filesList){
 	            this.getUrl.forEach((item,index,data)=>{
-		            if(filesList.name == item.name){
+		            if(filesList.keyId === item.keyId){
 			            data.splice(index,1);
 			            this.updateUrl(data)
 		            }

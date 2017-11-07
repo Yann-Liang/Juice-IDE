@@ -28,6 +28,7 @@ export const editor = {
         editor:{},
         searchVisible:false,
         replaceVisible:false,
+	    fileData:[]
     },
     actions: editorAction,
     getters: editorGetter,

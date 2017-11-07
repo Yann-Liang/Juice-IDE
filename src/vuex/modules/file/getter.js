@@ -3,6 +3,7 @@
  */
 export const fileGetter = {
 	fileTreeData(state){
+		console.log(state.treeData)
 		return state.treeData
 	},
 	activeFile(state){

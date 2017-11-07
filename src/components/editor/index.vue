@@ -57,7 +57,7 @@
                 <span @click='offReplace'>x</span>
             </div>
         </div>
-        <v-editor :currentView='currentView' :value='value' :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
+        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
         <div class="tips" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
@@ -88,17 +88,12 @@
                 // replaceVisible:false,
                 vistual:200,
                 activeClass:"",
-                fileData:[
-                    // {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
-                ],
                 fileTotal:10,
                 select:"",
                 currentView:"",
                 value:"",
-                name:""
+                name:"",
+                keyId:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -107,11 +102,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','editor','searchVisible','replaceVisible'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','boolSearchVisible','boolReplaceVisible']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -259,9 +254,12 @@
                 this.currentView = index;
                 this.value = item.value;
                 this.name = item.name;
+                this.keyId = item.keyId;
+	            console.log('切换tab现在的keyId:'+this.keyId)
                 this.updateEditFile({
 	                name:this.name,
-	                value:this.value
+	                value:this.value,
+                    keyId:this.keyId
                 })
                 // this.$refs.childMethod.change();
             },
@@ -280,75 +278,86 @@
                     this.editorVisible = false;
                     this.tipsVisible = true;
                     this.value = "readonly";
-                    this.fileData = [];
+	                this.changeFileData([]);
                 }else{
                     console.log("hahahahah")
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
                         console.log('高亮与删除相同')
-                        this.fileData.splice(index,1);
+                        let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         //如果当前高亮为0
                         if(this.select == 0){
                             this.select = index ;
                             this.currentView = index ;
                             this.value = this.fileData[index].value;
                             this.name = this.fileData[index].name;
+	                        this.keyId = this.fileData[index].keyId;
                         }else{
                             this.select = index - 1;
                             this.currentView = index - 1;
                             this.value = this.fileData[index - 1].value;
                             this.name = this.fileData[index - 1].name;
+                            this.keyId = this.fileData[index - 1].keyId;
+
                         }
                     }else if(this.select > index){
                         console.log('高亮>删除相同')
-                        this.fileData.splice(index,1);
+	                    let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         this.select = this.select - 1;
                         this.currentView = this.select - 1;
                         this.value= this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
+	                    this.keyId = this.fileData[this.select].keyId;
                     }else if(this.select < index){
                         console.log('高亮<删除相同')
-                        this.fileData.splice(index,1);
+	                    let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         this.select = this.select;
                         this.currentView = this.select;
                         this.value = this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
+	                    this.keyId = this.fileData[this.select].keyId;
                     }
                 }
-
-
             },
             //关闭所有窗口
             close:function(){
                 this.editorVisible = false;
                 this.tipsVisible = true;
                 this.value = "readonly";
-                this.fileData = [];
+	            this.changeFileData([]);
             },
             //新建文件
             newFile(){
                 this.open((name)=>{
-                    file.newFile("",name,(res)=>{
-                        if(res.code === 0){
-                            this.queryFileListData();
-                            this.updateEditFile({
-                                name:name,
-                                value:res.value
-                            })
-                            console.log(this.editFile);
-                        }else if(res.code === 1){
-                            this.tipOpen()
-                        }else if(res.code === 2){
-                            const url = this.getUrl;
-                            url.push({value:'',name:name});
-                            this.updateUrl(url);
-                            this.updateEditFile({
-                                name:name,
-                                value:res.value
-                            })
-                        }
-                    })
+	                file.newFile(this.activeFile.value,name,(res)=>{
+		                if(res.code === 0){
+			                this.queryFileListData();
+			                this.updateEditFile({
+				                name:file.uffixName(name),
+				                value:res.value,
+				                keyId:res.keyId
+			                })
+			                console.log(this.editFile);
+		                }else if(res.code === 1){
+			                this.tipOpen()
+		                }else if(res.code === 2){
+			                const url = this.getUrl;
+			                url.push({value:'',name:file.uffixName(name)});
+			                this.updateUrl(url);
+			                this.updateEditFile({
+				                name:file.uffixName(name),
+				                value:res.value,
+				                keyId:res.keyId
+			                })
+		                }
+	                })
                 });
             },
             open(fn) {
@@ -384,6 +393,7 @@
                     this.currentView = 0;
                     this.value = this.fileData[0].value;
                     this.name = this.fileData[0].name;
+                    this.keyId = this.fileData[0].keyId;
                     this.editorVisible = true;
                     this.tipsVisible = false;
                 }
@@ -395,7 +405,7 @@
                 //遍历已有的数组，查看是否已经有相同，有的话则高亮显示当前，没有则push进数组并高亮显示当前
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
-                    if(item.value == this.editFile.value && item.name == this.editFile.name){
+                    if(item.keyId == this.editFile.keyId){
                         console.log('不push进数组')
                         // console.log()
                         //为true 高亮显示当前，并且不push
@@ -403,17 +413,21 @@
                         this.currentView = index;
                         this.value = this.editFile.value;
                         this.name = this.editFile.name;
+                        this.keyId = this.editFile.keyId;
                         blo = true;
                     }
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
-                    console.log('push进数组')
-                    this.fileData.push(this.editFile);
+                    console.log('push进数组');
+	                let data = this.fileData;
+	                data.push(this.editFile);
+	                this.changeFileData(data);
                     this.select = this.fileData.length - 1;
                     this.currentView = this.fileData.length - 1;
                     this.value = this.fileData[this.fileData.length - 1].value;
                     this.name = this.fileData[this.fileData.length - 1].name;
+	                this.keyId = this.fileData[this.fileData.length - 1].keyId;
                 }
             }
         },
@@ -578,7 +592,6 @@
         position: absolute;
         top: 30px;
         left: 50%;
-        margin-left: -;
         z-index: 1000000;
         margin-left: -240px;
     }

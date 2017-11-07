@@ -23,4 +23,7 @@ export const editorMutation = {
     ['CHANGE_REPLACE_VISIBLE'](state,bool){
         state.replaceVisible = bool
     }
+	['UPDATE_File_DATA'](state,data){
+		state.fileData = data
+	},
 };

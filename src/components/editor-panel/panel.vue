@@ -16,6 +16,7 @@
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
+
     import file from '@/services/API-file'
     import compileService from '@/services/compile-exe/compile-service';
     var beautify = require('js-beautify').js_beautify
@@ -31,7 +32,7 @@
             }
         },
         //数组或对象，用于接收来自父组件的数据
-        props: ["currentView","value","searchValue",'name'],
+        props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
             ...mapGetters(['actionCode','editData','editFile'])
@@ -49,7 +50,6 @@
             },
             //全局搜索
             onSearch:function(name){
-                console.log(name)
                 this.editor.find(name,{
                     backwards: false,
                     wrap: false,
@@ -95,23 +95,18 @@
             },
             //代码格式化
             format:function(){
-                console.log('设置格式化')
                 this.editor.setValue(beautify(this.editor.getValue()));
                 //引用了js-beautify库
             },
             //设置值
             setValue:function(){
-                console.log("this.editData",this.editData)
                 let arr = this.editData.filter((item)=>{
-                    return item.name === this.name && item.value === this.value
+                    return item.keyId === this.keyId
                 });
-                console.log(arr);
                 if(arr.length != 0){
-                    console.log('读取缓存中的值并设置')
                     this.editor.setValue(arr[0].source);
                     this.setActiveEditor();
                 }else{
-                    console.log('通过文件fs读取文件内容')
                     if(this.value){
                         if(this.value == 'readonly'){
                             this.editor.setReadOnly(true);
@@ -136,6 +131,7 @@
 	            const editorData = {
 		            value: this.editFile.value,
 		            name: this.editFile.name,
+		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
 	            this.updateActiveEditor(editorData);
@@ -161,12 +157,13 @@
                 const item = {
                     value:this.value,
                     name:this.name,
+                    keyId:this.keyId,
                     source:this.editor.getValue()
                 }
 	            this.setActiveEditor();
                 console.log("当前item为");
                 for (let i = data.length - 1; i >= 0; i--) {
-                    if(item.value === data[i].value && item.name === data[i].name){
+                    if(item.keyId === data[i].keyId){
                         data[i].source = item.source
                         this.updateData(data);
                         return false;
@@ -190,7 +187,6 @@
             //失去焦点
             loseBlur:function(){
                 this.editor.on('blur',()=>{
-                    console.log("blurblurblurblurblurblur")
                     this.updateTreeData({value:this.value,name:this.name,save:true});
                 });
             },
@@ -230,13 +226,15 @@
 
         },
         mounted() {
+
             // console.log(consoleService)
             console.log(this.editData)
-            var _this = this;
             this.editor = ace.edit('javascript-editor');
             console.log(this.editor);
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
+            var _this = this;
+            this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
             this.editor.setTheme('ace/theme/monokai');
@@ -269,9 +267,7 @@
             });
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
-                this.updateTreeData({value:this.value,name:this.name,save:false});
-
-
+                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
             });
             //监听光标移动
             this.editor.getSession().selection.on('changeCursor', (e)=> {
@@ -301,7 +297,6 @@
                 name: 'find',
                 bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
                 exec: function(editor) {
-                    console.log("finddddddd")
                     _this.$emit("findFunction",true);
                     // _this.format();
                 },
@@ -312,7 +307,6 @@
                 name: 'replace',
                 bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
                 exec: function(editor) {
-                    console.log("replaceeeeeeeeeee")
                     _this.$emit("replaceFunction",true);
                     // _this.format();
                 },
@@ -323,7 +317,6 @@
         //监视
         watch: {
             name:function(){
-                console.log('this.name',this.name);
                 this.setValue();
                 // this.change();
                 // this.change();
@@ -337,12 +330,7 @@
                 console.log(this.actionCode)
                 switch(this.actionCode){
                     case 8:
-                    console.log("咯咯咯咯咯gege")
                         this.format();
-                        break;
-                    case 9:
-                    console.log("宝爸爸爸爸爸爸爱吧")
-                        this.saveFile();
                         break;
                 }
             },
