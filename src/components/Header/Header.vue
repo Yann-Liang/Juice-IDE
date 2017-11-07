@@ -29,6 +29,8 @@
     </div>
 </template>
 <script>
+	import {mapState, mapActions, mapGetters} from 'vuex';
+    var beautify = require('js-beautify').js_beautify
     export default {
         name: 'header',
         data() {
@@ -54,7 +56,12 @@
         props: {
 
         },
+        //计算
+        computed: {
+            ...mapGetters(['editor'])
+        },
         methods: {
+	        ...mapActions(['saveEditorFile','boolSearchVisible']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log(1)
@@ -114,7 +121,19 @@
             },
             //文件每个li的点击事件
             clickFileEvent:function(e){
+                var _this = this;
                 console.log(e.target.innerText);
+                switch(e.target.innerText){
+                    case '保存':
+                        this.saveEditorFile();
+                        break;
+                }
+            },
+            //代码格式化
+            format:function(){
+                console.log('设置格式化')
+                this.editor.setValue(beautify(this.editor.getValue()));
+                //引用了js-beautify库
             },
             //编辑每个li的点击事件
             clickEditEvent:function(e){
@@ -123,7 +142,16 @@
                 console.log(e.target.getAttribute("data-type"));
                 switch(e.target.getAttribute("data-type")){
                     case '格式化':
-                        _this.$store.commit('UPDATE_ACTION_CODE',8);
+                        _this.format();
+                        break;
+                    case '查找':
+                        _this.boolSearchVisible(true);
+                        break;
+                    case '替换':
+                        console.log(_this.editor.execCommand('replace'))
+                        break;
+                    case '复制':
+                        _this.editor.execCommand('copy')
                         break;
                 }
             }

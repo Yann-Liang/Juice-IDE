@@ -22,6 +22,12 @@
         <div class="tools">
             <div class="tool">
                 <span class='save' @click='save'>保存</span>
+                <span class='save' @click='replace'>替换</span>
+                <span class='save' @click='copy($event)'>复制</span>
+                <span class='save' @click='paste($event)'>粘贴</span>
+                <span class='save' @click='repeal'>撤销</span>
+                <span class='save' @click='renew'>恢复</span>
+                <span class='save' @click='cut'>剪切</span>
                 <span class="search" @click='search'>搜索</span>
                 <span class='format' @click='format' >格式化</span>
                 <span class='increase' @click='increase'>放大</span>
@@ -30,21 +36,28 @@
             </div>
             <div class="search-model" v-if='searchVisible'>
                 <div class='search-content'>
-                    <el-form :model="form"  :inline="true">
-                        <el-form-item label="">
-                            <el-input v-model.trim="form.search" placeholder="搜索" style="width:300px;"></el-input>
-                        </el-form-item>
-                        <el-form-item >
-                            <el-button type="primary" @click="onSearch">搜索</el-button>
-                        </el-form-item>
-                        <el-form-item >
-                            <el-button type="primary" @click="offSearch">X</el-button>
-                        </el-form-item>
-                    </el-form>
+                    <span>搜索</span>
+                    <span>
+                        <input type="text" v-model='inputValue' placeholder="搜索" @input='onSearch' style="width:300px;">
+                    </span>
+                    <span @click='onSearchUp'>↑</span>
+                    <span @click='onSearchDown'>↓</span>
+                    <span @click="offSearch">X</span>
                 </div>
             </div>
+            <div class="replace-model" v-if='replaceVisible'>
+                <span>
+                    form:<input type="text" name="" v-model='fromValue' @input='fromSearch'/>
+                </span>
+                <span>
+                    to  :<input type="text" name="" v-model="toValue"/>
+                </span>
+                <span @click='replaceSign' >单个替换</span>
+                <span @click='replaceAll'>全部替换</span>
+                <span @click='offReplace'>x</span>
+            </div>
         </div>
-        <v-editor :currentView='currentView' :value='value' :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible'></v-editor>
+        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
         <div class="tips" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
@@ -67,25 +80,20 @@
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
-                form:{
-                   search:"",
-                },
+                inputValue:"",
                 searchValue:"",
-                searchVisible:false,
-
+                // searchVisible:false,
+                fromValue:"",
+                toValue:"",
+                // replaceVisible:false,
                 vistual:200,
                 activeClass:"",
-                fileData:[
-                    // {"value":"E:/wamp/www/webapp/static/js/js/apply.js","name":"apply.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/block.js","name":"block.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/contract.js","name":"contract.js"},
-                    // {"value":"E:/wamp/www/webapp/static/js/js/dept.js","name":"dept.js"}
-                ],
                 fileTotal:10,
                 select:"",
                 currentView:"",
                 value:"",
-                name:""
+                name:"",
+                keyId:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -94,46 +102,120 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible']),
             //放大
             increase:function(){
-                this.$refs.childMethod.increase();
+                // this.$refs.childMethod.increase();
+                this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
                 this.$refs.childMethod.decrease();
             },
+            //
+            keydown:function(){
+                document.onKeydown = function(){
+                    if (event.ctrlKey && window.event.keyCode==67){
+                        return true;
+                    }
+                }
+            },
+            //copy事件
+            copy:function(event){
+                console.log()
+            },
+            //paste事件
+            paste:function(event){
+                // this.$refs.childMethod.paste();
+                if(event.ctrlKey && window.event.keyCode == 86){
+                    return true;
+                }
+            },
+            //撤销事件
+            repeal:function(){
+
+            },
+            //恢复事件
+            renew:function(){
+
+            },
+            //剪切事件
+            cut:function(){
+
+            },
+            findFunction:function(bool){
+                console.log(bool)
+                this.boolSearchVisible(bool);
+                // this.searchVisible = bool;
+            },
+            replaceFunction:function(bool){
+                this.boolReplaceVisible(bool);
+                // this.replaceVisible = bool;
+            },
             //点击搜索
             search:function(){
                 //弹窗出现
-                this.searchVisible = !this.searchVisible;
+                this.boolSearchVisible(true);
+                // this.searchVisible = !this.searchVisible;
             },
             //全局搜索
             onSearch:function(){
-                this.searchValue = this.form.search;
-                this.$refs.childMethod.onSearch();
+                console.log('diandiandian',this.inputValue)
+                this.searchValue = this.inputValue;
+                this.$refs.childMethod.onSearch(this.inputValue);
+            },
+            //向上搜索
+            onSearchUp:function(){
+                this.$refs.childMethod.onSearchUp();
+            },
+            //向下搜索
+            onSearchDown:function(){
+                this.$refs.childMethod.onSearchDown();
             },
             //关闭弹窗
             offSearch:function(){
                 //弹窗关闭
-                this.searchVisible = false;
+                this.boolSearchVisible(false);
+                // this.searchVisible = false;
+                this.inputValue = "";
+                this.searchValue = "";
+            },
+            fromSearch:function(){
+                this.$refs.childMethod.onSearch(this.fromValue);
+            },
+            replace:function(){
+                this.boolReplaceVisible(true);
+                // this.replaceVisible = !this.replaceVisible;
+            },
+            //单个替换
+            replaceSign:function(){
+                // this.$refs.childMethod.onSearch(this.fromValue);
+                this.$refs.childMethod.replaceSign(this.fromValue,this.toValue);
+            },
+            //全部替换
+            replaceAll:function(){
+                this.$refs.childMethod.replaceAll(this.fromValue,this.toValue);
+            },
+            //关闭替换弹窗
+            offReplace:function(){
+                this.boolReplaceVisible(false);
+                // this.replaceVisible = false;
+                this.fromValue = "";
+                this.toValue = "";
             },
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
-                /*
-                    获取当前
-                */
+                this.saveEditorFile();
             },
             //代码格式化
             format:function(){
                 console.log('代码格式化');
                 this.$refs.childMethod.format();
-                // this.editor.getSession().setTabSize(6);
             },
             //向右滑动
             scrollRight:function(e){
@@ -167,10 +249,18 @@
             },
             //切换tab
             selectProp: function (index,item) {
+                this.$refs.childMethod.loseBlur();
                 this.select = index;
                 this.currentView = index;
                 this.value = item.value;
                 this.name = item.name;
+                this.keyId = item.keyId;
+	            console.log('切换tab现在的keyId:'+this.keyId)
+                this.updateEditFile({
+	                name:this.name,
+	                value:this.value,
+                    keyId:this.keyId
+                })
                 // this.$refs.childMethod.change();
             },
             //关闭当前窗口
@@ -179,6 +269,8 @@
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
+                //关闭窗口时，提示用户是否已保存
+
                 console.log("数组长度")
                 console.log(this.fileData.length)
                 if(this.fileData.length == 1){
@@ -186,75 +278,86 @@
                     this.editorVisible = false;
                     this.tipsVisible = true;
                     this.value = "readonly";
-                    this.fileData = [];
+	                this.changeFileData([]);
                 }else{
                     console.log("hahahahah")
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
                         console.log('高亮与删除相同')
-                        this.fileData.splice(index,1);
+                        let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         //如果当前高亮为0
                         if(this.select == 0){
                             this.select = index ;
                             this.currentView = index ;
                             this.value = this.fileData[index].value;
                             this.name = this.fileData[index].name;
+	                        this.keyId = this.fileData[index].keyId;
                         }else{
                             this.select = index - 1;
                             this.currentView = index - 1;
                             this.value = this.fileData[index - 1].value;
                             this.name = this.fileData[index - 1].name;
+                            this.keyId = this.fileData[index - 1].keyId;
+
                         }
                     }else if(this.select > index){
                         console.log('高亮>删除相同')
-                        this.fileData.splice(index,1);
+	                    let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         this.select = this.select - 1;
                         this.currentView = this.select - 1;
                         this.value= this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
+	                    this.keyId = this.fileData[this.select].keyId;
                     }else if(this.select < index){
                         console.log('高亮<删除相同')
-                        this.fileData.splice(index,1);
+	                    let result = this.fileData;
+	                    result.splice(index,1);
+	                    this.changeFileData(result);
                         this.select = this.select;
                         this.currentView = this.select;
                         this.value = this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
+	                    this.keyId = this.fileData[this.select].keyId;
                     }
                 }
-
-
             },
             //关闭所有窗口
             close:function(){
                 this.editorVisible = false;
                 this.tipsVisible = true;
                 this.value = "readonly";
-                this.fileData = [];
+	            this.changeFileData([]);
             },
             //新建文件
             newFile(){
                 this.open((name)=>{
-                    file.newFile("",name,(res)=>{
-                        if(res.code === 0){
-                            this.queryFileListData();
-                            this.updateEditFile({
-                                name:name,
-                                value:res.value
-                            })
-                            console.log(this.editFile);
-                        }else if(res.code === 1){
-                            this.tipOpen()
-                        }else if(res.code === 2){
-                            const url = this.getUrl;
-                            url.push({value:'',name:name});
-                            this.updateUrl(url);
-                            this.updateEditFile({
-                                name:name,
-                                value:res.value
-                            })
-                        }
-                    })
+	                file.newFile(this.activeFile.value,name,(res)=>{
+		                if(res.code === 0){
+			                this.queryFileListData();
+			                this.updateEditFile({
+				                name:file.uffixName(name),
+				                value:res.value,
+				                keyId:res.keyId
+			                })
+			                console.log(this.editFile);
+		                }else if(res.code === 1){
+			                this.tipOpen()
+		                }else if(res.code === 2){
+			                const url = this.getUrl;
+			                url.push({value:'',name:file.uffixName(name)});
+			                this.updateUrl(url);
+			                this.updateEditFile({
+				                name:file.uffixName(name),
+				                value:res.value,
+				                keyId:res.keyId
+			                })
+		                }
+	                })
                 });
             },
             open(fn) {
@@ -290,6 +393,7 @@
                     this.currentView = 0;
                     this.value = this.fileData[0].value;
                     this.name = this.fileData[0].name;
+                    this.keyId = this.fileData[0].keyId;
                     this.editorVisible = true;
                     this.tipsVisible = false;
                 }
@@ -301,32 +405,41 @@
                 //遍历已有的数组，查看是否已经有相同，有的话则高亮显示当前，没有则push进数组并高亮显示当前
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
-                    if(item.value == this.editFile.value && item.name == this.editFile.name){
+                    if(item.keyId == this.editFile.keyId){
                         console.log('不push进数组')
                         // console.log()
                         //为true 高亮显示当前，并且不push
-
                         this.select = index;
                         this.currentView = index;
                         this.value = this.editFile.value;
                         this.name = this.editFile.name;
+                        this.keyId = this.editFile.keyId;
                         blo = true;
                     }
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
-                    console.log('push进数组')
-                    this.fileData.push(this.editFile);
+                    console.log('push进数组');
+	                let data = this.fileData;
+	                data.push(this.editFile);
+	                this.changeFileData(data);
                     this.select = this.fileData.length - 1;
                     this.currentView = this.fileData.length - 1;
                     this.value = this.fileData[this.fileData.length - 1].value;
                     this.name = this.fileData[this.fileData.length - 1].name;
+	                this.keyId = this.fileData[this.fileData.length - 1].keyId;
                 }
             }
         },
         //生命周期函数
         created() {
             this.init();
+            document.body.oncopy = function(){
+                return true;
+            },
+            document.onselectstart = function(){
+                //return false;
+            }
         },
         beforeMount() {
 
@@ -339,18 +452,24 @@
         watch: {
             editFile:function(){
                 this.pushArray();
+
+                // 保存当前激活的文件
+//                console.log(this.$refs.childMethod.getValue());
+//                const editorData = {
+//	                value: this.editFile.value,
+//	                name: this.editFile.name,
+//	                source: this.$refs.childMethod.getValue()
+//                }
+//                console.log(editorData);
+//	            this.updateActiveEditor(editorData);
+
+
+
+
                 // this.$refs.childMethod.initChange();
                 // this.$refs.childMethod.change();
             },
-            // saveCode:function(){
-            //     console.log(11111)
-            //     switch(this.saveCode){
-            //         case 0:
-            //             this.cha = false;
-            //             this.dian = true;
-            //             break;
-            //     }
-            // }
+
         },
         //组件
         components: {
@@ -465,7 +584,7 @@
         }
     }
     .search-model{
-        width: 460px;
+        width: 480px;
         height: 40px;
         padding: 5px;
         border-radius: 10px;
@@ -473,9 +592,20 @@
         position: absolute;
         top: 30px;
         left: 50%;
-        margin-left: -;
         z-index: 1000000;
-        margin-left: -230px;
+        margin-left: -240px;
+    }
+    .replace-model{
+        width: 480px;
+        height: 40px;
+        padding: 5px;
+        border-radius: 10px;
+        background-color: #000;
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        z-index: 1000000;
+        margin-left: -240px;
     }
 }
 .javascript-editor{

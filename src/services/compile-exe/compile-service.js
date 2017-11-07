@@ -9,6 +9,7 @@ class compileServies {
         this.contractName=null;
     }
     compiler(path = 'src/contract/Test.sol'){
+        if(store.state.compile.compileStatus==1) return;
         var _this = this;
         console.info(store.state.file.editFile);
         if(store.state.compile.compileStatus==1) return;
@@ -87,7 +88,7 @@ class compileServies {
         });
     }
     //语法检查
-    grammarCheck(cb){
+    grammarCheck(cb,resource){
         var source = {
             sources:{
                 // [resource]:fs.readFileSync(resource,"utf-8")

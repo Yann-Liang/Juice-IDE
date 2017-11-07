@@ -11,5 +11,19 @@ export const editorMutation = {
     ['UPLOAD_EDIT_FILEDATA'](state,data){
         state.editData = data
     },
-
+	['UPDATE_ACTION_EDITOR'](state,data){
+		state.activeEditor = data
+	},
+    ['SAVE_EDITOR'](state,obj){
+        state.editor = obj
+    },
+    ['CHANGE_SEARCH_VISIBLE'](state,bool){
+        state.searchVisible = bool
+    },
+    ['CHANGE_REPLACE_VISIBLE'](state,bool){
+        state.replaceVisible = bool
+    }
+	['UPDATE_File_DATA'](state,data){
+		state.fileData = data
+	},
 };

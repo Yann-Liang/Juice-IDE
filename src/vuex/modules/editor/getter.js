@@ -9,8 +9,24 @@ export const editorGetter = {
         return state.saveCode
     },
     editData(state){
-        console.log(typeof state.editData,state.editData)
+        // console.log(typeof state.editData,state.editData)
         return state.editData
-
+    },
+	activeEditor(state){
+        console.log('state.activeEditor',state.activeEditor)
+    	return state.activeEditor
+	},
+    editor(state){
+        console.log('editor对象',state.editor)
+        return state.editor
+    },
+    searchVisible(state){
+        return state.searchVisible
+    },
+    replaceVisible(state){
+        return state.replaceVisible
     }
+	fileData(state){
+		return state.fileData
+	}
 };
