@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-07 14:09:04
+ * @Last Modified time: 2017-11-07 15:46:24
  */
 //引入web3
 let Web3 = require('web3');
@@ -103,7 +103,6 @@ class DeployService {
         };
         return new Promise((resolve, reject) => {
             this.deployRunning();
-
             let calcContract = this.web3.eth.contract(abi);
             console.log('contractServies.web3', this.web3)
             let myContractReturned = calcContract.new({
@@ -133,7 +132,7 @@ class DeployService {
                         resolve(myContract.address);
                     }
                 } else {
-                    this.deployFailure();
+                    this.deployFailure(err);
                 }
             });
         })
@@ -143,13 +142,10 @@ class DeployService {
 
     //合约部署-开始
     deployStart(fileName, contractName) {
-        let time=new Date().Format("yyyy-MM-dd HH:mm:ss")
-        consoleService.output(time);
-        deployLogService.set(time);
-        consoleService.output('[开始部署]');
-        deployLogService.set('[开始部署]');
-        consoleService.output(`${fileName}:${contractName}合约正在部署`);
-        deployLogService.set(`${fileName}:${contractName}合约正在部署`);
+        let time = new Date().Format("yyyy-MM-dd HH:mm:ss"),
+            str = `${fileName}:${contractName}合约正在部署`;
+        consoleService.output(time,'[开始部署]',str,);
+        deployLogService.push(time,'[开始部署]',str);
         return new Promise((resolve, reject) => {
 
         })
@@ -164,20 +160,17 @@ class DeployService {
 
     //合约部署-部署完成
     deployFinish() {
-        consoleService.output('[部署结果]');
-        consoleService.output({ logSuccess: 'Deploy Success' });
-        consoleService.output(this.result);
-
+        consoleService.output('[部署结果]',{ logSuccess: 'Deploy Success' },this.result);
+        deployLogService.push('[部署结果]',{ logSuccess: 'Deploy Success' },this.result);
         return new Promise((resolve, reject) => {
 
         })
     }
 
     //合约部署-部署失败
-    deployFailure() {
-        consoleService.output('[部署结果]');
-        consoleService.output({ logError: 'Deploy failure' });
-
+    deployFailure(err) {
+        consoleService.output('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
+        deployLogService.push('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
         return new Promise((resolve, reject) => {
             resolve()
         })
