@@ -134,7 +134,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
-                console.log(editorData.source)
+                // console.log(editorData.source)
 	            this.updateActiveEditor(editorData);
             },
             //编辑区的change事件
@@ -143,6 +143,21 @@
                 this.editor.getSession().on('change', (e)=> {
                     console.log("ccccccccc")
                     this.initChange();
+                    //语法检查
+                    compileService.grammarCheck(function(result, missingInputs, source){
+                        console.log('语法检查',result)
+                        if(result.errors && result.errors.length>0){
+                            // falseData.error = result.errors;
+                            // console.log("result",result.errors);
+                            /*
+                                语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
+                            */
+                            result.errors.forEach(function(error){
+                                var errorId = error.match(/\w+\.sol\:[0-9]+/i);
+                                console.log(errorId.input,errorId.index);
+                            });
+                        }
+                    },this.value);
                 });
 
 
@@ -252,8 +267,6 @@
             //设置事件处理程序
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.editor.clearSelection();
-            // this.setValue();
-            // this.onSearch();
             this.setValue();
             this.change();
             //设置格式化
@@ -273,16 +286,12 @@
             //监听光标移动
             this.editor.getSession().selection.on('changeCursor', (e)=> {
                 // console.log(22222222222)
-                //语法检查
-                compileService.grammarCheck(function(result, missingInputs, source){
-                    console.log('语法检查',result)
-                    if(result.errors && result.errors.length>0){
-                        // falseData.error = result.errors;
-                        console.log("result",result.errors);
-                    }
-                },this.value);
-            });
 
+            });
+            //点击报错行显示报错的是啥信息
+            this.editor.on('guttermousedown',function(e){
+                console.log('guttermousedown',e)
+            })
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({
                 name: 'save',
