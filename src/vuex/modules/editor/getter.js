@@ -25,7 +25,7 @@ export const editorGetter = {
     },
     replaceVisible(state){
         return state.replaceVisible
-    }
+    },
 	fileData(state){
 		return state.fileData
 	}
