@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-06 18:15:20
+ * @Last Modified time: 2017-11-07 14:09:04
  */
 //引入web3
 let Web3 = require('web3');
@@ -10,65 +10,9 @@ let Web3 = require('web3');
 import consoleService from '@/services/console/console-service';
 import APIServies from '@/services/API-servies';
 //import store from '@/vuex/store';
+import DeployLogService from '@/services/deploy/deployLogServises'
 
-function Storage (prefix) {
-    this.exists = function (name) {
-      return this.get(name) !== null
-    }
-
-    this.get = function (name) {
-      return window.localStorage.getItem(prefix + name)
-    }
-
-    this.set = function (name, content) {
-      try {
-        window.localStorage.setItem(prefix + name, content)
-      } catch (exception) {
-        return false
-      }
-      return true
-    }
-
-    this.remove = function (name) {
-      window.localStorage.removeItem(prefix + name)
-      return true
-    }
-
-    this.rename = function (originalName, newName) {
-      var content = this.get(originalName)
-      if (!this.set(newName, content)) {
-        return false
-      }
-      this.remove(originalName)
-      return true
-    }
-
-    function safeKeys () {
-      // NOTE: this is a workaround for some browsers
-      return Object.keys(window.localStorage).filter(function (item) { return item !== null && item !== undefined })
-    }
-
-    this.keys = function () {
-      return safeKeys()
-        // filter any names not including the prefix
-        .filter(function (item) { return item.indexOf(prefix, 0) === 0 })
-        // remove prefix from filename and add the 'browser' path
-        .map(function (item) { return item.substr(prefix.length) })
-    }
-
-    // on startup, upgrade the old storage layout
-    safeKeys().forEach(function (name) {
-      if (name.indexOf('sol-cache-file-', 0) === 0) {
-        var content = window.localStorage.getItem(name)
-        window.localStorage.setItem(name.replace(/^sol-cache-file-/, 'sol:'), content)
-        window.localStorage.removeItem(name)
-      }
-    })
-
-    // remove obsolete key
-    window.localStorage.removeItem('editor-size-cache')
-  }
-
+const deployLogService = new DeployLogService();
 //是否为数组
 const isArray = (o) => {
     return Object.prototype.toString.call(o) === '[object Array]';
@@ -198,10 +142,14 @@ class DeployService {
 
 
     //合约部署-开始
-    deployStart(fileName,contractName) {
-        consoleService.output(new Date().Format("yyyy-MM-dd HH:mm:ss"));
+    deployStart(fileName, contractName) {
+        let time=new Date().Format("yyyy-MM-dd HH:mm:ss")
+        consoleService.output(time);
+        deployLogService.set(time);
         consoleService.output('[开始部署]');
+        deployLogService.set('[开始部署]');
         consoleService.output(`${fileName}:${contractName}合约正在部署`);
+        deployLogService.set(`${fileName}:${contractName}合约正在部署`);
         return new Promise((resolve, reject) => {
 
         })
@@ -219,6 +167,7 @@ class DeployService {
         consoleService.output('[部署结果]');
         consoleService.output({ logSuccess: 'Deploy Success' });
         consoleService.output(this.result);
+
         return new Promise((resolve, reject) => {
 
         })
