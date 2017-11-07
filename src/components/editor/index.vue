@@ -23,8 +23,8 @@
             <div class="tool">
                 <span class='save' @click='save'>保存</span>
                 <span class='save' @click='replace'>替换</span>
-                <span class='save' @click='copy'>复制</span>
-                <span class='save' @click='paste'>粘贴</span>
+                <span class='save' @click='copy($event)'>复制</span>
+                <span class='save' @click='paste($event)'>粘贴</span>
                 <span class='save' @click='repeal'>撤销</span>
                 <span class='save' @click='renew'>恢复</span>
                 <span class='save' @click='cut'>剪切</span>
@@ -43,18 +43,6 @@
                     <span @click='onSearchUp'>↑</span>
                     <span @click='onSearchDown'>↓</span>
                     <span @click="offSearch">X</span>
-                    <!-- <el-form :model="form"  :inline="true">
-                        <el-form-item label="">
-                            <el-input v-model.trim="form.search" placeholder="搜索"></el-input>
-                        </el-form-item>
-
-                        <el-form-item >
-                            <el-button type="primary" @click="onSearch">搜索</el-button>
-                        </el-form-item>
-                        <el-form-item >
-                            <el-button type="primary" @click="offSearch">X</el-button>
-                        </el-form-item>
-                    </el-form> -->
                 </div>
             </div>
             <div class="replace-model" v-if='replaceVisible'>
@@ -92,14 +80,12 @@
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
-
                 inputValue:"",
-
                 searchValue:"",
-                searchVisible:false,
+                // searchVisible:false,
                 fromValue:"",
                 toValue:"",
-                replaceVisible:false,
+                // replaceVisible:false,
                 vistual:200,
                 activeClass:"",
                 fileData:[
@@ -121,26 +107,38 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','editor','searchVisible','replaceVisible'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','boolSearchVisible','boolReplaceVisible']),
             //放大
             increase:function(){
-                this.$refs.childMethod.increase();
+                // this.$refs.childMethod.increase();
+                this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
                 this.$refs.childMethod.decrease();
             },
+            //
+            keydown:function(){
+                document.onKeydown = function(){
+                    if (event.ctrlKey && window.event.keyCode==67){
+                        return true;
+                    }
+                }
+            },
             //copy事件
-            copy:function(){
-                this.$refs.childMethod.copy();
+            copy:function(event){
+                console.log()
             },
             //paste事件
-            paste:function(){
-                this.$refs.childMethod.paste();
+            paste:function(event){
+                // this.$refs.childMethod.paste();
+                if(event.ctrlKey && window.event.keyCode == 86){
+                    return true;
+                }
             },
             //撤销事件
             repeal:function(){
@@ -156,15 +154,18 @@
             },
             findFunction:function(bool){
                 console.log(bool)
-                this.searchVisible = bool;
+                this.boolSearchVisible(bool);
+                // this.searchVisible = bool;
             },
             replaceFunction:function(bool){
-                this.replaceVisible = bool;
+                this.boolReplaceVisible(bool);
+                // this.replaceVisible = bool;
             },
             //点击搜索
             search:function(){
                 //弹窗出现
-                this.searchVisible = !this.searchVisible;
+                this.boolSearchVisible(true);
+                // this.searchVisible = !this.searchVisible;
             },
             //全局搜索
             onSearch:function(){
@@ -183,7 +184,8 @@
             //关闭弹窗
             offSearch:function(){
                 //弹窗关闭
-                this.searchVisible = false;
+                this.boolSearchVisible(false);
+                // this.searchVisible = false;
                 this.inputValue = "";
                 this.searchValue = "";
             },
@@ -191,7 +193,8 @@
                 this.$refs.childMethod.onSearch(this.fromValue);
             },
             replace:function(){
-                this.replaceVisible = !this.replaceVisible;
+                this.boolReplaceVisible(true);
+                // this.replaceVisible = !this.replaceVisible;
             },
             //单个替换
             replaceSign:function(){
@@ -204,7 +207,8 @@
             },
             //关闭替换弹窗
             offReplace:function(){
-                this.replaceVisible = false;
+                this.boolReplaceVisible(false);
+                // this.replaceVisible = false;
                 this.fromValue = "";
                 this.toValue = "";
             },
@@ -267,6 +271,8 @@
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
+                //关闭窗口时，提示用户是否已保存
+
                 console.log("数组长度")
                 console.log(this.fileData.length)
                 if(this.fileData.length == 1){
@@ -414,6 +420,12 @@
         //生命周期函数
         created() {
             this.init();
+            document.body.oncopy = function(){
+                return true;
+            },
+            document.onselectstart = function(){
+                //return false;
+            }
         },
         beforeMount() {
 
@@ -579,7 +591,6 @@
         position: absolute;
         top: 30px;
         left: 50%;
-        margin-left: -;
         z-index: 1000000;
         margin-left: -240px;
     }

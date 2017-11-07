@@ -17,6 +17,7 @@
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
     import file from '@/services/API-file'
+    import compileService from '@/services/compile-exe/compile-service';
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
     export default {
@@ -37,7 +38,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile']),
+            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -143,9 +144,18 @@
             change:function(){
                 //监听编辑区的change事件
                 this.editor.getSession().on('change', (e)=> {
+                    console.log("ccccccccc")
                     this.initChange();
                 });
+
+
             },
+            // change:function(){
+            //     this.editor.getSession().selection.on('changeCursor', (e)=> {
+            //         console.log("changecursor")
+            //         this.initChange();
+            //     });
+            // },
             initChange:function(){
                 const data = this.editData;
                 const item = {
@@ -154,7 +164,7 @@
                     source:this.editor.getValue()
                 }
 	            this.setActiveEditor();
-                console.log("当前item为",item);
+                console.log("当前item为");
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.value === data[i].value && item.name === data[i].name){
                         data[i].source = item.source
@@ -169,14 +179,14 @@
             getValue:function(){
                 return this.editor.getValue();
             },
-            //保存当期文件
-            saveFile:function(){
-                file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
-                    // alert("保存当前文件成功")
-                    this.updateTreeData({value:this.value,name:this.name,save:true});
-                    this.editor.blur();
-                });
-            },
+            // //保存当期文件
+            // saveFile:function(){
+            //     file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
+            //         // alert("保存当前文件成功")
+            //         this.updateTreeData({value:this.value,name:this.name,save:true});
+            //         this.editor.blur();
+            //     });
+            // },
             //失去焦点
             loseBlur:function(){
                 this.editor.on('blur',()=>{
@@ -186,15 +196,13 @@
             },
             //copy事件
             copy:function(){
-                if(this.editor.getCopyText()){
-                    this.editor.once("copy",()=>{
-                        this.editor.selection.clearSelection();
-                    })
-                }
+                console.log(this.editor.getCopyText())
+                // this.editor.addEventListener('copy', this.onCopy);
             },
             //paste事件
             paste:function(){
                 this.editor.insert(this.editor.getCopyText());
+                console.log(this.editor.getCopyText())
                 console.log(this.editor.insert(this.editor.getCopyText()))
             },
             //撤销事件
@@ -208,6 +216,10 @@
             //剪切事件
             cut:function(){
 
+            },
+            //语法检查
+            getResult:function(result){
+                console.log(result);
             }
         },
         //生命周期函数
@@ -218,10 +230,13 @@
 
         },
         mounted() {
+            // console.log(consoleService)
             console.log(this.editData)
             var _this = this;
             this.editor = ace.edit('javascript-editor');
             console.log(this.editor);
+            //把editor对象存在vuex中，方便在别的文件中使用editor的方法
+            this.saveEditor(this.editor);
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
             this.editor.setTheme('ace/theme/monokai');
@@ -255,7 +270,22 @@
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
                 this.updateTreeData({value:this.value,name:this.name,save:false});
+
+
             });
+            //监听光标移动
+            this.editor.getSession().selection.on('changeCursor', (e)=> {
+                // console.log(22222222222)
+                //语法检查
+                compileService.grammarCheck(function(result, missingInputs, source){
+                    console.log('语法检查',result)
+                    if(result.errors && result.errors.length>0){
+                        // falseData.error = result.errors;
+                        console.log("result",result.errors);
+                    }
+                },this.value);
+            });
+
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({
                 name: 'save',

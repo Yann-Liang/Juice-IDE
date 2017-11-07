@@ -22,11 +22,20 @@ export const editorAction = {
 		console.log(state.activeEditor)
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err)=>{
 			if(err){
-			
+
 			}else{
 				dispatch('updateTreeData',{value:state.activeEditor.value,name:state.activeEditor.name,save:true},{ root: true });
 			}
 		})
+	},
+	saveEditor({commit,state},obj){
+		commit('SAVE_EDITOR',obj);
+	},
+	boolSearchVisible({commit,state},bool){
+		commit('CHANGE_SEARCH_VISIBLE',bool)
+	},
+	boolReplaceVisible({commit,state},bool){
+		commit('CHANGE_REPLACE_VISIBLE',bool)
 	}
 	// updateObj({commit,state},obj){
 	// 	commit('UPLOAD_EDIT_FILEOBJ',obj)
