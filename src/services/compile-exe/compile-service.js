@@ -9,8 +9,9 @@ class compileServies {
         this.contractName=null;
     }
     compiler(path = 'src/contract/Test.sol'){
-        if(store.state.compile.compileStatus==1) return;
         var _this = this;
+        console.info(store.state.file.editFile);
+        if(store.state.compile.compileStatus==1) return;
         var name = path.slice(path.lastIndexOf('/')+1,path.length);
         consoleService.output('[开始编译]');
         store.dispatch('compileWatch',1);
@@ -86,12 +87,13 @@ class compileServies {
         });
     }
     //语法检查
-    grammarCheck(cb,resource="src/contract/Test.sol"){
+    grammarCheck(cb){
         var source = {
             sources:{
-                [resource]:fs.readFileSync(resource,"utf-8")
+                // [resource]:fs.readFileSync(resource,"utf-8")
+                [store.state.file.editFile.name]:store.state.file.editFile.source
             },
-            target:resource
+            target:store.state.file.editFile.name
         };
         var compiler = solc(window.Module);
         var missingInputs = []
