@@ -17,7 +17,6 @@ class consoleServies {
         logs.forEach((log) => {
             store.dispatch('updateConsoleDetail',log);
         });
-        store.dispatch('updateConsoleDetail',log);
     }
     command(order){
         //执行命令order
