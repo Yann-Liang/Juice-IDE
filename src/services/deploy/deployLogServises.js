@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-11-07 14:05:12
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-07 15:22:31
+ * @Last Modified time: 2017-11-07 15:29:25
  * 用于管理部署日志
  */
 
@@ -34,8 +34,9 @@ class DeployLogStorage {
         return true
     }
 
+
+    //添加日志
     push(...items) {
-        debugger;
         console.log(this)
         if (!this.data||this.data==null||this.data.length==0) {
             this.data = this.get();
@@ -53,6 +54,7 @@ class DeployLogStorage {
         return true
     }
 
+    //设置保存条数
     setSaveLength(len) {
         this.saveLength = len;
         return true;
