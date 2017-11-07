@@ -108,7 +108,7 @@ class compileServies {
         } catch (exception) {
             result = { error: 'Uncaught JavaScript exception:\n' + exception }
         }
-        if(result && result.errors.length>0){
+        if(result.errors && result.errors.length>0){
             let errors = result.errors,errorsKeyArr={},errorsArr=[];
             errors.forEach(function(error){
                 var errorId = error.match(/\w+\.sol\:[0-9]+/i);
