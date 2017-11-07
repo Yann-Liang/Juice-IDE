@@ -18,7 +18,7 @@ export const editorAction = {
 	updateActiveEditor({commit,state},data){
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
-	saveEditorFile({dispatch,commit,state,actions}){
+	saveEditorFile({dispatch,commit,state,actions},cb){
 		console.log(state.activeEditor)
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
 			if(err){
@@ -33,6 +33,9 @@ export const editorAction = {
 				}else{
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 				}
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
 			}
 		})
 	},
