@@ -94,6 +94,7 @@ class compileServies {
             },
             target:resource
         };
+        console.log('source',source)
         var compiler = solc(window.Module);
         var missingInputs = []
         var missingInputsCallback = function (path) {

@@ -134,6 +134,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
+                console.log(editorData.source)
 	            this.updateActiveEditor(editorData);
             },
             //编辑区的change事件
