@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-07 14:09:04
+ * @Last Modified time: 2017-11-07 14:56:46
  */
 //引入web3
 let Web3 = require('web3');
@@ -143,13 +143,12 @@ class DeployService {
 
     //合约部署-开始
     deployStart(fileName, contractName) {
-        let time=new Date().Format("yyyy-MM-dd HH:mm:ss")
+        let time = new Date().Format("yyyy-MM-dd HH:mm:ss"),
+            str = `${fileName}:${contractName}合约正在部署`;
         consoleService.output(time);
-        deployLogService.set(time);
         consoleService.output('[开始部署]');
-        deployLogService.set('[开始部署]');
-        consoleService.output(`${fileName}:${contractName}合约正在部署`);
-        deployLogService.set(`${fileName}:${contractName}合约正在部署`);
+        consoleService.output(str);
+        deployLogService.push(time,'[开始部署]',str);
         return new Promise((resolve, reject) => {
 
         })
