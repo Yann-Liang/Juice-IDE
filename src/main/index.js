@@ -82,6 +82,7 @@ function createWindow() {
 			mode: 'undocked'
 		});
 	});
+	globalShortcut.unregister('ctrl+-')
 
 };
 

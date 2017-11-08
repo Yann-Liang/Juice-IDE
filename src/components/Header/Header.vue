@@ -140,10 +140,10 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editor'])
+            ...mapGetters(['editor','copyText'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -272,7 +272,8 @@
                         break;
                     case '3':
                     case 3:
-                        console.log('复制');//复制
+                    console.log(_this.editor.getCopyText())
+                        _this.updateCopyText(_this.editor.getCopyText());//复制
                         break;
                     case '4':
                     case 4:
@@ -280,7 +281,7 @@
                         break;
                     case '5':
                     case 5:
-                        console.log('复制');//粘贴
+                        _this.editor.insert(_this.copyText);//粘贴
                         break;
                     case '6':
                     case 6:

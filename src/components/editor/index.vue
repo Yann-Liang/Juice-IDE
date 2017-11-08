@@ -3,7 +3,7 @@
         <div class="file-tab">
             <div class="tabs" ref='tabs'>
                 <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
-                    <i>&lt;</i>
+                    <i class='el-icon-d-arrow-left'></i>
                 </div>
                 <ul class='files' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
@@ -13,9 +13,8 @@
                     </li>
                     <li class='new-file' @click='newFile'>+</li>
                 </ul>
-                <!-- <div class='new-file' @click='newFile'>+</div> -->
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
-                    <i>&gt;</i>
+                    <i class='el-icon-d-arrow-right'></i>
                 </div>
             </div>
         </div>
@@ -23,8 +22,6 @@
             <div class="tool">
                 <span class='save' @click='save'>保存</span>
                 <span class='save' @click='replace'>替换</span>
-                <span class='save' @click='copy($event)'>复制</span>
-                <span class='save' @click='paste($event)'>粘贴</span>
                 <span class="search" @click='search'>搜索</span>
                 <span class='format' @click='format' >格式化</span>
                 <span class='increase' @click='increase'>放大</span>
@@ -67,6 +64,10 @@
     import {mapState, mapActions, mapGetters} from 'vuex';
     import Editor from '@/components/editor-panel/panel'
     import file from '@/services/API-file'
+    // import {remote} from 'electron'
+    // const globalShortcut = remote.globalShortcut
+    const {globalShortcut} = require('electron').remote
+
     export default {
         //组件名
         name: 'index',
@@ -107,27 +108,13 @@
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
+                console.log('放大')
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                this.$refs.childMethod.decrease();
-            },
-
-            //copy事件
-            copy:function(event){
-                console.log('发生复制事件');
-                console.log(this.editor)
-                // this.editor.commands.bindKeys({ 'ctrl-z': 'undo' })
-                this.editor.onCommandKey()
-                console.log()
-            },
-            //paste事件
-            paste:function(event){
-                // this.$refs.childMethod.paste();
-                if(event.ctrlKey && window.event.keyCode == 86){
-                    return true;
-                }
+                console.log('缩小')
+                this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             findFunction:function(bool){
                 console.log(bool)
@@ -416,11 +403,32 @@
         //生命周期函数
         created() {
             this.init();
-            document.body.oncopy = function(){
-                return true;
-            },
-            document.onselectstart = function(){
-                //return false;
+            var _this = this;
+            document.onkeydown = function(event){
+                event.stopPropagation();
+                var e = event || window.event || arguments.callee.caller.arguments[0];
+                if(e && e.keyCode==38){ // 按 up
+                    //要做的事情
+                    _this.onSearchUp();
+                }
+                if(e && e.keyCode==40){ // 按 down
+                    //要做的事情
+                    _this.onSearchDown();
+                }
+                if(e && e.keyCode==27){ // 按 Esc
+                    //要做的事情
+                    _this.boolSearchVisible(false);
+                    _this.boolReplaceVisible(false);
+                }
+                if (e.ctrlKey && e.keyCode == 187){ //按 ctrl++
+                    console.log('方法')
+                    _this.increase();
+                }
+                if (e.ctrlKey && e.keyCode == 189){ //按 ctrl--
+                    console.log("fafff")
+                    _this.decrease();
+                }
+
             }
         },
         beforeMount() {

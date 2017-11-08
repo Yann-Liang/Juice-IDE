@@ -9,7 +9,7 @@ export const editorAction = {
 		commit('UPDATE_SAVE_CODE',code)
 	},
 	updateData({commit,state},data){
-		alert(11111111111111111111111111111111111111111111111111)
+		// alert(11111111111111111111111111111111111111111111111111)
 		localStorage.setItem('editFileData',JSON.stringify(data))
 		commit('UPLOAD_EDIT_FILEDATA',data)
 	},
@@ -19,7 +19,7 @@ export const editorAction = {
 	updateActiveEditor({commit,state},data){
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
-	saveEditorFile({dispatch,commit,state},cb){
+	saveEditorFile({dispatch,commit,state,rootState},cb){
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
 			if(err){
 
@@ -28,7 +28,7 @@ export const editorAction = {
 					console.log(state.fileData);
 					const keyId = file.keyIdFn(filepath);
 					dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
-					
+
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
 					// 更新url
 					let url = rootState.file.url;
@@ -40,7 +40,7 @@ export const editorAction = {
 							return;
 						}
 					})
-					
+
 					dispatch('updateUrl',url,{ root: true });
 
 					// 更新未保存vuex的状态
@@ -52,10 +52,10 @@ export const editorAction = {
 							return;
 						}
 					});
-					
-					
+
+
 					console.log(editData);
-					
+
 					dispatch('updateData',editData,{ root: true });
 
 
@@ -126,5 +126,9 @@ export const editorAction = {
 	},
 	changeFileData({commit,state},data){
 		commit('UPDATE_File_DATA',data)
+	},
+	//复制信息保存
+	updateCopyText({commit,state},data){
+		commit('UPDATE_COPY_TEXT',data)
 	}
 }
