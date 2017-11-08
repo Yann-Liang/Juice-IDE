@@ -15,7 +15,7 @@
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
                 <query-tab class="tab" v-if="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
-                <i class="border" v-if="queryTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <i class="border" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
@@ -233,7 +233,7 @@
 
     .tab-box{
         display: flex;
-        flex-direction:column;
+        /*flex-direction:column;*/
         overflow-y:auto;
     }
     .tab{
