@@ -12,8 +12,8 @@
             <div class="tab-box bggray">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
-                <run-tab class="tab" v-if="runTabFlag" :style="{width:tabWidth+'px'}"></run-tab>
-                <i class="border bgblue" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <query-tab class="tab" v-if="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
+                <i class="border bgblue" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
@@ -31,7 +31,7 @@
     import comHeader from "@/components/Header/Header.vue";
     import filesTab from "@/components/tabs/files-tab/";
     import deployTab from "@/components/tabs/deploy-tab/";
-    import runTab from "@/components/tabs/run-tab/";
+    import queryTab from "@/components/tabs/query-tab/";
     import consoleEle from "@/components/console/";
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
@@ -48,7 +48,7 @@
             return {
                 filesTabFlag: false,
                 deployTabFlag: false,
-                runTabFlag: false,
+                queryTabFlag: false,
                 ghostbarFlag:false,
                 ghostbarLeft:100,
                 tabWidth:223,
@@ -66,26 +66,26 @@
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
-                this.runTabFlag = false;
+                this.queryTabFlag = false;
             },
             compile() {
                 this.filesTabFlag = false;
                 this.deployTabFlag = false;
-                this.runTabFlag = false;
+                this.queryTabFlag = false;
                 compileService.compiler();
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
                 this.filesTabFlag = false;
-                this.runTabFlag = false;
+                this.queryTabFlag = false;
             },
-            runTab() {
-                this.runTabFlag = !this.runTabFlag;
+            queryTab() {
+                this.queryTabFlag = !this.queryTabFlag;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
             hiddenTabs(){
-                this.runTabFlag = false;
+                this.queryTabFlag = false;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
             },
@@ -194,7 +194,7 @@
             comHeader,
             filesTab,
             deployTab,
-            runTab,
+            queryTab,
             consoleEle,
             editor
         },
@@ -230,7 +230,7 @@
 
     .tab-box{
         display: flex;
-        flex-direction:column;
+        /*flex-direction:column;*/
         overflow-y:auto;
         border-right:solid 1px #e5e5e5;
     }

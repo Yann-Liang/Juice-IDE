@@ -22,12 +22,12 @@
             </el-form>
             <el-form :label-position="'top'" label-width="80px" :model="form2">
                 <el-form-item label="选择需要运行的函数">
-                    <el-select v-model="form2.selectFn" placeholder="运行选择需要运行的函数">
+                    <el-select v-model="form2.selectFnIndex" placeholder="运行选择需要运行的函数">
                         <el-option v-for="(item,index) in contractFn" :key="index" :label="item.name" :value="index"></el-option>
                     </el-select>
                 </el-form-item>
                 <p class="darker">输入函数运行所需参数</p>
-                <el-form-item v-for="(item,index) in contractFn[form2.selectFn].inputs" :key="index" :label="item.name">
+                <el-form-item v-for="(item,index) in contractFn[form2.selectFnIndex].inputs" :key="index" :label="item.name">
                     <el-input v-model="args[index].arg" :placeholder="item.type"></el-input>
                 </el-form-item>
 
@@ -56,11 +56,11 @@
                 },
                 form2:{
                     selectDeployData:'',
-                    selectFn:0,
+                    selectFnIndex:0,//运行的函数的下标
 
                 },
                 flag:false,
-                args:[{},{}],
+                args:[{arg:''},{arg:''}],
                 deployedData:contractServies.data
             }
         },
@@ -80,9 +80,9 @@
             },
             runDisabled:function() {
                 let bool=false;
-                // for(let i=0;i<this.form2.selectFn.inputs.length;i++){
-                //      console.log(this.selectFn.inputs[i].arg)
-                //     if(!this.selectFn.inputs[i].arg){
+                // for(let i=0;i<this.form2.selectFnIndex.inputs.length;i++){
+                //      console.log(this.selectFnIndex.inputs[i].arg)
+                //     if(!this.selectFnIndex.inputs[i].arg){
                 //         bool=true;
                 //         break;
                 //     }
@@ -106,7 +106,7 @@
             run(){
                 console.log(this.args);
                 let argsList=[],
-                    inputs=this.contractFn[this.form2.selectFn].inputs;
+                    inputs=this.contractFn[this.form2.selectFnIndex].inputs;
                 for(let i=0;i<this.args.length;i++){
                     if(inputs[i].type=='string'){
                         argsList[i]=this.args[i].arg;
@@ -119,7 +119,7 @@
                         }
                     }
                 }
-                contractServies.run(this.form2.selectDeployData,this.contractFn[this.form2.selectFn].name,this.form2.selectFn,argsList).then((res)=>{
+                contractServies.run(this.form2.selectDeployData,this.contractFn[this.form2.selectFnIndex].name,this.form2.selectFnIndex,argsList).then((res)=>{
                     console.log('run result=',res)
                 })
             },
@@ -137,9 +137,12 @@
         },
         //监视
         watch: {
-            'form2.selectFn':function () {
-                //alert(12323);
-                //this.args=
+            'form2.selectFnIndex':function () {
+                let length=this.contractFn[this.form2.selectFnIndex].inputs.length;
+                this.args=[];
+                for(let i=0;i<length;i++){
+                     this.args[i]={arg:''};
+                }
             }
         },
         //组件
