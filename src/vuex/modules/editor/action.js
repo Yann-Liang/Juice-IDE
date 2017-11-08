@@ -9,6 +9,7 @@ export const editorAction = {
 		commit('UPDATE_SAVE_CODE',code)
 	},
 	updateData({commit,state},data){
+		alert(11111111111111111111111111111111111111111111111111)
 		localStorage.setItem('editFileData',JSON.stringify(data))
 		commit('UPLOAD_EDIT_FILEDATA',data)
 	},

@@ -25,9 +25,6 @@
                 <span class='save' @click='replace'>替换</span>
                 <span class='save' @click='copy($event)'>复制</span>
                 <span class='save' @click='paste($event)'>粘贴</span>
-                <span class='save' @click='repeal'>撤销</span>
-                <span class='save' @click='renew'>恢复</span>
-                <span class='save' @click='cut'>剪切</span>
                 <span class="search" @click='search'>搜索</span>
                 <span class='format' @click='format' >格式化</span>
                 <span class='increase' @click='increase'>放大</span>
@@ -116,14 +113,7 @@
             decrease:function(){
                 this.$refs.childMethod.decrease();
             },
-            //
-            keydown:function(){
-                document.onKeydown = function(){
-                    if (event.ctrlKey && window.event.keyCode==67){
-                        return true;
-                    }
-                }
-            },
+
             //copy事件
             copy:function(event){
                 console.log('发生复制事件');
@@ -138,19 +128,6 @@
                 if(event.ctrlKey && window.event.keyCode == 86){
                     return true;
                 }
-            },
-            //撤销事件
-            repeal:function(){
-                console.log(this.editor);
-                this.editor.commands.commands.undo.exec(this.editor);
-            },
-            //恢复事件
-            renew:function(){
-                this.editor.commands.commands.redo.exec(this.editor);
-            },
-            //剪切事件
-            cut:function(){
-                this.editor.commands.commands.cut.exec(this.editor);
             },
             findFunction:function(bool){
                 console.log(bool)
