@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-07 15:46:24
+ * @Last Modified time: 2017-11-07 15:57:35
  */
 //引入web3
 let Web3 = require('web3');
@@ -104,7 +104,7 @@ class DeployService {
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
-            console.log('contractServies.web3', this.web3)
+            debugger;
             let myContractReturned = calcContract.new({
                 data: bin,
                 from: userAddress,
@@ -169,8 +169,8 @@ class DeployService {
 
     //合约部署-部署失败
     deployFailure(err) {
-        consoleService.output('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
-        deployLogService.push('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
+        consoleService.output('[部署结果]',{ logError: 'Deploy failure' },{ info: err.message });
+        deployLogService.push('[部署结果]',{ logError: 'Deploy failure' },{ info: err.message });
         return new Promise((resolve, reject) => {
             resolve()
         })
