@@ -2,20 +2,18 @@
     <div class="index" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
-
-
         <div class="main">
-            <ul class="tabs">
-                <li @click="filesTab()">文件</li>
-                <li @click="compile()">编译</li>
-                <li @click="deployTab()">部署</li>
-                <li @click="runTab()">运行</li>
+            <ul class="tabs bgblue white">
+                <li @click="filesTab()"><i class="iconfont" title="文件">&#xe615;</i></li>
+                <li @click="compile()"><i class="iconfont" title="编译">&#xe613;</i></li>
+                <li @click="deployTab()"><i class="iconfont" title="部署">&#xe614;</i></li>
+                <li @click="runTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
             </ul>
-            <div class="tab-box">
+            <div class="tab-box bggray">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
                 <run-tab class="tab" v-if="runTabFlag" :style="{width:tabWidth+'px'}"></run-tab>
-                <i class="border" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <i class="border bgblue" v-if="runTabFlag||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
@@ -23,7 +21,7 @@
             </div>
 
         </div>
-        <div class="ghostbar" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
+        <div class="ghostbar bgblue" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
@@ -223,10 +221,9 @@
     .tabs {
         width: 48px;
         min-width:48px;
-        background: #0b8aee;
-        color: #fff;
         text-align: center;
         >li {
+            margin:20px 0 30px;
             cursor: pointer;
         }
     }
@@ -235,6 +232,7 @@
         display: flex;
         flex-direction:column;
         overflow-y:auto;
+        border-right:solid 1px #e5e5e5;
     }
     .tab{
         width: 223px;
@@ -244,7 +242,6 @@
     .border{
         width: 1px;
         height: 100%;
-        background:#0b8aee;
         cursor: col-resize;
         //border-right: 1px solid ;
     }
@@ -265,7 +262,6 @@
 
     .ghostbar{
         width             : 3px;
-        background-color  : #0b8aee;
         opacity           : 0.5;
         position          : absolute;
         cursor            : col-resize;
@@ -273,5 +269,7 @@
         top               : 100px;
         bottom            : 0;
     }
-
+    .iconfont{
+        font-size:26px;
+    }
 </style>

@@ -1,22 +1,21 @@
 <template>
-    <div class="header">
-
+    <div class="header bgwhite info">
         <div>
             <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
-                    <ul v-show='fileVisible' ref="filedata" >
+                    <ul v-show='fileVisible' ref="filedata" class="bgwhite shadow">
                         <li v-for="fileName in fileData" :key="fileName" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == fileName}">{{fileName}}</li>
                     </ul>
                 </li>
                 <li>
                     编辑
-                    <ul v-show='editVisible' ref="editdata" >
+                    <ul v-show='editVisible' ref="editdata" class="bgwhite shadow">
                         <li v-for="(value,key) in editData"  :key="value" @mouseenter="showActive(value)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == value}" :data-type="value" @click.stop="clickEditEvent($event)">
                             {{value}}
-                            <span :data-type="value">{{key}}</span>
+                            <span :data-type="value" class="dark">{{key}}</span>
                         </li>
                     </ul>
                 </li>
@@ -173,13 +172,12 @@
 </script>
 
 <style lang="less" scoped>
-@height:48px;
+@height:30px;
    .header{
        height: @height;
        display: flex;
        flex-direction:row;
-       background-color:#1b1b1b;
-       color:#fff;
+       border-bottom:solid 1px #e5e5e5;
        .img{
         img{
             display: block;
@@ -190,35 +188,25 @@
         display: flex;
         flex-direction:row;
         height:@height;
-        padding-left:0px;
-        li{
+        padding-left:20px;
+        >li{
             line-height: @height;
-            padding:0 30px;
+            margin-right:126px;
             position: relative;
             ul{
                 position: absolute;
-                width:170px;
+                width:150px;
                 top:@height;
                 left:0px;
-                padding:5px 0;
-                background-color:#1b1b1b;
                 z-index:1000;
                 .same{
-                    height:35px;
-                    line-height: 35px;
-                    padding:0 20px;
+                    height:30px;
+                    line-height: 30px;
+                    padding:0 18px;
                     span{
                         float:right;
-                        color:#999999;
                     }
                 }
-                .active{
-                    background-color:gray;
-                }
-            }
-            &:hover{
-                background:gray;
-
             }
         }
        }

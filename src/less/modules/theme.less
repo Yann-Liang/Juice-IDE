@@ -1,0 +1,72 @@
+//variable
+@blue:#0b8aee;
+@darkblue:#0068b7;
+@gray:#fafafa;
+@green:#5bb75b;
+@danger:#ff0000;
+@warning:#faa732;
+@fontBase:#333;
+@white:#fff;
+
+//background color
+.bgblue{
+  background-color: @blue!important;
+}
+.bgwhite{
+  background-color: @white!important;
+}
+.bggray{
+  background-color: @gray!important;
+}
+//font color
+.default{
+  color:@fontBase
+}
+.dark{
+  color:@fontBase*3
+}
+.darker{
+  color:@fontBase*2
+}
+.white{
+  color:@white
+}
+.info{
+  color:@blue
+}
+.danger{
+  color:@danger
+}
+.success{
+  color:@green
+}
+.warning{
+  color:@warning
+}
+
+//shadow
+.shadow{
+  border:solid 1px #e5e5e5;
+  box-shadow:0 0 7px 3px rgba(204,204,204,0.35);
+}
+
+//active
+.active{
+  background-color: @blue;
+  color:#fff;
+}
+.activeFile{
+  background: lighten(@blue,43%);
+}
+
+//button
+.btn-info{
+  background-color: @blue;
+  color:@white;
+  border:solid 1px @blue;
+  &:hover{
+    border-color:@darkblue;
+    background-color: @darkblue;;
+    color:@white;
+  }
+}

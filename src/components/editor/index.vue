@@ -1,11 +1,11 @@
 <template>
     <div class="">
-        <div class="file-tab">
+        <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
+                <div class='scroll-bar left-bar info' ref='leftbar' @click='scrollLeft' >
                     <i>&lt;</i>
                 </div>
-                <ul class='files' ref='files'>
+                <ul class='files white' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
                         <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
@@ -14,51 +14,47 @@
                     <li class='new-file' @click='newFile'>+</li>
                 </ul>
                 <!-- <div class='new-file' @click='newFile'>+</div> -->
-                <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
+                <div class='scroll-bar right-bar info' @click='scrollRight' ref='rightbar'>
                     <i>&gt;</i>
                 </div>
             </div>
-        </div>
-        <div class="tools">
-            <div class="tool">
-                <span class='save' @click='save'>保存</span>
-                <span class='save' @click='replace'>替换</span>
-                <span class='save' @click='copy($event)'>复制</span>
-                <span class='save' @click='paste($event)'>粘贴</span>
-                <span class='save' @click='repeal'>撤销</span>
-                <span class='save' @click='renew'>恢复</span>
-                <span class='save' @click='cut'>剪切</span>
-                <span class="search" @click='search'>搜索</span>
-                <span class='format' @click='format' >格式化</span>
-                <span class='increase' @click='increase'>放大</span>
-                <span class='decrease' @click='decrease'>缩小</span>
-                <span class='close' @click='close'>关所</span>
-            </div>
-            <div class="search-model" v-if='searchVisible'>
-                <div class='search-content'>
-                    <span>搜索</span>
-                    <span>
-                        <input type="text" v-model='inputValue' placeholder="搜索" @input='onSearch' style="width:300px;">
-                    </span>
-                    <span @click='onSearchUp'>↑</span>
-                    <span @click='onSearchDown'>↓</span>
-                    <span @click="offSearch">X</span>
+            <div class="tools">
+                <div class="tool">
+                    <span class='icon icon-save' @click='save' title="保存当前文件"></span>
+                    <span class="icon icon-search" @click='search' title="搜索"></span>
+                    <span class='icon icon-format' @click='format' title="代码格式化"></span>
+                    <span class='icon icon-big-font' @click='increase' title="字体放大"></span>
+                    <span class='icon icon-sm-font' @click='decrease' title="字体缩小"></span>
+                    <span class='icon icon-close-all' @click='close' title="关闭所有窗口"></span>
                 </div>
-            </div>
-            <div class="replace-model" v-if='replaceVisible'>
+
+                <div class="replace-model" v-if='replaceVisible'>
                 <span>
                     form:<input type="text" name="" v-model='fromValue' @input='fromSearch'/>
                 </span>
-                <span>
+                    <span>
                     to  :<input type="text" name="" v-model="toValue"/>
                 </span>
-                <span @click='replaceSign' >单个替换</span>
-                <span @click='replaceAll'>全部替换</span>
-                <span @click='offReplace'>x</span>
+                    <span @click='replaceSign' >单个替换</span>
+                    <span @click='replaceAll'>全部替换</span>
+                    <span @click='offReplace'>x</span>
+                </div>
+            </div>
+            <div class="search-model shadow" v-if='searchVisible'>
+                <div class='search-content'>
+                    <span>
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;">
+                    </span>
+                    <span class="btn btn-info">查找</span>
+                    <!--<span @click='onSearchUp'>↑</span>-->
+                    <!--<span @click='onSearchDown'>↓</span>-->
+                    <!--这里的上下切换，换成了input的键盘事件-->
+                    <span @click="offSearch" class="icon icon-close"></span>
+                </div>
             </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
-        <div class="tips" v-if='tipsVisible'>
+        <div class="tips default" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
     </div>
@@ -497,24 +493,23 @@
     描述：统一使用less,局部样式
 -->
 <style lang="less" scoped>
+    @import "../../less/modules/theme.less";
 .file-tab{
-    height:30px;
-    // width:100%;
-    background-color:gray;
+    display:flex;
+    align-content: space-between;
+    height:40px;
+    line-height:40px;
     position: relative;
-    overflow:hidden;
     .tabs{
-        width:100%;
+        flex-grow: 1;
         position: relative;
+        padding-right:20px;
+        overflow-x:hidden;
         .scroll-bar{
             position: absolute;
             width:20px;
-            height:30px;
-            background:red;
-            color:#fff;
             top:0;
             z-index:999;
-            // height:100%;
             font-size:16px;
             cursor: pointer;
         }
@@ -529,14 +524,10 @@
             flex-wrap:nowrap;
             flex-direction:row;
             justify-content:flex-start;
-            height:30px;
-            line-height: 30px;
             position: absolute;
             left:20px;
             overflow:hidden;
             cursor: pointer;
-            background-color:#000;
-            color:#fff;
             li{
                 padding:0 10px;
                 border-right:1px solid #fff;
@@ -544,61 +535,48 @@
                 flex-wrap:nowrap;
                 flex-direction:row;
                 justify-content:flex-end;
+                background-color:#c0c0c0;
                 span{
                     display: inline-block;
                     white-space: nowrap;
                     &:last-child{
                         // float:right;
                         padding:0 10px;
-                        &:hover{
-                            background-color:gray
-                        }
+                        /*&:hover{*/
+                            /*background-color:gray*/
+                        /*}*/
                     }
                 }
             }
+            .new-file{
+                margin:7px 0 0 10px;
+                display:inline-block;
+                padding:0;
+                width:24px;
+                height:24px;
+                line-height:24px;
+                text-align: center;
+                border-radius: 24px;
+                background-color:#838d93;
+            }
             .li-active{
-                color: red;
+                background-color: #999;
                 font-weight: bold;
                 border-bottom: 0 none;
-
             }
-
-        }
-        .new-file{
-
         }
 
     }
 }
 .tools{
-
-    height:30px;
-    color:#fff;
-    background-color:#000;
+    width:227px;
     position: relative;
-    width:100%;
     .tool{
         text-align: right;
         span{
             display: inline-block;
-            line-height: 25px;
-            padding:0 5px;
-            border:1px solid #000;
             cursor: pointer;
-            border-left:1px solid #fff;
         }
-    }
-    .search-model{
-        width: 480px;
-        height: 40px;
-        padding: 5px;
-        border-radius: 10px;
-        background-color: #000;
-        position: absolute;
-        top: 30px;
-        left: 50%;
-        z-index: 1000000;
-        margin-left: -240px;
     }
     .replace-model{
         width: 480px;
@@ -611,6 +589,45 @@
         left: 50%;
         z-index: 1000000;
         margin-left: -240px;
+    }
+}
+.search-model{
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -240px;
+    padding: 0 10px;
+    width: 440px;
+    height: 60px;
+    line-height: 60px;
+    border:solid 1px #e5e5e5;
+    border-radius: 3px;
+    input{
+        padding-left:10px;
+        width:300px;
+        height:38px;
+        line-height:38px;
+        border:solid 1px #bfbfbf;
+        &:focus{
+            outline:none;
+            border:solid 1px @blue;
+         }
+    }
+    .btn{
+        margin:0 10px;
+        display: inline-block;
+        width:60px;
+        height:38px;
+        line-height:38px;
+        text-align: center;
+        border-radius:3px;
+    }
+    .icon-close{
+        position:absolute;
+        right:10px;
+        top:23px;
+        margin-right:0;
     }
 }
 .javascript-editor{
@@ -627,5 +644,33 @@
 
     // background-color:#000;
 }
-
+.icon{
+    margin-right:14px;
+    display:inline-block;
+    width:16px;
+    height:40px;
+}
+.icon-close{
+    height:16px;
+    background: url('./images/close.png') no-repeat center center;
+}
+.icon-save{
+    background: url('./images/save_file.png') no-repeat center center;
+}
+.icon-search{
+    background: url('./images/search.png') no-repeat center center;
+}
+.icon-format{
+    width:20px;
+    background: url('./images/formatting.png') no-repeat center center;
+}
+.icon-big-font{
+    background: url('./images/big_font_widget.png') no-repeat center center;
+}
+.icon-sm-font{
+    background: url('./images/decrease_font_size.png') no-repeat center center;
+}
+.icon-close-all{
+    background: url('./images/close_all_libraries.png') no-repeat center center;
+}
 </style>
