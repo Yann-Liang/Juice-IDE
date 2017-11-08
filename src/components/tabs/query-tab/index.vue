@@ -2,7 +2,13 @@
     <div class="run-index">
         <el-form :label-position="'top'" label-width="80px" :model="form">
             <el-form-item label="查询需要运行的合约">
-                <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
+                <el-input v-model="form.address" placeholder="输入合约地址"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-input
+                    type="textarea"
+                    :rows="8"
+                    placeholder="输入合约ABI" v-model="form.abi"></el-input>
             </el-form-item>
             <el-button class="tab-btn" type="primary" @click="queryContract">查询合约</el-button>
         </el-form>
@@ -11,7 +17,6 @@
                 <el-option label="区域一" value="shanghai"></el-option>
                 <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
-
             <p>输入函数运行所需参数</p>
              <el-form-item label="To">
                 <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
@@ -35,7 +40,8 @@
         data() {
             return {
                 form:{
-                    input:''
+                    address:'',
+                    abi:'',
                 },
                 form2:{
 
