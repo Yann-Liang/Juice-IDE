@@ -75,7 +75,7 @@
                 return !(this.form.select && this.form.contractItem);
             },
             contractFn:function() {
-                console.log(this.deployedData[this.form2.selectDeployData])
+                console.log(this.deployedData,this.form2.selectDeployData)
                 return this.deployedData[this.form2.selectDeployData].contract.abi
             },
             runDisabled:function() {
@@ -96,8 +96,11 @@
                 let item=this.form.contractItem;
                 contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x2619db00823169359d24697fb38fff5062e11334').then((address)=>{
                     console.log('address',address)
-                    this.form2.selectDeployData=address;
-                    this.flag=true;
+                     this.form2.selectDeployData=address;
+                    let length=this.contractFn[address].inputs.length;
+                    for(let i=0;i<length;i++){
+                        this.args[i]={arg:''};
+                    }
                 })
             },
             queryContract(){

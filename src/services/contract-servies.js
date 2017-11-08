@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-08 16:10:14
+ * @Last Modified time: 2017-11-08 19:03:34
  */
 //引入web3
 let Web3 = require('web3');
@@ -105,6 +105,7 @@ class DeployService {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
             debugger;
+            console.log(bin);
             let myContractReturned = calcContract.new({
                 data: bin,
                 from: userAddress,
@@ -117,6 +118,7 @@ class DeployService {
                         this.result.TxHash = myContract.transactionHash;
                         console.log("部署合约的交易哈希值: " + myContract.transactionHash);
                     } else {
+                        debugger;
                         console.log("合约的部署地址: " + myContract.address);
                         this.result.contractAddress = myContract.address;
                         this.data[myContract.address] = {
@@ -262,7 +264,7 @@ class DeployService {
     }
 
     runStart(contractAddress,contractFnName,constant,payable) {
-        consoleService.output('[开始运行]', `Function [${fnName}] invoking...`, 'Invoke args:', {
+        consoleService.output('[开始运行]', `Function [${contractFnName}] invoking...`, 'Invoke args:', {
             From: this.user.userAddress,
             to: contractAddress,
             constant: constant,
