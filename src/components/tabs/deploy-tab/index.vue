@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="deploy">
         <el-form :label-position="'top'" label-width="220px" :model="form">
             <el-form-item label="选择需要部署的合约">
                 <el-select v-model="form.select" placeholder="选择合约文件">
@@ -13,7 +13,7 @@
             </el-form-item>
         </el-form>
 
-        <el-button class="tab-btn" type="primary" @click="deploy" :disabled="disabled">部署合约</el-button>
+        <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
         <div v-if="flag">
             <el-form :label-position="'top'" label-width="80px" :model="form2">
                 <el-select v-model="form2.selectDeployData" filterable  placeholder="选择合约文件">
@@ -26,12 +26,12 @@
                         <el-option v-for="(item,index) in contractFn" :key="index" :label="item.name" :value="index"></el-option>
                     </el-select>
                 </el-form-item>
-                <p>输入函数运行所需参数</p>
+                <p class="darker">输入函数运行所需参数</p>
                 <el-form-item v-for="(item,index) in contractFn[form2.selectFnIndex].inputs" :key="index" :label="item.name">
                     <el-input v-model="args[index].arg" :placeholder="item.type"></el-input>
                 </el-form-item>
 
-                <el-button class="tab-btn" type="primary" @click="run" :disabled="runDisabled">运行</el-button>
+                <el-button class="tab-btn btn-info" @click="run" :disabled="runDisabled">运行</el-button>
             </el-form>
 
         </div>
@@ -164,5 +164,14 @@
 </script>
 
 <style lang="less" scoped>
-
+    .deploy{
+        padding:28px 10px;
+        color:#666;
+        .el-form-item{
+            margin-bottom:10px;
+        }
+    }
+    .tab-btn{
+        margin:20px 0 30px;
+    }
 </style>

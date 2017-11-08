@@ -11,7 +11,7 @@ const watch = require('watch');
 // id标识文件的类型 save标识是否保存
 class file {
 	constructor() {
-	
+
 	}
 	//遍历文件夹，获取所有文件夹里面的文件信息
 	/*
@@ -45,7 +45,7 @@ class file {
 				filesList.push(rootItem);
 			}
 		});
-		
+
 		filesList.forEach((item,index)=>{
 			let targetObj = {};
 			if(item.children){
@@ -73,7 +73,7 @@ class file {
 					item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
 					filesList.push(item);
 				}
-				
+
 				that.readFile(path+'/'+file,filesList,item);
 			}else{
 				//创建一个对象保存信息
@@ -81,7 +81,7 @@ class file {
 				obj.size = states.size;//文件大小，以字节为单位
 				obj.name = file;//文件名
 				obj.path = path+'/'+file; //文件绝对路径
-				
+
 				if(targetObj["children"]){
 					var item = {name:file,value:obj.path,id:2,save:true,keyId:preId}
 					targetObj["children"].push(item);
@@ -102,32 +102,32 @@ class file {
 	writeFile(fileName,data,fn){
 		fs.writeFile(fileName,data,'utf-8',fn);
 	}
-	
+
 	fsReadFile(fileName,fn){
 		fs.readFile(fileName,'utf-8',fn);
 	}
-	
+
 	// 文件是否存在
 	exists(filePath){
 		return fs.existsSync(filePath);
 	}
-	
+
 	// 是不是文件
 	isFile(path){
 		return this.exists(path) && fs.statSync(path).isFile();
 	}
-	
+
 	// 是不是文键夹
 	isDir(path){
 		return this.exists(path) && fs.statSync(path).isDirectory();
 	}
-	
+
 	// 通过路径获取文件名
 	basename(filePath){
 		const name = path.basename(filePath);
 		return name;
 	}
-	
+
 	//编辑器新建文件
 	newFile (activePath,fileName,fn){
 		if(activePath){
@@ -163,7 +163,7 @@ class file {
 			});
 		}
 	}
-	
+
 	//编辑器新建文件夹
 	newMkdir(activePath,fileName,fn){
 		if(activePath){
@@ -186,8 +186,8 @@ class file {
 			console.log('待定')
 		}
 	}
-	
-	
+
+
 	//删除文件
 	removeFile(path,fn){
 		console.log(path);
@@ -196,7 +196,7 @@ class file {
 			fn && fn();
 		})
 	}
-	
+
 	// 过滤未保存的文件
 	filterFile (data, id) {
 		const that = this;
@@ -210,7 +210,7 @@ class file {
 		newData.forEach(x => x.children && (x.children = that.filterFile(x.children, id)))
 		return newData
 	}
-	
+
 	// 保存文件
 	saveFile(path,name,source,fn){
 		console.log(name);
@@ -231,8 +231,8 @@ class file {
 			})
 		}
 	}
-	
-	
+
+
 	// 保存所有文件
 	saveAllHaveFile(fileData,fn){
 		// fileData.forEach(x => {
@@ -268,9 +268,9 @@ class file {
 				if(filepath){
 					this.writeFile(filepath,'dsa222',(err)=>{
 						if(err){
-						
+
 						}else{
-						
+
 						}
 					})
 				}
@@ -279,8 +279,8 @@ class file {
 			})
 		}
 	}
-	
-	
+
+
 	// 文件重命名
 	renameFile(oldpath,newpath,fn){
 		fs.rename(oldpath,newpath, function(err) {
@@ -290,7 +290,7 @@ class file {
 			fn && fn();
 		})
 	}
-	
+
 	// 导入文件
 	exportFile(type,fn){
 		let properties;
@@ -307,7 +307,7 @@ class file {
 			fn && fn(filepath)
 		})
 	}
-	
+
 	// 更新文件的状态
 	updateFile(data,obj){
 		const that = this;
@@ -327,26 +327,26 @@ class file {
 		data.forEach(x => x.children && (x.children = that.updateFile(x.children, obj)))
 		return data;
 	}
-	
+
 	// 获取文件的信息
 	fileDetail(path){
 		const stat = fs.statSync(path);
 		return stat
 	}
-	
+
 	// 获取时间戳
 	timestampFn(){
 		const timestamp=new Date().getTime()
 		return timestamp
 	}
-	
+
 	//添加文件名后缀
 	uffixName(name,suffix){
 		suffix = suffix || '.sol';
 		name = name + suffix;
 		return name;
 	}
-	
+
 	keyIdFn(path,id){
 		let keyId;
 		if(path){
@@ -357,7 +357,7 @@ class file {
 		}
 		return keyId;
 	}
-	
+
 	// 监听文件变化
 	watchFile(pathArr,fn){
 		pathArr.forEach((item,index)=>{
@@ -381,7 +381,7 @@ class file {
 				})
 			}
 		})
-		
+
 	}
 }
 

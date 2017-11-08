@@ -3,14 +3,14 @@
         <li class="tree">
             <div
                 class="ellipsis root-file"
-                :class="{bold: isFolder,activeClass:filesList.value == activeFile.value && filesList.name ==  activeFile.name}"
+                :class="{bold: isFolder,activeFile:filesList.value == activeFile.value && filesList.name ==  activeFile.name}"
                 @mousedown.stop="rightMenu(filesList, $event)"
                 @click="toggle(filesList)">
                 <!--@dblclick="changeType">-->
                 <i class="el-icon-date dir-icon" v-show="filesList.children"></i>
                 <i class="el-icon-document dir-icon" v-show="!filesList.children"></i>
                 {{filesList.name}}
-                <span class="no-save" v-if="!filesList.save">未保存</span>
+                <span class="no-save danger" v-if="!filesList.save">未保存</span>
                 <div class="wrap-delete">
                     <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList)"></i>
                 </div>
@@ -174,11 +174,7 @@
     .root-file:hover .wrap-delete{
         display:block;
     }
-    .activeClass{
-        background: #a8d9ff;
-    }
     .no-save{
-        color:red;
         margin-left:20px;
     }
 </style>

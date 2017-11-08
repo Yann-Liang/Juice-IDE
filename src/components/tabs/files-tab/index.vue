@@ -1,15 +1,15 @@
 <template>
     <div class="file">
         <ul class="tab-list">
-            <li @click="newFile()">新建</li>
-            <li @click="exportFile('file')">导入</li>
-            <li @click="exportFile('dir')">dir</li>
-            <li @click="newDir()">nD</li>
-            <li @click="saveAllFileFn()">save</li>
-            <li @click="removeAllFile()">delete</li>
+            <li class="icon icon-create" title="新建文件" @click="newFile()"></li>
+            <li class="icon icon-import-file" title="导入文件" @click="exportFile('file')"></li>
+            <li class="icon icon-import-folder" title="导入文件夹" @click="exportFile('dir')"></li>
+            <li class="icon icon-new-folder" title="新建文件夹" @click="newDir()"></li>
+            <li class="icon icon-save-all" title="保存所有文件" @click="saveAllFile()"></li>
+            <li class="icon icon-del-all" title="删除所有文件" @click="removeAllFile()"></li>
         </ul>
         <ul class="file-content">
-            <item v-for="(item,index) in fileTreeData" :key="index" :filesList="item"></item>
+            <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item"></item>
             <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
                 <ul class="wrap-menu-list">
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
@@ -199,30 +199,59 @@
 
 <style lang="less" scoped>
     .file{
-        height:100%;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         min-width:200px;
-        background:#666;
-        overflow:hidden;
         position: relative;
     }
     .file-content{
-        position:absolute;
-        top:31px;
-        bottom:0;
-        width:100%;
-        overflow-y: auto;
+        flex-grow: 1;
     }
     .tab-list{
-        border-bottom:1px solid #fff;
-        height:30px;
+        height:40px;
+        min-height:40px;
+        padding:0 15px;
+        display: flex;
+        align-content: space-between;
+        border-bottom:solid 1px #e5e5e5;
     }
     .tab-list li{
-        float:left;
-        width:35px;
+        flex-grow: 1;
         height:30px;
         line-height:30px;
         cursor:pointer;
-        color:blue;
+    }
+    .tab-list{
+        .icon{
+            display:inline-block;
+            width:20px;
+            height:40px;
+        }
+        .icon-create{
+            background: url('./images/create_new_file.png') no-repeat center center;
+        }
+        .icon-import-file{
+            background: url('./images/import_file.png') no-repeat center center;
+        }
+        .icon-import-folder{
+            background: url('./images/import_folder.png') no-repeat center center;
+        }
+        .icon-new-folder{
+            background: url('./images/new_folder.png') no-repeat center center;
+        }
+        .icon-save-all{
+            background: url('./images/save_all.png') no-repeat center center;
+        }
+        .icon-del-all{
+            background: url('./images/delete_all_files.png') no-repeat center center;
+        }
+    }
+    .file-content{
+        .file-item{
+            height:40px;
+            line-height:40px;
+        }
     }
     .right-menu{
         position:fixed;

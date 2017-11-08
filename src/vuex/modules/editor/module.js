@@ -28,7 +28,8 @@ export const editor = {
         editor:{},
         searchVisible:false,
         replaceVisible:false,
-	    fileData:[]
+	    fileData:[],
+        copyText:"",
     },
     actions: editorAction,
     getters: editorGetter,

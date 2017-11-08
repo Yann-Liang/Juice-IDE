@@ -10,21 +10,24 @@
                     :rows="8"
                     placeholder="输入合约ABI" v-model="form.abi"></el-input>
             </el-form-item>
-            <el-button class="tab-btn" type="primary" @click="queryContract">查询合约</el-button>
+            <el-button class="tab-btn btn-info" @click="queryContract">查询合约</el-button>
         </el-form>
         <el-form :label-position="'top'" label-width="80px" :model="form2">
-            <el-select v-model="form2.select" placeholder="运行选择需要运行的函数">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+            <el-form-item label="选择需要运行的函数">
+                <el-select v-model="form2.select" placeholder="选择需要运行的函数">
+                    <el-option label="区域一" value="shanghai"></el-option>
+                    <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
-            <p>输入函数运行所需参数</p>
+            </el-form-item>
+
+            <p class="item darker">输入函数运行所需参数</p>
              <el-form-item label="To">
                 <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
             </el-form-item>
-             <el-form-item label="Value">
+             <el-form-item label="Value" class="top20">
                 <el-input v-model="form.input" placeholder="输入合约地址"></el-input>
             </el-form-item>
-            <el-button class="tab-btn" type="primary" @click="run">运行</el-button>
+            <el-button class="tab-btn btn-info" @click="run">运行</el-button>
         </el-form>
 
     </div>
@@ -95,7 +98,18 @@
 </script>
 
 <style lang="less" scoped>
+    @import "../../../less/modules/theme.less";
     .run-index{
-
+        padding:28px 10px;
+        color:#666;
+        .el-form-item{
+            margin-bottom:10px;
+        }
+    }
+    .tab-btn,.item{
+        margin:30px 0 20px;
+    }
+    .top20{
+        margin-top:20px;
     }
 </style>

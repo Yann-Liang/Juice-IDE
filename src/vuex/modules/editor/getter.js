@@ -28,5 +28,8 @@ export const editorGetter = {
     },
 	fileData(state){
 		return state.fileData
-	}
+	},
+    copyText(state){
+        return state.copyText
+    }
 };
