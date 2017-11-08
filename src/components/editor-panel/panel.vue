@@ -234,7 +234,9 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            // this.editor.setTheme('ace/theme/tomorrow');
+
+            this.editor.setTheme('ace/theme/clouds');
+
             //启用提示菜单
             ace.acequire('ace/ext/language_tools')
             this.editor.setOptions({
