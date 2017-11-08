@@ -264,9 +264,9 @@
             });
             //监听光标移动
             this.editor.getSession().selection.on('changeCursor', (e)=> {
-                // console.log(22222222222)
 
             });
+
             //点击报错行显示报错的是啥信息
             this.editor.on('guttermousedown',function(e){
                 console.log('guttermousedown',e)
@@ -309,7 +309,6 @@
                 console.log(this.keyId);
                 this.setValue();
             },
-
         },
         //组件
         components: {

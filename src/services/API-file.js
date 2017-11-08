@@ -6,6 +6,7 @@
  */
 const [fs,path] = [require('fs-extra'),require('path')];
 const{dialog} = require('electron').remote;
+const watch = require('watch');
 
 // id标识文件的类型 save标识是否保存
 class file {
@@ -212,6 +213,7 @@ class file {
 	
 	// 保存文件
 	saveFile(path,name,source,fn){
+		console.log(name);
 		if(path){
 			this.writeFile(path,source,(err)=>{
 				fn && fn(err,'')
@@ -233,25 +235,29 @@ class file {
 	
 	// 保存所有文件
 	saveAllHaveFile(fileData,fn){
-		fileData.forEach(x => {
-			if(x.children){
-				this.saveAllHaveFile(x.children)
-			}else{
-				if(x.save === false){
-					// 保存文件
-					this.saveFile(x.value,x.name,'2222333',(err)=>{
-						fn && fn(err);
-						if(err){
-							console.log('保存失败'+ x.value)
-						}else{
-							console.log('保存成功'+ x.value)
-						}
-					});
-				}
-			}
+		// fileData.forEach(x => {
+		// 	if(x.children){
+		// 		this.saveAllHaveFile(x.children)
+		// 	}else{
+		// 		if(x.save === false){
+		// 			// 保存文件
+		// 			this.saveFile(x.value,x.name,'2222333',(err)=>{
+		// 				fn && fn(err);
+		// 				if(err){
+		// 					console.log('保存失败'+ x.value)
+		// 				}else{
+		// 					console.log('保存成功'+ x.value)
+		// 				}
+		// 			});
+		// 		}
+		// 	}
+		// })
+		fileData.forEach((item,index)=>{
+			this.saveFile(item.value,item.name,item.source,(err)=>{
+				fn && fn(err,item);
+			});
 		})
 	}
-	
 	saveAllNoFile(dialogFile){
 		console.log(dialogFile);
 		if(dialogFile.length>0){
@@ -273,6 +279,7 @@ class file {
 			})
 		}
 	}
+	
 	
 	// 文件重命名
 	renameFile(oldpath,newpath,fn){
@@ -349,6 +356,32 @@ class file {
 			keyId =  id || this.timestampFn();
 		}
 		return keyId;
+	}
+	
+	// 监听文件变化
+	watchFile(pathArr,fn){
+		pathArr.forEach((item,index)=>{
+			if(this.isDir(item.value)){
+				watch.watchTree(item.value,  (f, curr, prev)=> {
+					if (typeof f == "object" && prev === null && curr === null) {
+						// Finished walking the tree
+					} else if (prev === null) {
+						// f is a new file
+						console.log('新建文件')
+						console.log(f)
+						fn && fn()
+					} else if (curr.nlink === 0) {
+						// f was removed
+						console.log('删除文件')
+						console.log(f)
+						fn && fn()
+					} else {
+						// f was changed
+					}
+				})
+			}
+		})
+		
 	}
 }
 

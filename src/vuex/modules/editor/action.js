@@ -19,8 +19,7 @@ export const editorAction = {
 	updateActiveEditor({commit,state},data){
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
-	saveEditorFile({dispatch,commit,state,actions},cb){
-		console.log(state.activeEditor)
+	saveEditorFile({dispatch,commit,state},cb){
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
 			if(err){
 
@@ -29,8 +28,45 @@ export const editorAction = {
 					console.log(state.fileData);
 					const keyId = file.keyIdFn(filepath);
 					dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
-					console.log(state.fileData);
+					
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
+					// 更新url
+					let url = rootState.file.url;
+					rootState.file.url.forEach((item,index)=>{
+						if(item.name === state.activeEditor.name && item.value === state.activeEditor.value){
+							url[index].value = filepath;
+							url[index].name = file.basename(filepath);
+							url[index].keyId = keyId;
+							return;
+						}
+					})
+					
+					dispatch('updateUrl',url,{ root: true });
+
+					// 更新未保存vuex的状态
+					let editData = state.editData;
+					state.editData.forEach((item,index)=>{
+						console.log(item.keyId ==  state.activeEditor.keyId);
+						if(item.keyId ==  state.activeEditor.keyId){
+							editData.splice(index,1);
+							return;
+						}
+					});
+					
+					
+					console.log(editData);
+					
+					dispatch('updateData',editData,{ root: true });
+
+
+					commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
+						value: filepath,
+						name: file.basename(filepath),
+						keyId:keyId,
+						source: state.activeEditor.source
+					})
+					// 更新当前激活的文件状态
+					dispatch('updateEditFile',{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},{ root: true });
 				}else{
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 				}
