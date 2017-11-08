@@ -6,10 +6,10 @@
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
-                    <ul v-show='fileVisible' ref="filedata" class="bgwhite shadow">
+                    <ul v-show='fileVisible' ref="filedata" class="bgwhite shadow xwidth">
                         <li v-for="item in fileData" :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()"  :data-id="item.id" @click.stop="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == item.keys}">
-                            {{item.ZH}}
-                            <span :data-id="item.id">{{item.keys}}</span>
+                            <i class="default">{{item.ZH}}</i>
+                            <span :data-id="item.id" class="dark">{{item.keys}}</span>
                         </li>
                     </ul>
                 </li>
@@ -17,8 +17,8 @@
                     编辑
                     <ul v-show='editVisible' ref="editdata" class="bgwhite shadow">
                         <li v-for="item in editData"  :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == item.keys}" :data-id="item.id" @click.stop="clickEditEvent($event)">
-                            {{item.ZH}}
-                            <span :data-id="item.id">{{item.keys}}</span>
+                            <i class="default">{{item.ZH}}</i>
+                            <span :data-id="item.id" class="darker">{{item.keys}}</span>
                         </li>
                     </ul>
                 </li>
@@ -347,7 +347,13 @@
                     span{
                         float:right;
                     }
+                    i{
+                        font-style: normal;
+                    }
                 }
+            }
+            .xwidth{
+                width:220px;
             }
         }
        }
