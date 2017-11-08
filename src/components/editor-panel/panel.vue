@@ -273,13 +273,13 @@
             this.editor.getSession().selection.on('changeCursor', (e)=> {
                 // console.log(22222222222)
                 //语法检查
-                compileService.grammarCheck(function(result, missingInputs, source){
-                    console.log('语法检查',result)
-                    if(result.errors && result.errors.length>0){
-                        // falseData.error = result.errors;
-                        console.log("result",result.errors);
-                    }
-                },this.value);
+//                compileService.grammarCheck(function(result, missingInputs, source){
+//                    console.log('语法检查',result)
+//                    if(result.errors && result.errors.length>0){
+//                        // falseData.error = result.errors;
+//                        console.log("result",result.errors);
+//                    }
+//                },this.value);
             });
 
             //设置ctrl+s 保存当前
@@ -316,7 +316,7 @@
         },
         //监视
         watch: {
-            name:function(){
+	        "editFile.keyId":function(){
                 this.setValue();
                 // this.change();
                 // this.change();

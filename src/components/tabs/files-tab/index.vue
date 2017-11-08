@@ -5,7 +5,7 @@
             <li @click="exportFile('file')">导入</li>
             <li @click="exportFile('dir')">dir</li>
             <li @click="newDir()">nD</li>
-            <li @click="saveAllFile()">save</li>
+            <li @click="saveAllFileFn()">save</li>
             <li @click="removeAllFile()">delete</li>
         </ul>
         <ul class="file-content">
@@ -49,7 +49,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock','updateTreeData']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock','updateTreeData','saveAllFile']),
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
@@ -136,25 +136,8 @@
 
                 })
             },
-	        saveAllFile(){
-		        let fileData = this.fileTreeData.filter((item)=>{
-		        	console.log(item)
-			        return item.value;
-		        });
-		        let dialogFile = this.getUrl.filter((item)=>{
-			        return !item.value;
-		        });
-		        console.log(fileData);
-		        console.log(dialogFile);
-		        file.saveAllHaveFile(fileData,(fileObj)=>{
-		        	alert(1111)
-		        	console.log('dsafsafsafasfsaf:')
-		        	console.log(fileObj);
-//		        	file.writeFile()
-                });
-		        file.saveAllNoFile(dialogFile,()=>{
-
-                });
+	        saveAllFileFn(){
+		        this.saveAllFile()
 	        },
 	        removeFileFn(){
 		        if(this.activeFile.value){
