@@ -41,7 +41,7 @@
 <script>
     //import  from ''
     import {mapState, mapActions, mapGetters} from 'vuex';
-    import deployServies from '@/services/deploy-servies';
+    import contractServies from '@/services/contract-servies';
     import APIServies from '@/services/API-servies';
 
     export default {
@@ -53,7 +53,6 @@
                 form:{
                     select:'',
                     contractItem:'',
-                    input:''
                 },
                 form2:{
                     selectDeployData:'',
@@ -62,7 +61,7 @@
                 },
                 flag:false,
                 args:[{},{}],
-                deployedData:deployServies.data
+                deployedData:contractServies.data
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -81,13 +80,13 @@
             },
             runDisabled:function() {
                 let bool=false;
-                for(let i=0;i<this.form2.selectFn.inputs.length;i++){
-                     console.log(this.selectFn.inputs[i].arg)
-                    if(!this.selectFn.inputs[i].arg){
-                        bool=true;
-                        break;
-                    }
-                }
+                // for(let i=0;i<this.form2.selectFn.inputs.length;i++){
+                //      console.log(this.selectFn.inputs[i].arg)
+                //     if(!this.selectFn.inputs[i].arg){
+                //         bool=true;
+                //         break;
+                //     }
+                // }
                 return bool;
             }
         },
@@ -95,7 +94,8 @@
         methods: {
             deploy(){
                 let item=this.form.contractItem;
-                deployServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x268bb04bd0ce585a7fffda8fe0ddc27f89252359').then((address)=>{
+                contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x2619db00823169359d24697fb38fff5062e11334').then((address)=>{
+                    console.log('address',address)
                     this.form2.selectDeployData=address;
                     this.flag=true;
                 })
@@ -104,24 +104,24 @@
                 console.log('queryContract',this.form.input)
             },
             run(){
-                let argList=[],
-                abi=this.contractFn[this.form2.selectFn],
-                contract=this.deployedData[this.form2.selectDeployData].contract;
-                for(let i=0;i<abi.inputs.length;i++){
-                    console.log(abi.inputs[i].arg)
-                    if(abi.inputs[i].arg){
-                        argList[i]=abi.inputs[i].arg;
+                console.log(this.args);
+                let argsList=[],
+                    inputs=this.contractFn[this.form2.selectFn].inputs;
+                for(let i=0;i<this.args.length;i++){
+                    if(inputs[i].type=='string'){
+                        argsList[i]=this.args[i].arg;
                     }else{
-
+                        try{
+                            argsList[i]=Number(this.args[i].arg);
+                        }catch(e){
+                            console.warn(e);
+                            argsList[i]=this.args[i].arg;
+                        }
                     }
                 }
-
-                argList.push({
-                    from: '0x268bb04bd0ce585a7fffda8fe0ddc27f89252359'
+                contractServies.run(this.form2.selectDeployData,this.contractFn[this.form2.selectFn].name,this.form2.selectFn,argsList).then((res)=>{
+                    console.log('run result=',res)
                 })
-
-                console.log(contract[abi.name].apply(null,argList));
-                deployServies.run(this.form2.selectDeployData)
             },
 
         },
@@ -138,7 +138,7 @@
         //监视
         watch: {
             'form2.selectFn':function () {
-                alert(12323);
+                //alert(12323);
                 //this.args=
             }
         },

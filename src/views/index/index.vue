@@ -181,7 +181,7 @@
         },
         //生命周期函数
         created() {
-            contractServies.setProvider('http://10.10.8.220:6789')
+            contractServies.setProvider('http://10.10.8.202:6789')
 	        this.hotkeysFn();
         },
         beforeMount() {},
