@@ -8,7 +8,7 @@
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
                     <ul v-show='fileVisible' ref="filedata" class="bgwhite shadow xwidth">
                         <li v-for="item in fileData" :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()"  :data-id="item.id" @click.stop="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == item.keys}">
-                            <i class="default">{{item.ZH}}</i>
+                            <i class="default"  :data-id="item.id">{{item.ZH}}</i>
                             <span :data-id="item.id" class="dark">{{item.keys}}</span>
                         </li>
                     </ul>
@@ -17,7 +17,7 @@
                     编辑
                     <ul v-show='editVisible' ref="editdata" class="bgwhite shadow">
                         <li v-for="item in editData"  :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == item.keys}" :data-id="item.id" @click.stop="clickEditEvent($event)">
-                            <i class="default">{{item.ZH}}</i>
+                            <i class="default"  :data-id="item.id">{{item.ZH}}</i>
                             <span :data-id="item.id" class="darker">{{item.keys}}</span>
                         </li>
                     </ul>
@@ -263,15 +263,17 @@
                 switch(e.target.getAttribute("data-id")){
                     case '1':
                     case 1:
+                    console.log(_this.editor.commands.commands.undo.exec(_this.editor))
                         _this.editor.commands.commands.undo.exec(_this.editor);//撤销
                         break;
                     case '2':
                     case 2:
+                    console.log(_this.editor.commands.commands.redo.exec(_this.editor))
                         _this.editor.commands.commands.redo.exec(_this.editor);//恢复
                         break;
                     case '3':
                     case 3:
-                    console.log(_this.editor.getCopyText())
+                        console.log(_this.editor.getCopyText())
                         _this.updateCopyText(_this.editor.getCopyText());//复制
                         break;
                     case '4':
