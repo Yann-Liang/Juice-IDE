@@ -26,4 +26,7 @@ export const editorMutation = {
 	['UPDATE_File_DATA'](state,data){
 		state.fileData = data
 	},
+	['UPDATE_REMOVE_DATA'](state,data){
+		state.removeData = data
+	},
 };

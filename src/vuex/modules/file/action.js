@@ -20,6 +20,7 @@ export const fileAction = {
 			return item.value;
 		});
 		file.watchFile(dirPathArr,()=>{
+			
 			dispatch('queryFileListData',null,{ root: true });
 		});
 		dispatch('queryFileListData',null,{ root: true });
@@ -87,7 +88,7 @@ export const fileAction = {
 									})
 									dispatch('updateUrl',url,{ root: true });
 									
-									if(currentFile.keyId == rootState.editor.activeEditor){
+									if(currentFile.keyId == rootState.editor.activeEditor.keyId){
 										commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
 											value: filepath,
 											name: file.basename(filepath),
@@ -110,5 +111,130 @@ export const fileAction = {
 			dispatch('updateData',[],{ root: true });
 			saveAllNoFile(dialogFile);
 		}
-	}
+	},
+	renameFile({ commit, state,rootState,dispatch},name){
+		const filesList = state.position.item;
+		file.renameFile(filesList.value,name,(newFilePath)=>{
+			// 重命名成功更新状态
+			const keyId = file.keyIdFn(newFilePath);
+			name = file.uffixName(name);
+			// 更新updateFileData编辑去tabs
+			dispatch('updateFileData',{param:{keyId:keyId,value:newFilePath,name:name}},{ root: true });
+			
+			// 更新当前编辑的状态
+			if(keyId == rootState.editor.activeEditor.keyId){
+				dispatch('updateActiveEditor',{
+					value: newFilePath,
+					name: name,
+					keyId:keyId,
+					source: rootState.editor.activeEditor.source
+				},{ root: true });
+				// 更新当前激活的文件状态
+				dispatch('updateEditFile',{keyId:keyId,value:newFilePath,name:name},{ root: true });
+			}
+			
+			// 更新未保存vuex的状态
+			let edit = rootState.editor.editData;
+			rootState.editor.editData.forEach((item,index)=>{
+				if(item.keyId ===  keyId){
+					edit[index].name = name;
+					edit[index].value = newFilePath;
+					dispatch('updateData',edit,{ root: true });
+					return false;
+				}
+			})
+		})
+	},
+	// 另存为
+	saveOtherPath({ commit, state,rootState,dispatch},type){
+		if(type == 1){
+			const activeFile = rootState.editor.activeEditor;
+			file.saveFile(activeFile.value,activeFile.name,activeFile.source,()=>{})
+		}else if(type == 2){
+			let activeFile = state.activeFile;
+			if(activeFile.value){
+				file.fsReadFile(activeFile.value,(err,data)=>{
+					if(!err){
+						file.saveFile('',activeFile.name,data,()=>{})
+					}else{
+					
+					}
+				});
+			}else{
+				let data = rootState.editor.editData.filter((item)=>{
+					return item.keyId === activeFile.keyId
+				});
+				const name = data.length ? data[0].name : activeFile.name;
+				const source =  data.length ? data[0].source : '';
+				file.saveFile('',name,source,(err,filepath)=>{
+					if(err){
+					
+					}else{
+						const oldKeyId = activeFile.keyId;
+						if(filepath){
+							const keyId = file.keyIdFn(filepath);
+							
+							dispatch('updateFileData',{param:{keyId:oldKeyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
+							
+							dispatch('updateTreeData',{keyId:oldKeyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
+							// 更新url
+							let url = rootState.file.url;
+							rootState.file.url.forEach((item,index)=>{
+								if(item.keyId === oldKeyId ){
+									url[index].value = filepath;
+									url[index].name = file.basename(filepath);
+									url[index].keyId = keyId;
+									return;
+								}
+							})
+							dispatch('updateUrl',url,{ root: true });
+							console.log(rootState.file.url);
+							
+							if(oldKeyId == rootState.editor.activeEditor.keyId){
+								commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
+									value: filepath,
+									name: file.basename(filepath),
+									keyId:keyId,
+									source: rootState.editor.activeEditor.source
+								})
+								// 更新当前激活的文件状态
+								dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath)},{ root: true });
+							}
+							
+						}else{
+							dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
+						}
+						// 更新未保存vuex的状态
+						// let edit = rootState.editor.editData;
+						// rootState.editor.editData.forEach((item,index)=>{
+						// 	if(item.keyId ===  oldKeyId){
+						// 		edit[index].value = filepath;
+						// 		edit[index].name = file.basename(filepath);
+						// 		edit[index].keyId = keyId;
+						// 		return;
+						// 	}
+						// })
+						let edit = [];
+						rootState.editor.editData.forEach((item,index)=>{
+							if(item.keyId !==  oldKeyId){
+								edit.push(item);
+							}
+						})
+						dispatch('updateData',edit,{ root: true });
+					}
+				})
+			}
+		}
+	},
+	// 删除所有文件
+	removeAllFile({ commit, state}){
+		const arr = state.url;
+		arr.forEach((item,index)=>{
+			if(item.value){
+				file.removeFile(item.value,()=>{
+					console.log('删除文件'+item.value+'成功');
+				})
+			}
+		})
+	},
 }

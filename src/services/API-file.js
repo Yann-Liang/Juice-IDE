@@ -8,6 +8,7 @@ const [fs,path] = [require('fs-extra'),require('path')];
 const{dialog} = require('electron').remote;
 const watch = require('watch');
 
+
 // id标识文件的类型 save标识是否保存
 class file {
 	constructor() {
@@ -213,10 +214,10 @@ class file {
 	
 	// 保存文件
 	saveFile(path,name,source,fn){
-		console.log(name);
 		if(path){
 			this.writeFile(path,source,(err)=>{
 				fn && fn(err,'')
+				console.log('保存成功')
 			})
 		}else{
 			dialog.showSaveDialog({
@@ -226,6 +227,7 @@ class file {
 				if(filepath){
 					this.writeFile(filepath,source,(err)=>{
 						fn && fn(err,filepath)
+						console.log('保存成功')
 					})
 				}
 			})
@@ -235,23 +237,6 @@ class file {
 	
 	// 保存所有文件
 	saveAllHaveFile(fileData,fn){
-		// fileData.forEach(x => {
-		// 	if(x.children){
-		// 		this.saveAllHaveFile(x.children)
-		// 	}else{
-		// 		if(x.save === false){
-		// 			// 保存文件
-		// 			this.saveFile(x.value,x.name,'2222333',(err)=>{
-		// 				fn && fn(err);
-		// 				if(err){
-		// 					console.log('保存失败'+ x.value)
-		// 				}else{
-		// 					console.log('保存成功'+ x.value)
-		// 				}
-		// 			});
-		// 		}
-		// 	}
-		// })
 		fileData.forEach((item,index)=>{
 			this.saveFile(item.value,item.name,item.source,(err)=>{
 				fn && fn(err,item);
@@ -282,12 +267,13 @@ class file {
 	
 	
 	// 文件重命名
-	renameFile(oldpath,newpath,fn){
-		fs.rename(oldpath,newpath, function(err) {
+	renameFile(oldpath,name,fn){
+		const newFilePath = path.dirname(oldpath).replace(/\\/g,'/') + '/'+name;
+		fs.rename(oldpath,newFilePath, function(err) {
 			if (err) {
 				throw err;
 			}
-			fn && fn();
+			fn && fn(newFilePath);
 		})
 	}
 	
@@ -379,9 +365,16 @@ class file {
 						// f was changed
 					}
 				})
+			}else if(this.isFile(item.value)){
+				
 			}
 		})
 		
+	}
+	
+	// 另存为
+	saveOtherPath(activeFile,source){
+	
 	}
 }
 

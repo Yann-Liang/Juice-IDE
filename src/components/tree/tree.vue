@@ -12,7 +12,7 @@
                 {{filesList.name}}
                 <span class="no-save" v-if="!filesList.save">未保存</span>
                 <div class="wrap-delete">
-                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click="removeFile(filesList)"></i>
+                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click.stop="removeFile(filesList)"></i>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@
         },
 		//方法
 		methods: {
-			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock']),
+			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock','updateDeleteStatus']),
 			toggle(itemInfo) {
 				console.log('正在点击的→→→→→→→→→→→→→→→→');
 				console.log(itemInfo);
@@ -92,6 +92,7 @@
 		            if(filesList.keyId === item.keyId){
 			            data.splice(index,1);
 			            this.updateUrl(data)
+                        return;
 		            }
 	            })
             },
@@ -101,6 +102,7 @@
 						this.updateUrlFn(filesList);
 						this.queryFileListData();
 						console.log('删除文件成功');
+                        this.updateDeleteStatus(filesList)
 					})
                 }else{
 					this.updateUrlFn(filesList);

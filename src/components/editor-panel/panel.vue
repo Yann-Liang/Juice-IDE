@@ -116,7 +116,7 @@
                                     return console.error(err);
                                 }
                                 this.editor.setValue(data.toString());
-	                           this.setActiveEditor();
+	                            this.setActiveEditor();
                             });
                         }
                     }else{
@@ -143,57 +143,43 @@
                 this.editor.getSession().on('change', (e)=> {
                     console.log("ccccccccc")
                     this.initChange();
-                    //语法检查
-                    compileService.grammarCheck((result, missingInputs, source)=>{
-                        console.log('语法检查',result)
-                        // let css='',rowId=[],tips=[];
-                        var row = this.editor.session.getBreakpoints();
-                        console.log(row);
-                        if(result.errors && result.errors.length>0){
-                            // falseData.error = result.errors;
-                            // console.log("result",result.errors);
-                            /*
-                                语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
-                            */
-                            let css='';
-                            result.errors.forEach((error)=>{
-                                var errorId = error.match(/\w+\.sol\:[0-9]+/i);
-                                console.log(errorId[0],errorId.input);
-                                var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
-                                var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
-                                console.log(rowId[1],tips[1]);
-                                if(tips[1] == 'Warning'){
-                                    css = 'ace_warning'
-                                }else{
-                                    css = 'ace_error'
-                                }
-                                this.setBreakpoint(rowId[1]-1,css)
-                            });
-                        }else{
-                            // console.log(css);
-                            console.log(1111)
-                            this.editor.session.clearBreakpoints();
-                        }
-                    },this.value);
+                    this.getResult();
                 });
-
-
             },
             //设置错误警示css
             setBreakpoint:function(row,css){
                 console.log(row,css)
                 this.editor.session.setBreakpoint(row,css);
             },
-            //移除错误警示css
-            removeGutterDecoration:function(row,css){
-                this.editor.session.removeGutterDecoration(row,css);
+            //语法检查
+            getResult:function(){
+                //语法检查
+                // var _this = this;
+//                compileService.grammarCheck((result, missingInputs, source)=>{
+//                    console.log('语法检查',result)
+//                    if(result.errors && result.errors.length>0){
+//                        /*
+//                            语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
+//                        */
+//                        let css='';
+//                        result.errors.forEach((error)=>{
+//                            var errorId = error.match(/\w+\.sol\:[0-9]+/i);
+//                            var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
+//                            var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
+//                            console.log(rowId[1],tips[1]);
+//                            if(tips[1] == 'Warning'){
+//                                css = 'ace_warning'
+//                            }else{
+//                                css = 'ace_error'
+//                            }
+//                            this.setBreakpoint(rowId[1]-1,css)
+//                        });
+//                    }else{
+//                        console.log('没有错误警示')
+//                        this.editor.session.clearBreakpoints();
+//                    }
+//                },this.value);
             },
-            // change:function(){
-            //     this.editor.getSession().selection.on('changeCursor', (e)=> {
-            //         console.log("changecursor")
-            //         this.initChange();
-            //     });
-            // },
             initChange:function(){
                 const data = this.editData;
                 const item = {
@@ -218,47 +204,13 @@
             getValue:function(){
                 return this.editor.getValue();
             },
-            // //保存当期文件
-            // saveFile:function(){
-            //     file.saveFile(this.value,this.name,this.editor.getValue(),()=>{
-            //         // alert("保存当前文件成功")
-            //         this.updateTreeData({value:this.value,name:this.name,save:true});
-            //         this.editor.blur();
-            //     });
-            // },
             //失去焦点
             loseBlur:function(){
                 this.editor.on('blur',()=>{
                     this.updateTreeData({value:this.value,name:this.name,save:true});
                 });
             },
-            //copy事件
-            copy:function(){
-                console.log(this.editor.getCopyText())
-                // this.editor.addEventListener('copy', this.onCopy);
-            },
-            //paste事件
-            paste:function(){
-                this.editor.insert(this.editor.getCopyText());
-                console.log(this.editor.getCopyText())
-                console.log(this.editor.insert(this.editor.getCopyText()))
-            },
-            //撤销事件
-            repeal:function(){
 
-            },
-            //恢复事件
-            renew:function(){
-
-            },
-            //剪切事件
-            cut:function(){
-
-            },
-            //语法检查
-            getResult:function(result){
-                console.log(result);
-            }
         },
         //生命周期函数
         created() {
@@ -295,6 +247,7 @@
             this.editor.clearSelection();
             this.setValue();
             this.change();
+            this.getResult();
             //设置格式化
             this.editor.commands.addCommand({
                 name: 'myCommand',
@@ -353,8 +306,10 @@
         //监视
         watch: {
             keyId:function(){
-                console.log(this.keyId);
-                this.setValue();
+            	alert(3245)
+            	if(!this.editFile.unWatch){
+		            this.setValue();
+                }
             },
         },
         //组件

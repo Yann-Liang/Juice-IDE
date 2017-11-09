@@ -15,7 +15,7 @@
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
                     <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
                     <li @click="saveFile()" @mousedown.stop="">保存</li>
-                    <li @click="saveOtherPath()" @mousedown.stop="">另存为</li>
+                    <li @click="saveOtherPathFn()" @mousedown.stop="">另存为</li>
                     <li @click="rename" @mousedown.stop="">重命名</li>
                     <li @click="removeFileFn" @mousedown.stop="">删除</li>
                 </ul>
@@ -49,7 +49,8 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock','updateTreeData','saveAllFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
+                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus']),
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
@@ -92,6 +93,7 @@
 		        });
             },
 	        open(fn) {
+		        this.updateRightMenuBlock(false);
 		        this.$prompt('请输入邮箱', '提示', {
 			        confirmButtonText: '确定',
 			        cancelButtonText: '取消',
@@ -132,9 +134,7 @@
                })
             },
 	        saveFile(){
-	        	file.saveFile('','123456','2222',()=>{
-
-                })
+	        	this.saveEditorFile();
             },
 	        saveAllFileFn(){
 		        this.saveAllFile()
@@ -146,6 +146,7 @@
 				        this.updateUrlFn(this.activeFile);
 				        this.queryFileListData();
 				        console.log('删除文件成功');
+				        this.updateDeleteStatus(filesList)
 			        })
 		        }else{
 			        this.updateUrlFn(this.activeFile);
@@ -153,19 +154,14 @@
 		        this.updateRightMenuBlock(false);
 		        return false;
 	        },
-            rename(){
-
+            rename(){ // 重命名
+	            this.open((name)=>{
+	            	this.renameFile(name)
+	            });
             },
-	        saveOtherPath(){
-		        file.fsReadFile(this.activeFile.value,(err,data)=>{
-		        	if(!err){
-				        file.saveFile('',this.activeFile.name,data,()=>{
-
-                        })
-                    }else{
-
-                    }
-                });
+	        saveOtherPathFn(){
+		        this.updateRightMenuBlock(false);
+		        this.saveOtherPath(2);
             }
         },
         //生命周期函数

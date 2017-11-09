@@ -8,15 +8,18 @@
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
                     <ul v-show='fileVisible' ref="filedata" >
-                        <li v-for="fileName in fileData" :key="fileName" @mouseenter="showActive(fileName)" @mouseleave="removeActive()" @click="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == fileName}">{{fileName}}</li>
+                        <li v-for="item in fileData" :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()"  :data-id="item.id" @click.stop="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == item.keys}">
+                            {{item.ZH}}
+                            <span :data-id="item.id">{{item.keys}}</span>
+                        </li>
                     </ul>
                 </li>
                 <li>
                     编辑
                     <ul v-show='editVisible' ref="editdata" >
-                        <li v-for="(value,key) in editData"  :key="value" @mouseenter="showActive(value)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == value}" :data-type="value" @click.stop="clickEditEvent($event)">
-                            {{value}}
-                            <span :data-type="value">{{key}}</span>
+                        <li v-for="item in editData"  :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == item.keys}" :data-id="item.id" @click.stop="clickEditEvent($event)">
+                            {{item.ZH}}
+                            <span :data-id="item.id">{{item.keys}}</span>
                         </li>
                     </ul>
                 </li>
@@ -30,6 +33,7 @@
 </template>
 <script>
 	import {mapState, mapActions, mapGetters} from 'vuex';
+    import file from '@/services/API-file'
     var beautify = require('js-beautify').js_beautify
     export default {
         name: 'header',
@@ -39,17 +43,95 @@
                 editVisible:false,
                 iSame:true,
                 activeClass:"",
-                fileData:['新建文件', '新建文件夹', '导入本地文件', '保存', '导出到本地','全部保存','删除','删除所有文件'],
-                editData:{
-                    "Ctrl+Z":"撤销",
-                    "Ctrl+Y":"恢复",
-                    "Ctrl+C":"复制",
-                    "Ctrl+X":"剪切",
-                    "Ctrl+V":"粘贴",
-                    "Ctrl+F":"查找",
-                    "Ctrl+H":"替换",
-                    "Ctrl+L":"格式化",
-                },
+                fileData:[
+                    {
+                        id:"1",
+                        ZH:"新建文件",
+                        keys:"Ctrl+N",
+                    },
+                    {
+                        id:"2",
+                        ZH:"新建文件夹",
+                        keys:"Ctrl+W",
+                    },
+                    {
+                        id:"3",
+                        ZH:"导入本地文件",
+                        keys:"O",
+                    },
+                    {
+                        id:"4",
+                        ZH:"导入本地文件夹",
+                        keys:"Ctrl+O",
+                    },
+                    {
+                        id:"5",
+                        ZH:"保存",
+                        keys:"Ctrl+S",
+                    },
+                    {
+                        id:"6",
+                        ZH:"另存为",
+                        keys:"Ctrl+Shift+S",
+                    },
+                    {
+                        id:"7",
+                        ZH:"全部保存",
+                        keys:"Ctrl+Alt+S",
+                    },
+                    {
+                        id:"8",
+                        ZH:"删除",
+                        keys:"Ctrl+Delete",
+                    },
+                    {
+                        id:"8",
+                        ZH:"删除所有文件",
+                        keys:"Ctrl+Shift+Del",
+                    },
+                ],
+                editData:[
+                    {
+                        id:"1",
+                        ZH:"撤销",
+                        keys:"Ctrl+Z",
+                    },
+                    {
+                        id:"2",
+                        ZH:"恢复",
+                        keys:"Ctrl+Y",
+                    },
+                    {
+                        id:"3",
+                        ZH:"复制",
+                        keys:"Ctrl+C",
+                    },
+                    {
+                        id:"4",
+                        ZH:"剪切",
+                        keys:"Ctrl+X",
+                    },
+                    {
+                        id:"5",
+                        ZH:"粘贴",
+                        keys:"Ctrl+V",
+                    },
+                    {
+                        id:"6",
+                        ZH:"查找",
+                        keys:"Ctrl+F",
+                    },
+                    {
+                        id:"7",
+                        ZH:"替换",
+                        keys:"Ctrl+H",
+                    },
+                    {
+                        id:"8",
+                        ZH:"格式化",
+                        keys:"Ctrl+L",
+                    },
+                ]
 
             }
         },
@@ -61,16 +143,16 @@
             ...mapGetters(['editor'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
-                    console.log(1)
+                    console.log('文件')
                     // this.fileVisible=true;
                     this.editVisible=false;
                     this.fileVisible ? this.hideFile() : this.showFile();
                     // this.visible ? this.hide() : this.show()
                 }else if(e.target.innerText=='编辑'){
-                    console.log(2)
+                    console.log('编辑')
                     // this.editVisible=true;
                     this.editVisible ? this.hideEdit() : this.showEdit()
                     this.fileVisible=false;
@@ -122,10 +204,49 @@
             //文件每个li的点击事件
             clickFileEvent:function(e){
                 var _this = this;
-                console.log(e.target.innerText);
-                switch(e.target.innerText){
-                    case '保存':
-                        this.saveEditorFile();
+                this.fileVisible = false
+                console.log(e.target.getAttribute("data-id"));
+                // switch(e.target.innerText){
+                //     case '保存':
+                //         this.saveEditorFile();
+                //         break;
+                // }
+                switch(e.target.getAttribute("data-id")){
+                    case '1':
+                    case 1:
+                        //新建文件
+                        break;
+                    case '2':
+                    case 2:
+                        //新建文件夹
+                        break;
+                    case '3':
+                    case 3:
+                        console.log('复制');//导入本地文件
+                        break;
+                    case '4':
+                    case 4:
+                        //导入本地文件夹
+                        break;
+                    case '5':
+                    case 5:
+                        _this.saveEditorFile();//保存
+                        break;
+                    case '6':
+                    case 6:
+                        //另存为
+                        break;
+                    case '7':
+                    case 7:
+                        //全部保存
+                        break;
+                    case '8':
+                    case 8:
+                        ;//删除
+                        break;
+                    case '9':
+                    case 9:
+                        //删除所有文件
                         break;
                 }
             },
@@ -139,19 +260,39 @@
             clickEditEvent:function(e){
                 var _this = this;
                 this.editVisible = false
-                console.log(e.target.getAttribute("data-type"));
-                switch(e.target.getAttribute("data-type")){
-                    case '格式化':
-                        _this.format();
+                console.log(e.target.getAttribute("data-id"));
+                switch(e.target.getAttribute("data-id")){
+                    case '1':
+                    case 1:
+                        _this.editor.commands.commands.undo.exec(_this.editor);//撤销
                         break;
-                    case '查找':
-                        _this.boolSearchVisible(true);
+                    case '2':
+                    case 2:
+                        _this.editor.commands.commands.redo.exec(_this.editor);//恢复
                         break;
-                    case '替换':
-                        console.log(_this.editor.execCommand('replace'))
+                    case '3':
+                    case 3:
+                        console.log('复制');//复制
                         break;
-                    case '复制':
-                        _this.editor.execCommand('copy')
+                    case '4':
+                    case 4:
+                        _this.editor.commands.commands.cut.exec(_this.editor);//剪切
+                        break;
+                    case '5':
+                    case 5:
+                        console.log('复制');//粘贴
+                        break;
+                    case '6':
+                    case 6:
+                        _this.boolSearchVisible(true);//查找
+                        break;
+                    case '7':
+                    case 7:
+                        _this.boolReplaceVisible(true);//替换
+                        break;
+                    case '8':
+                    case 8:
+                        _this.format();//格式化
                         break;
                 }
             }
@@ -197,7 +338,7 @@
             position: relative;
             ul{
                 position: absolute;
-                width:170px;
+                width:225px;
                 top:@height;
                 left:0px;
                 padding:5px 0;
