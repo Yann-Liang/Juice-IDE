@@ -100,12 +100,14 @@
             },
             //设置值
             setValue:function(){
+                console.log('setvalue')
                 let arr = this.editData.filter((item)=>{
                     return item.keyId === this.keyId
                 });
                 if(arr.length != 0){
+                    console.log('缓存中的值')
                     this.editor.setValue(arr[0].source);
-                    this.setActiveEditor();
+                    this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
                         if(this.value == 'readonly'){
@@ -115,19 +117,18 @@
                                 if (err) {
                                     return console.error(err);
                                 }
+                                console.log('读取路径文件的值')
                                 this.editor.setValue(data.toString());
-	                            this.setActiveEditor();
+	                            this.setActiveEditor(this.getResult);
                             });
                         }
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2");
-	                    this.setActiveEditor();
+                        this.editor.setValue("pragma solidity ^0.4.2;");
+	                    this.setActiveEditor(this.getResult);
                     }
                 }
-
-
             },
-            setActiveEditor(){
+            setActiveEditor(cb){
 	            const editorData = {
 		            value: this.editFile.value,
 		            name: this.editFile.name,
@@ -136,6 +137,9 @@
 	            }
                 // console.log(editorData.source)
 	            this.updateActiveEditor(editorData);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
             },
             //编辑区的change事件
             change:function(){
@@ -220,8 +224,7 @@
 
         },
         mounted() {
-
-            // console.log(consoleService)
+            console.log(this.value)
             console.log(this.keyId)
             this.editor = ace.edit('javascript-editor');
             console.log(this.editor);
@@ -231,7 +234,9 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/monokai');
+
+            this.editor.setTheme('ace/theme/clouds');
+
             //启用提示菜单
             ace.acequire('ace/ext/language_tools')
             this.editor.setOptions({
@@ -244,22 +249,14 @@
             this.editor.setOption("wrap", "free");
             //设置事件处理程序
             // this.editor.setKeyboardHandler('ace/keyboard/vim');
-            this.editor.clearSelection();
             this.setValue();
             this.change();
-            this.getResult();
-            //设置格式化
-            this.editor.commands.addCommand({
-                name: 'myCommand',
-                bindKey: {win: 'Ctrl-L',  mac: 'Command-L'},
-                exec: function(editor) {
-                    _this.format();
-                    //...
-                },
-                readOnly: true // 如果不需要使用只读模式，这里设置false
-            });
+            this.editor.clearSelection();
+            // this.getResult();
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
+                console.log(444444444444444)
+                console.log(this.keyId)
                 this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
             });
             //监听光标移动
@@ -270,7 +267,17 @@
             //点击报错行显示报错的是啥信息
             this.editor.on('guttermousedown',function(e){
                 console.log('guttermousedown',e)
-            })
+            });
+            //设置格式化
+            this.editor.commands.addCommand({
+                name: 'myCommand',
+                bindKey: {win: 'Ctrl-L',  mac: 'Command-L'},
+                exec: function(editor) {
+                    _this.format();
+                    //...
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
             //设置ctrl+s 保存当前
             this.editor.commands.addCommand({
                 name: 'save',
@@ -287,7 +294,6 @@
                 bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
                 exec: function(editor) {
                     _this.$emit("findFunction",true);
-                    // _this.format();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
@@ -297,16 +303,15 @@
                 bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
                 exec: function(editor) {
                     _this.$emit("replaceFunction",true);
-                    // _this.format();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
+
 
         },
         //监视
         watch: {
             keyId:function(){
-            	alert(3245)
             	if(!this.editFile.unWatch){
 		            this.setValue();
                 }

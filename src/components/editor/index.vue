@@ -1,61 +1,59 @@
 <template>
     <div class="">
-        <div class="file-tab">
+        <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
                 <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
-                    <i>&lt;</i>
+                    <i class='el-icon-d-arrow-left darker'></i>
                 </div>
-                <ul class='files' ref='files'>
+                <ul class='files white' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
                         <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
-                    <li class='new-file' @click='newFile'>+</li>
+                    <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <!-- <div class='new-file' @click='newFile'>+</div> -->
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
-                    <i>&gt;</i>
+                    <i class='el-icon-d-arrow-right darker'></i>
                 </div>
             </div>
-        </div>
-        <div class="tools">
-            <div class="tool">
-                <span class='save' @click='save'>保存</span>
-                <span class='save' @click='replace'>替换</span>
-                <span class='save' @click='copy($event)'>复制</span>
-                <span class='save' @click='paste($event)'>粘贴</span>
-                <span class="search" @click='search'>搜索</span>
-                <span class='format' @click='format' >格式化</span>
-                <span class='increase' @click='increase'>放大</span>
-                <span class='decrease' @click='decrease'>缩小</span>
-                <span class='close' @click='close'>关所</span>
-            </div>
-            <div class="search-model" v-if='searchVisible'>
-                <div class='search-content'>
-                    <span>搜索</span>
+            <div class="tools">
+                <div class="tool">
+                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe62a;</i></span>
+                    <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
+                    <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
+                    <span @click.prevent='increase' title="字体放大"><i class="iconfont info">&#xe61d;</i></span>
+                    <span @click.prevent='decrease' title="字体缩小"><i class="iconfont info">&#xe622;</i></span>
+                    <span @click.prevent='close' title="关闭所有窗口"><i class="iconfont info">&#xe61e;</i></span>
+                </div>
+
+                <div class="replace-model" v-if='replaceVisible'>
                     <span>
-                        <input type="text" v-model='inputValue' placeholder="搜索" @input='onSearch' style="width:300px;">
+                        form:<input type="text" name="" v-model='fromValue' @input='fromSearch'/>
                     </span>
-                    <span @click='onSearchUp'>↑</span>
-                    <span @click='onSearchDown'>↓</span>
-                    <span @click="offSearch">X</span>
+                        <span>
+                        to  :<input type="text" name="" v-model="toValue"/>
+                    </span>
+                    <span @click='replaceSign' >单个替换</span>
+                    <span @click='replaceAll'>全部替换</span>
+                    <span @click='offReplace'>x</span>
                 </div>
             </div>
-            <div class="replace-model" v-if='replaceVisible'>
-                <span>
-                    form:<input type="text" name="" v-model='fromValue' @input='fromSearch'/>
-                </span>
-                <span>
-                    to  :<input type="text" name="" v-model="toValue"/>
-                </span>
-                <span @click='replaceSign' >单个替换</span>
-                <span @click='replaceAll'>全部替换</span>
-                <span @click='offReplace'>x</span>
+            <div class="search-model shadow" v-if='searchVisible'>
+                <div class='search-content'>
+                    <span>
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;">
+                    </span>
+                    <span class="btn btn-info">查找</span>
+                    <!--<span @click='onSearchUp'>↑</span>-->
+                    <!--<span @click='onSearchDown'>↓</span>-->
+                    <!--这里的上下切换，换成了input的键盘事件-->
+                    <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
+                </div>
             </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
-        <div class="tips" v-if='tipsVisible'>
+        <div class="tips default" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
     </div>
@@ -67,6 +65,10 @@
     import {mapState, mapActions, mapGetters} from 'vuex';
     import Editor from '@/components/editor-panel/panel'
     import file from '@/services/API-file'
+    // import {remote} from 'electron'
+    // const globalShortcut = remote.globalShortcut
+    const {globalShortcut} = require('electron').remote
+
     export default {
         //组件名
         name: 'index',
@@ -107,27 +109,13 @@
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
+                console.log('放大')
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                this.$refs.childMethod.decrease();
-            },
-
-            //copy事件
-            copy:function(event){
-                console.log('发生复制事件');
-                console.log(this.editor)
-                // this.editor.commands.bindKeys({ 'ctrl-z': 'undo' })
-                this.editor.onCommandKey()
-                console.log()
-            },
-            //paste事件
-            paste:function(event){
-                // this.$refs.childMethod.paste();
-                if(event.ctrlKey && window.event.keyCode == 86){
-                    return true;
-                }
+                console.log('缩小')
+                this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             findFunction:function(bool){
                 console.log(bool)
@@ -410,11 +398,32 @@
         //生命周期函数
         created() {
             this.init();
-            document.body.oncopy = function(){
-                return true;
-            },
-            document.onselectstart = function(){
-                //return false;
+            var _this = this;
+            document.onkeydown = function(event){
+                event.stopPropagation();
+                var e = event || window.event || arguments.callee.caller.arguments[0];
+                if(e && e.keyCode==38){ // 按 up
+                    //要做的事情
+                    _this.onSearchUp();
+                }
+                if(e && e.keyCode==40){ // 按 down
+                    //要做的事情
+                    _this.onSearchDown();
+                }
+                if(e && e.keyCode==27){ // 按 Esc
+                    //要做的事情
+                    _this.boolSearchVisible(false);
+                    _this.boolReplaceVisible(false);
+                }
+                if (e.ctrlKey && e.keyCode == 187){ //按 ctrl++
+                    console.log('方法')
+                    _this.increase();
+                }
+                if (e.ctrlKey && e.keyCode == 189){ //按 ctrl--
+                    console.log("fafff")
+                    _this.decrease();
+                }
+
             }
         },
         beforeMount() {
@@ -446,7 +455,6 @@
                 // this.$refs.childMethod.change();
             },
             'removeData.id':function(){
-            	alert(34567);
             	this.remove(this.removeData.index)
             }
 
@@ -472,24 +480,23 @@
     描述：统一使用less,局部样式
 -->
 <style lang="less" scoped>
+    @import "../../less/modules/theme.less";
 .file-tab{
-    height:30px;
-    // width:100%;
-    background-color:gray;
+    display:flex;
+    align-content: space-between;
+    height:40px;
+    line-height:40px;
     position: relative;
-    overflow:hidden;
     .tabs{
-        width:100%;
+        flex-grow: 1;
         position: relative;
+        padding-right:20px;
+        overflow-x:hidden;
         .scroll-bar{
             position: absolute;
             width:20px;
-            height:30px;
-            background:red;
-            color:#fff;
             top:0;
             z-index:999;
-            // height:100%;
             font-size:16px;
             cursor: pointer;
         }
@@ -504,14 +511,10 @@
             flex-wrap:nowrap;
             flex-direction:row;
             justify-content:flex-start;
-            height:30px;
-            line-height: 30px;
             position: absolute;
             left:20px;
             overflow:hidden;
             cursor: pointer;
-            background-color:#000;
-            color:#fff;
             li{
                 padding:0 10px;
                 border-right:1px solid #fff;
@@ -519,61 +522,43 @@
                 flex-wrap:nowrap;
                 flex-direction:row;
                 justify-content:flex-end;
+                background-color:#c0c0c0;
                 span{
                     display: inline-block;
                     white-space: nowrap;
                     &:last-child{
                         // float:right;
                         padding:0 10px;
-                        &:hover{
-                            background-color:gray
-                        }
+                        /*&:hover{*/
+                            /*background-color:gray*/
+                        /*}*/
                     }
                 }
             }
+            .new-file{
+                margin-left:10px;
+                padding:0;
+                background-color:transparent;
+            }
             .li-active{
-                color: red;
+                background-color: #999;
                 font-weight: bold;
                 border-bottom: 0 none;
-
             }
-
-        }
-        .new-file{
-
         }
 
     }
 }
 .tools{
-
-    height:30px;
-    color:#fff;
-    background-color:#000;
+    width:227px;
     position: relative;
-    width:100%;
     .tool{
         text-align: right;
         span{
+            margin-right:14px;
             display: inline-block;
-            line-height: 25px;
-            padding:0 5px;
-            border:1px solid #000;
             cursor: pointer;
-            border-left:1px solid #fff;
         }
-    }
-    .search-model{
-        width: 480px;
-        height: 40px;
-        padding: 5px;
-        border-radius: 10px;
-        background-color: #000;
-        position: absolute;
-        top: 30px;
-        left: 50%;
-        z-index: 1000000;
-        margin-left: -240px;
     }
     .replace-model{
         width: 480px;
@@ -586,6 +571,43 @@
         left: 50%;
         z-index: 1000000;
         margin-left: -240px;
+    }
+}
+.search-model{
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -240px;
+    padding: 0 10px;
+    width: 440px;
+    height: 60px;
+    line-height: 60px;
+    border:solid 1px #e5e5e5;
+    border-radius: 3px;
+    input{
+        padding-left:10px;
+        width:300px;
+        height:38px;
+        line-height:38px;
+        border:solid 1px #bfbfbf;
+        &:focus{
+            outline:none;
+            border:solid 1px @blue;
+         }
+    }
+    .btn{
+        margin:0 10px;
+        display: inline-block;
+        width:60px;
+        height:38px;
+        line-height:38px;
+        text-align: center;
+        border-radius:3px;
+    }
+    .close-search{
+        float:right;
+        cursor: pointer;
     }
 }
 .javascript-editor{
@@ -602,5 +624,4 @@
 
     // background-color:#000;
 }
-
 </style>

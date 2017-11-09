@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-07 15:46:24
+ * @Last Modified time: 2017-11-08 19:03:34
  */
 //引入web3
 let Web3 = require('web3');
@@ -104,7 +104,8 @@ class DeployService {
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
-            console.log('contractServies.web3', this.web3)
+            debugger;
+            console.log(bin);
             let myContractReturned = calcContract.new({
                 data: bin,
                 from: userAddress,
@@ -117,6 +118,7 @@ class DeployService {
                         this.result.TxHash = myContract.transactionHash;
                         console.log("部署合约的交易哈希值: " + myContract.transactionHash);
                     } else {
+                        debugger;
                         console.log("合约的部署地址: " + myContract.address);
                         this.result.contractAddress = myContract.address;
                         this.data[myContract.address] = {
@@ -162,15 +164,12 @@ class DeployService {
     deployFinish() {
         consoleService.output('[部署结果]',{ logSuccess: 'Deploy Success' },this.result);
         deployLogService.push('[部署结果]',{ logSuccess: 'Deploy Success' },this.result);
-        return new Promise((resolve, reject) => {
-
-        })
     }
 
     //合约部署-部署失败
     deployFailure(err) {
-        consoleService.output('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
-        deployLogService.push('[部署结果]',{ logError: 'Deploy failure' },{ info: err });
+        consoleService.output('[部署结果]',{ logError: 'Deploy failure' },{ info: err.message });
+        deployLogService.push('[部署结果]',{ logError: 'Deploy failure' },{ info: err.message });
         return new Promise((resolve, reject) => {
             resolve()
         })
@@ -178,13 +177,17 @@ class DeployService {
 
 
     /* 运行合约
-
+     *contractAddress 合约地址
+     *
      */
     run(contractAddress, contractFnName, IndexInAbi, argumentList = []) {
-        console.log(contractAddress, contractFnName, IndexInAbi, argumentList)
+        console.log(contractAddress, contractFnName, IndexInAbi, argumentList);
+
         let contract = this.data[contractAddress].contract,
-        constant = contract.abi[IndexInAbi].constant,
-        payable = contract.abi[IndexInAbi].payable
+            constant = contract.abi[IndexInAbi].constant,
+            payable = contract.abi[IndexInAbi].payable;
+
+        this.runStart(contractAddress,contractFnName,constant,payable);
 
         return new Promise((resolve, reject) => {
             debugger;
@@ -196,28 +199,31 @@ class DeployService {
                     });
                     let result = contract[contractFnName].apply(null, argumentList);
                     console.log("result:\n", result);
+                    consoleService.output('[运行结果]',result);
                     if (isJson(result)) {
                         resolve(JSON.parse(result));
                     } else {
                         resolve(result);
                     }
-
+                    this.runFinish({
+                        result:result,
+                    })
                 } catch (e) {
-                    console.warn(e);
-                    return {
-                        ret: 999,
-                        messge: '合约异常',
-                        data: '',
-
-                    };
+                    this.runFailure(e);
+                    resolve(e);
                 }
             } else {
                 let data = '';
                 argumentList = dealArgumentList(argumentList);
+                debugger;
                 if (isArray(argumentList)) { //数组
                     data=contract.getData.apply(null, argumentList);
                 } else if (typeof argumentList == 'string') { //字符串
-                    data=contract.getData(argumentList);
+                    try {
+                        data=contract.getData(argumentList);
+                    } catch (error) {
+
+                    }
                 } else {
                     console.warn('argumentList参数类型不正确！！！');
                 }
@@ -255,6 +261,24 @@ class DeployService {
 
         })
 
+    }
+
+    runStart(contractAddress,contractFnName,constant,payable) {
+        consoleService.output('[开始运行]', `Function [${contractFnName}] invoking...`, 'Invoke args:', {
+            From: this.user.userAddress,
+            to: contractAddress,
+            constant: constant,
+            payable:payable,
+        });
+    }
+
+    runFinish(result) {
+        consoleService.output('[运行结果]','Invoke finish',this.result);
+
+    }
+
+    runFailure(err) {
+        consoleService.output('[运行结果]',{ logError: 'Invoke failure' },{ info: err.message });
     }
 
     getTransactionReceipt(hash) {

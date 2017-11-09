@@ -31,7 +31,8 @@ export const editor = {
 	    fileData:[],
 	    removeData:{
         	id:''
-	    }
+	    },
+        copyText:"",
     },
     actions: editorAction,
     getters: editorGetter,

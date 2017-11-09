@@ -1,12 +1,12 @@
 <template>
-    <header class="title-header">
+    <header class="title-header bgblue white">
         <i class="header-icon"></i>
         <ul class="header-right fr" id="toolbar">
             <li class="min" @click="min"></li>
             <li class="max" @click="max"></li>
             <li class="close" @click="close"></li>
         </ul>
-        <p>Juice IDE</p>
+        <p>JUICE IDE</p>
 
     </header>
 </template>
@@ -78,8 +78,6 @@
     .title-header {
         height: 50px;
         line-height: 50px;
-        color: white;
-        background: #0b8aee;
         -webkit-app-region: drag;
     }
 

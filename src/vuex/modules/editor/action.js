@@ -151,5 +151,10 @@ export const editorAction = {
 			index:index
 		}
 		commit('UPDATE_REMOVE_DATA',data)
+	},
+
+	//复制信息保存
+	updateCopyText({commit,state},data){
+		commit('UPDATE_COPY_TEXT',data)
 	}
 }

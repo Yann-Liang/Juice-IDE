@@ -1,15 +1,15 @@
 <template>
     <div class="file">
         <ul class="tab-list">
-            <li @click="newFile()">新建</li>
-            <li @click="exportFile('file')">导入</li>
-            <li @click="exportFile('dir')">dir</li>
-            <li @click="newDir()">nD</li>
-            <li @click="saveAllFileFn()">save</li>
-            <li @click="removeAllFile()">delete</li>
+            <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
+            <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
+            <li title="导入文件夹" @click="exportFile('dir')"><i class="iconfont info">&#xe626;</i></li>
+            <li title="新建文件夹" @click="newDir()"><i class="iconfont info">&#xe627;</i></li>
+            <li title="保存所有文件" @click="saveAllFile()"><i class="iconfont info">&#xe629;</i></li>
+            <li title="删除所有文件" @click="removeAllFile()"><i class="iconfont info">&#xe623;</i></li>
         </ul>
         <ul class="file-content">
-            <item v-for="(item,index) in fileTreeData" :key="index" :filesList="item"></item>
+            <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item"></item>
             <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
                 <ul class="wrap-menu-list">
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
@@ -195,30 +195,34 @@
 
 <style lang="less" scoped>
     .file{
-        height:100%;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
         min-width:200px;
-        background:#666;
-        overflow:hidden;
         position: relative;
     }
     .file-content{
-        position:absolute;
-        top:31px;
-        bottom:0;
-        width:100%;
-        overflow-y: auto;
+        flex-grow: 1;
     }
     .tab-list{
-        border-bottom:1px solid #fff;
-        height:30px;
+        height:40px;
+        min-height:40px;
+        padding:0 15px;
+        display: flex;
+        align-content: space-between;
+        border-bottom:solid 1px #e5e5e5;
     }
     .tab-list li{
-        float:left;
-        width:35px;
-        height:30px;
-        line-height:30px;
+        flex-grow: 1;
+        height:40px;
+        line-height:40px;
         cursor:pointer;
-        color:blue;
+    }
+    .file-content{
+        .file-item{
+            height:40px;
+            line-height:40px;
+        }
     }
     .right-menu{
         position:fixed;

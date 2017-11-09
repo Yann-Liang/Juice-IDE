@@ -1,25 +1,24 @@
 <template>
-    <div class="header">
-
+    <div class="header bgwhite info">
         <div>
             <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
                     <!-- <file-data :fileVisible="fileVisible" ref="filedata"></file-data> -->
-                    <ul v-show='fileVisible' ref="filedata" >
+                    <ul v-show='fileVisible' ref="filedata" class="bgwhite shadow xwidth">
                         <li v-for="item in fileData" :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()"  :data-id="item.id" @click.stop="clickFileEvent($event)" :class="{'same': iSame,active: activeClass == item.keys}">
-                            {{item.ZH}}
-                            <span :data-id="item.id">{{item.keys}}</span>
+                            <i class="default">{{item.ZH}}</i>
+                            <span :data-id="item.id" class="dark">{{item.keys}}</span>
                         </li>
                     </ul>
                 </li>
                 <li>
                     编辑
-                    <ul v-show='editVisible' ref="editdata" >
+                    <ul v-show='editVisible' ref="editdata" class="bgwhite shadow">
                         <li v-for="item in editData"  :key="item.keys" @mouseenter="showActive(item.keys)" @mouseleave="removeActive()" :class="{'same': iSame,active: activeClass == item.keys}" :data-id="item.id" @click.stop="clickEditEvent($event)">
-                            {{item.ZH}}
-                            <span :data-id="item.id">{{item.keys}}</span>
+                            <i class="default">{{item.ZH}}</i>
+                            <span :data-id="item.id" class="darker">{{item.keys}}</span>
                         </li>
                     </ul>
                 </li>
@@ -140,10 +139,10 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editor'])
+            ...mapGetters(['editor','copyText'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -272,7 +271,8 @@
                         break;
                     case '3':
                     case 3:
-                        console.log('复制');//复制
+                    console.log(_this.editor.getCopyText())
+                        _this.updateCopyText(_this.editor.getCopyText());//复制
                         break;
                     case '4':
                     case 4:
@@ -280,7 +280,7 @@
                         break;
                     case '5':
                     case 5:
-                        console.log('复制');//粘贴
+                        _this.editor.insert(_this.copyText);//粘贴
                         break;
                     case '6':
                     case 6:
@@ -314,13 +314,12 @@
 </script>
 
 <style lang="less" scoped>
-@height:48px;
+@height:30px;
    .header{
        height: @height;
        display: flex;
        flex-direction:row;
-       background-color:#1b1b1b;
-       color:#fff;
+       border-bottom:solid 1px #e5e5e5;
        .img{
         img{
             display: block;
@@ -331,35 +330,31 @@
         display: flex;
         flex-direction:row;
         height:@height;
-        padding-left:0px;
-        li{
+        padding-left:20px;
+        >li{
             line-height: @height;
-            padding:0 30px;
+            margin-right:126px;
             position: relative;
             ul{
                 position: absolute;
-                width:225px;
+                width:150px;
                 top:@height;
                 left:0px;
-                padding:5px 0;
-                background-color:#1b1b1b;
                 z-index:1000;
                 .same{
-                    height:35px;
-                    line-height: 35px;
-                    padding:0 20px;
+                    height:30px;
+                    line-height: 30px;
+                    padding:0 18px;
                     span{
                         float:right;
-                        color:#999999;
+                    }
+                    i{
+                        font-style: normal;
                     }
                 }
-                .active{
-                    background-color:gray;
-                }
             }
-            &:hover{
-                background:gray;
-
+            .xwidth{
+                width:220px;
             }
         }
        }

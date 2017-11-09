@@ -1,18 +1,20 @@
 <template>
     <div>
         <div class="log-header">
-            <h4>
-                <span>控制台</span>
+            <h4 class="bggray">
+                <span class="default">控制台</span>
                 <span class="search">
-                    <input :style="{backgroundColor:hasMatch?'#333':'#6f3c37'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.up="near(-1)" @keyup.down="near(1)">
-                    <span class="direction" @click="near(-1)">↑</span>
-                    <span class="direction" @click="near(1)">↓</span>
-                    <span class="icon" @click="viewLog()">trigger icon</span>
+                    <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.up="near(-1)" @keyup.down="near(1)">
+                    <!--<span class="direction" @click="near(-1)">↑</span>-->
+                    <!--<span class="direction" @click="near(1)">↓</span>-->
+                     <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
+                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
+                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
                 </span>
             </h4>
         </div>
-        <div v-show="consoleFlag" class="log-area">
-            <div class="log-output" id="log-id">
+        <div v-show="consoleFlag" class="log-area bgwhite">
+            <div class="log-output bgwhite default" id="log-id">
                 <div class="log-detail">
                     <ul>
                         <li v-for="(item,index) in consoleDetail" :key="index" class="log-item">
@@ -34,13 +36,15 @@
                                     </div>
                                 </div>
                                 <div v-else>
-                                    <p v-if="item.logError" class="failed">{{item.logError}}</p>
-                                    <p v-else-if="item.logSuccess" class="success">{{item.logSuccess}}</p>
-                                    <p v-else-if="item.logInfo" class="info">{{item.logInfo}}</p>
+                                    <p v-if="item.logError" class="danger">{{item.logError}}</p>
+                                    <p v-else-if="item.logSuccess" class="success" >{{item.logSuccess}}</p>
+                                    <p v-else-if="item.logInfo" class="info">{{item.logInfo}}</span></p>
                                     <p v-else-if="item.logWarning" class="warning">{{item.logWarning}}</p>
                                     <p v-else v-for="(obj,objKey) in item" :key="objKey">
-                                        <span class="log-title">{{objKey}}</span>
-                                        <span >{{obj}}</span>
+                                        <span v-if="JSON.stringify(obj)!=='{}'">
+                                            <span class="log-title info">{{objKey}}</span>
+                                            <span>{{obj}}</span>
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -51,7 +55,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="command-line" id="command" contenteditable="true" @focus="command()" @blur="commandBlur" @keyup.enter="comply($event)" @keyup.up="complyNear($event,-1)" @keyup.down="complyNear($event,1)">
+            <div class="command-line bggray dark" id="command" contenteditable="true" @focus="command()" @blur="commandBlur" @keyup.enter="comply($event)" @keyup.up="complyNear($event,-1)" @keyup.down="complyNear($event,1)">
                 请输入需要执行的命令
             </div>
         </div>
@@ -88,6 +92,17 @@
             viewLog(){
                 consoleService.trigger(!this.consoleFlag);
             },
+            viewRecord(){
+                var log = window.localStorage.getItem('deployLog');
+                if(log){
+                    var arr = JSON.parse(log);
+                    arr.forEach(function(item){
+                        consoleService.output(item)
+                    });
+                }else{
+                    consoleService.output('未找到部署记录~');
+                }
+            },
             saveData(){
                 this.htmlData = document.getElementById('log-id').innerHTML;
             },
@@ -114,6 +129,7 @@
                         this.hasMatch = false;
                     }
                 }else{
+                    this.hasMatch = true;
                     document.getElementById('log-id').innerHTML=data;
                 }
             },
@@ -194,73 +210,57 @@
 </script>
 
 <style lang="less" scoped>
+    @import "../../less/modules/theme.less";
     .log-header{
         align-items:flex-end;
         h4{
-            padding:0 10px;
+            padding:0 14px 0 10px;
             height:50px;
             line-height:50px;
-            background-color: #000;
-            color:#fff;
             .search{
                 float:right;
             }
             .icon{
+                margin-left:20px;
                 cursor:pointer;
             }
             input{
                 padding-left:10px;
-                width:180px;
-                height:28px;
-                line-height:28px;
-                border-style:none;
-                color:#bbb;
+                width:200px;
+                height:32px;
+                line-height:32px;
+                border:solid 1px #bfbfbf;
+                &:focus{
+                    outline:none;
+                    border:solid 1px @blue;
+                 }
             }
         }
     }
-    .log-area{
-        background-color: #222;
-    }
     .log-output{
-        height:300px;
+        height:200px;
         overflow-x: hidden;
         overflow-y: auto;
         padding:10px 15px;
         line-height:24px;
-        color:#fff;
-        background-color: #222;
     }
     .log-output::-webkit-scrollbar {
-        width:10px;
-        height:10px;
+        width:5px;
+        height:5px;
     }
     .log-output::-webkit-scrollbar-track-piece {
-        background:#333;
+        background:#fff;
     }
     .log-output::-webkit-scrollbar-thumb{
-        background:#666;
-        border-radius:4px;
+        background:#e5e5e5;
+        height:50px;
+        border-radius:8px;
     }
     .log-item{
         margin-bottom:15px;
     }
     .log-item-title{
         margin-bottom:10px;
-    }
-    .error{
-        color:orange;
-    }
-    .success{
-        color:green;
-    }
-    .failed{
-        color:red;
-    }
-    .warning{
-        color:orange;
-    }
-    .info{
-        color:#20a0ff;
     }
     .log-detail{
         p,li,span{
@@ -269,7 +269,6 @@
     }
     .log-title{
         margin-right:30px;
-        color:#20a0ff;
     }
     .console-item{
         margin-bottom:10px;
@@ -279,10 +278,13 @@
         cursor:pointer;
     }
     .command-line{
-        margin-top:16px;
-        padding-left:20px;
+        padding-left:25px;
         line-height:34px;
-        color:#bbb;
-        background-color: #333;
+        border:solid 1px transparent;
+        background: url('./images/command.png') no-repeat 10px center;
+        &:focus{
+            outline:none;
+            border:solid 1px @blue;
+         }
     }
 </style>

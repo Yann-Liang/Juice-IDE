@@ -31,5 +31,8 @@ export const editorGetter = {
 	},
 	removeData(state){
 		return state.removeData;
-	}
+	},
+    copyText(state){
+        return state.copyText
+    }
 };
