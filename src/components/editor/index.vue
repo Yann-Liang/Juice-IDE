@@ -3,7 +3,7 @@
         <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
                 <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
-                    <i class='el-icon-d-arrow-left'></i>
+                    <i class='el-icon-d-arrow-left darker'></i>
                 </div>
                 <ul class='files white' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
@@ -11,20 +11,20 @@
                         <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
-                    <li class='new-file' @click='newFile'>+</li>
+                    <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
                 <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
-                    <i class='el-icon-d-arrow-right'></i>
+                    <i class='el-icon-d-arrow-right darker'></i>
                 </div>
             </div>
             <div class="tools">
                 <div class="tool">
-                    <span class='icon icon-save' @click.prevent='save' title="保存当前文件"></span>
-                    <span class="icon icon-search" @click.prevent='search' title="搜索"></span>
-                    <span class='icon icon-format' @click.prevent='format' title="代码格式化"></span>
-                    <span class='icon icon-big-font' @click.prevent='increase' title="字体放大"></span>
-                    <span class='icon icon-sm-font' @click.prevent='decrease' title="字体缩小"></span>
-                    <span class='icon icon-close-all' @click.prevent='close' title="关闭所有窗口"></span>
+                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe62a;</i></span>
+                    <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
+                    <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
+                    <span @click.prevent='increase' title="字体放大"><i class="iconfont info">&#xe61d;</i></span>
+                    <span @click.prevent='decrease' title="字体缩小"><i class="iconfont info">&#xe622;</i></span>
+                    <span @click.prevent='close' title="关闭所有窗口"><i class="iconfont info">&#xe61e;</i></span>
                 </div>
 
                 <div class="replace-model" v-if='replaceVisible'>
@@ -48,7 +48,7 @@
                     <!--<span @click='onSearchUp'>↑</span>-->
                     <!--<span @click='onSearchDown'>↓</span>-->
                     <!--这里的上下切换，换成了input的键盘事件-->
-                    <span @click="offSearch" class="icon icon-close"></span>
+                    <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
             </div>
         </div>
@@ -539,15 +539,9 @@
                 }
             }
             .new-file{
-                margin:7px 0 0 10px;
-                display:inline-block;
+                margin-left:10px;
                 padding:0;
-                width:24px;
-                height:24px;
-                line-height:24px;
-                text-align: center;
-                border-radius: 24px;
-                background-color:#838d93;
+                background-color:transparent;
             }
             .li-active{
                 background-color: #999;
@@ -564,6 +558,7 @@
     .tool{
         text-align: right;
         span{
+            margin-right:14px;
             display: inline-block;
             cursor: pointer;
         }
@@ -613,11 +608,9 @@
         text-align: center;
         border-radius:3px;
     }
-    .icon-close{
-        position:absolute;
-        right:10px;
-        top:23px;
-        margin-right:0;
+    .close-search{
+        float:right;
+        cursor: pointer;
     }
 }
 .javascript-editor{
@@ -633,34 +626,5 @@
     flex-grow:1;
 
     // background-color:#000;
-}
-.icon{
-    margin-right:14px;
-    display:inline-block;
-    width:16px;
-    height:40px;
-}
-.icon-close{
-    height:16px;
-    background: url('./images/close.png') no-repeat center center;
-}
-.icon-save{
-    background: url('./images/save_file.png') no-repeat center center;
-}
-.icon-search{
-    background: url('./images/search.png') no-repeat center center;
-}
-.icon-format{
-    width:20px;
-    background: url('./images/formatting.png') no-repeat center center;
-}
-.icon-big-font{
-    background: url('./images/big_font_widget.png') no-repeat center center;
-}
-.icon-sm-font{
-    background: url('./images/decrease_font_size.png') no-repeat center center;
-}
-.icon-close-all{
-    background: url('./images/close_all_libraries.png') no-repeat center center;
 }
 </style>

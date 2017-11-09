@@ -7,8 +7,9 @@
                     <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <!--<span class="direction" @click="near(-1)">↑</span>-->
                     <!--<span class="direction" @click="near(1)">↓</span>-->
-                     <span class="icon icon-record" @click="viewRecord()"></span>
-                    <span :class="[consoleFlag ? 'icon-unfold' : 'icon-shrink', 'icon']" @click="viewLog()"></span>
+                     <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
+                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
+                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
                 </span>
             </h4>
         </div>
@@ -40,7 +41,7 @@
                                     <p v-else-if="item.logInfo" class="info">{{item.logInfo}}</span></p>
                                     <p v-else-if="item.logWarning" class="warning">{{item.logWarning}}</p>
                                     <p v-else v-for="(obj,objKey) in item" :key="objKey">
-                                        <span>
+                                        <span v-if="JSON.stringify(obj)!=='{}'">
                                             <span class="log-title info">{{objKey}}</span>
                                             <span>{{obj}}</span>
                                         </span>
@@ -220,25 +221,8 @@
                 float:right;
             }
             .icon{
-                display:inline-block;
-                width:16px;
                 margin-left:20px;
                 cursor:pointer;
-            }
-            .icon-unfold{
-                height:10px;
-                background: url('./images/unfold.png') no-repeat center center;
-            }
-            .icon-shrink{
-                height:10px;
-                background: url('./images/shrink.png') no-repeat center center;
-            }
-            .icon-record{
-                position:relative;
-                top:2px;
-                width:18px;
-                height:16px;
-                background: url('./images/record.png') no-repeat center center;
             }
             input{
                 padding-left:10px;

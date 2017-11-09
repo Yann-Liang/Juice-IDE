@@ -1,12 +1,12 @@
 <template>
     <div class="file">
         <ul class="tab-list">
-            <li class="icon icon-create" title="新建文件" @click="newFile()"></li>
-            <li class="icon icon-import-file" title="导入文件" @click="exportFile('file')"></li>
-            <li class="icon icon-import-folder" title="导入文件夹" @click="exportFile('dir')"></li>
-            <li class="icon icon-new-folder" title="新建文件夹" @click="newDir()"></li>
-            <li class="icon icon-save-all" title="保存所有文件" @click="saveAllFile()"></li>
-            <li class="icon icon-del-all" title="删除所有文件" @click="removeAllFile()"></li>
+            <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
+            <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
+            <li title="导入文件夹" @click="exportFile('dir')"><i class="iconfont info">&#xe626;</i></li>
+            <li title="新建文件夹" @click="newDir()"><i class="iconfont info">&#xe627;</i></li>
+            <li title="保存所有文件" @click="saveAllFile()"><i class="iconfont info">&#xe629;</i></li>
+            <li title="删除所有文件" @click="removeAllFile()"><i class="iconfont info">&#xe623;</i></li>
         </ul>
         <ul class="file-content">
             <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item"></item>
@@ -218,34 +218,9 @@
     }
     .tab-list li{
         flex-grow: 1;
-        height:30px;
-        line-height:30px;
+        height:40px;
+        line-height:40px;
         cursor:pointer;
-    }
-    .tab-list{
-        .icon{
-            display:inline-block;
-            width:20px;
-            height:40px;
-        }
-        .icon-create{
-            background: url('./images/create_new_file.png') no-repeat center center;
-        }
-        .icon-import-file{
-            background: url('./images/import_file.png') no-repeat center center;
-        }
-        .icon-import-folder{
-            background: url('./images/import_folder.png') no-repeat center center;
-        }
-        .icon-new-folder{
-            background: url('./images/new_folder.png') no-repeat center center;
-        }
-        .icon-save-all{
-            background: url('./images/save_all.png') no-repeat center center;
-        }
-        .icon-del-all{
-            background: url('./images/delete_all_files.png') no-repeat center center;
-        }
     }
     .file-content{
         .file-item{
