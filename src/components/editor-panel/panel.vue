@@ -146,18 +146,9 @@
                 //监听编辑区的change事件
                 console.log(this.editor.getSession().on)
 	            console.log(this.editor.getSession().off)
-//                this.editor.getSession().on('change', (e)=> {
-//	                //监听鼠标获得焦点
-//                    console.log("cccccccccccccccccccccccccccccccc")
-//	                this.editor.on("focus",()=>{
-//		                console.log("focusssssssssssssssssssssssss")
-//		                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-//		                this.initChange();
-//		                this.getResult();
-//	                });
-//                });
+                let red ;
 	            this.editor.on("focus",()=>{
-			            this.editor.getSession().on('change', (e)=> {
+		            red = this.editor.getSession().on('change', (e)=> {
 				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
 				            this.initChange();
@@ -166,7 +157,7 @@
 	            });
 
 	            this.editor.on("blur",()=>{
-		            this.editor.getSession().removeAllListeners('change')
+		            this.editor.getSession().off('change',red)
 	            });
             },
             //设置错误警示css
