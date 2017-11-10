@@ -26,18 +26,6 @@
                     <span @click.prevent='decrease' title="字体缩小"><i class="iconfont info">&#xe622;</i></span>
                     <span @click.prevent='close' title="关闭所有窗口"><i class="iconfont info">&#xe61e;</i></span>
                 </div>
-
-                <div class="replace-model" v-if='replaceVisible'>
-                    <span>
-                        form:<input type="text" name="" v-model='fromValue' @input='fromSearch'/>
-                    </span>
-                        <span>
-                        to  :<input type="text" name="" v-model="toValue"/>
-                    </span>
-                    <span @click='replaceSign' >单个替换</span>
-                    <span @click='replaceAll'>全部替换</span>
-                    <span @click='offReplace'>x</span>
-                </div>
             </div>
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
@@ -49,6 +37,33 @@
                     <!--<span @click='onSearchDown'>↓</span>-->
                     <!--这里的上下切换，换成了input的键盘事件-->
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
+                </div>
+            </div>
+            <div class="replace-model" v-if='replaceVisible'>
+                <div class="replace-content">
+                    <div>
+                        <p>
+                            <label for="" style="width:80px">form:</label>
+                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/>
+                        </p>
+                        <p>
+                           <label for="" style="width:80px">to  :</label>
+                           <input type="text" name="" v-model="toValue"/>
+                        </p>
+                        <!-- <span> -->
+                            <!-- <label for="">form:</label>
+                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/> -->
+                        <!-- </span>
+                        <span> -->
+                            <!-- <label for="">to  :</label>
+                            <input type="text" name="" v-model="toValue"/> -->
+                        <!-- </span> -->
+                    </div>
+                    <div>
+                        <span @click='replaceSign'>Replace</span>
+                        <span @click='replaceAll'>ReplaceAll</span>
+                    </div>
+                    <div @click='offReplace' class="icon icon-close"></div>
                 </div>
             </div>
         </div>
@@ -560,18 +575,6 @@
             cursor: pointer;
         }
     }
-    .replace-model{
-        width: 480px;
-        height: 40px;
-        padding: 5px;
-        border-radius: 10px;
-        background-color: #000;
-        position: absolute;
-        top: 30px;
-        left: 50%;
-        z-index: 1000000;
-        margin-left: -240px;
-    }
 }
 .search-model{
     position: absolute;
@@ -609,6 +612,76 @@
         float:right;
         cursor: pointer;
     }
+}
+.replace-model{
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -260px;
+    padding: 0 10px;
+    width: 520px;
+    height: 100px;
+    line-height: 100px;
+    border:solid 1px #e5e5e5;
+    border-radius: 3px;
+    .replace-content{
+        display: flex;
+        flex-wrap:nowrap;
+        flex-direction:row;
+        justify-content:flex-start;
+        div{
+            border:1px solid red;
+            height:100px;
+            // span{
+            //     display: inline-block;
+            //     height:30px;
+            //     input{
+            //         // height:30px;
+            //         // vertical-align: top;
+            //     }
+            // }
+            p{
+                height:30px;
+                background:red;
+                input{
+                    height:25px;
+                }
+            }
+            &:bth-child(2){
+                margin-top:10px;
+            }
+        }
+        .btn{
+            margin:0 10px;
+            display: inline-block;
+            width:60px;
+            height:38px;
+            line-height:38px;
+            text-align: center;
+            border-radius:3px;
+        }
+        .icon-close{
+            position:absolute;
+            right:10px;
+            top:23px;
+            margin-right:0;
+        }
+    }
+
+
+    // input{
+    //     padding-left:10px;
+    //     width:300px;
+    //     height:38px;
+    //     line-height:38px;
+    //     border:solid 1px #bfbfbf;
+    //     &:focus{
+    //         outline:none;
+    //         border:solid 1px @blue;
+    //      }
+    // }
+
 }
 .javascript-editor{
     width:100%;

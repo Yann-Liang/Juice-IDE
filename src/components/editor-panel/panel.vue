@@ -16,11 +16,11 @@
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
-
     import file from '@/services/API-file'
     import compileService from '@/services/compile-exe/compile-service';
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
+    ace.acequire('ace/ext/language_tools')
     export default {
         //组件名
         name: '',
@@ -159,30 +159,31 @@
             getResult:function(){
                 //语法检查
                 // var _this = this;
-//                compileService.grammarCheck((result, missingInputs, source)=>{
-//                    console.log('语法检查',result)
-//                    if(result.errors && result.errors.length>0){
-//                        /*
-//                            语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
-//                        */
-//                        let css='';
-//                        result.errors.forEach((error)=>{
-//                            var errorId = error.match(/\w+\.sol\:[0-9]+/i);
-//                            var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
-//                            var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
-//                            console.log(rowId[1],tips[1]);
-//                            if(tips[1] == 'Warning'){
-//                                css = 'ace_warning'
-//                            }else{
-//                                css = 'ace_error'
-//                            }
-//                            this.setBreakpoint(rowId[1]-1,css)
-//                        });
-//                    }else{
-//                        console.log('没有错误警示')
-//                        this.editor.session.clearBreakpoints();
-//                    }
-//                },this.value);
+                compileService.grammarCheck((result, missingInputs, source)=>{
+                    console.log('语法检查',result)
+                    if(result.errors && result.errors.length>0){
+                        /*
+                            语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
+                        */
+                        let css='';
+                        result.errors.forEach((error)=>{
+                            var errorId = error.match(/\w+\.sol\:[0-9]+/i);
+                            var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
+                            var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
+                            console.log(rowId[1],tips[1]);
+                            if(tips[1] == 'Warning'){
+                                css = 'ace_warning'
+                            }else{
+                                css = 'ace_error'
+                            }
+                            this.setBreakpoint(rowId[1]-1,css);
+                            this.mouseHover(error)
+                        });
+                    }else{
+                        console.log('没有错误警示')
+                        this.editor.session.clearBreakpoints();
+                    }
+                },this.value);
             },
             initChange:function(){
                 const data = this.editData;
@@ -214,6 +215,24 @@
                     this.updateTreeData({value:this.value,name:this.name,save:true});
                 });
             },
+            //鼠标hover事件
+            mouseHover:function(str){
+                //点击报错行显示报错的是啥信息
+                this.editor.on('guttermousemove',(e)=>{
+                    var target = e.domEvent.target;
+                    // console.log('guttermousemove',e)
+                    var row = e.getDocumentPosition().row;
+                    console.log(row);
+                    var className = e.domEvent.toElement.className;
+                    console.log(className);
+                    if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
+                        e.domEvent.toElement.title=str;
+                        return false;
+                    }else{
+                        e.domEvent.toElement.title=""
+                    }
+                });
+            }
 
         },
         //生命周期函数
@@ -224,39 +243,34 @@
 
         },
         mounted() {
-            console.log(this.value)
-            console.log(this.keyId)
             this.editor = ace.edit('javascript-editor');
-            console.log(this.editor);
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
+            console.log(this.editor)
             var _this = this;
+            require('brace/ext/language_tools')
+            ace.acequire('ace/ext/language_tools')
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-
             this.editor.setTheme('ace/theme/clouds');
-
             //启用提示菜单
-            ace.acequire('ace/ext/language_tools')
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
+                enableSnippets: true,
                 enableLiveAutocompletion: true
             });
             //字体大小
             this.editor.setFontSize(12);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
-            //设置事件处理程序
-            // this.editor.setKeyboardHandler('ace/keyboard/vim');
             this.setValue();
             this.change();
             this.editor.clearSelection();
+            var sourceAnnotations = [];
             // this.getResult();
             //监听鼠标获得焦点
             this.editor.on("focus",()=>{
-                console.log(444444444444444)
-                console.log(this.keyId)
                 this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
             });
             //监听光标移动
@@ -264,10 +278,8 @@
 
             });
 
-            //点击报错行显示报错的是啥信息
-            this.editor.on('guttermousedown',function(e){
-                console.log('guttermousedown',e)
-            });
+
+
             //设置格式化
             this.editor.commands.addCommand({
                 name: 'myCommand',
