@@ -73,9 +73,9 @@
                         <li><i class="iconfont dark">&#xe61f;</i></li>
                         <li>确定要关闭窗口吗？</li>
                         <li>
-                            <span class='btn-info'>是</span>
-                            <span class='btn-info'>否</span>
-                            <span class='btn-info'>取消</span>
+                            <span class='btn-info' @click='yes($event)' :data-index='dataindex'>是</span>
+                            <span class='btn-info' @click='no($event)' :data-index='dataindex'>否</span>
+                            <span class='btn-info' @click='calcel($event)' :data-index='dataindex'>取消</span>
                         </li>
                     </ul>
                 </div>
@@ -106,11 +106,12 @@
         //实例的数据对象
         data() {
             return {
+                dataindex:"",
                 cha:true,
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
-                askVisible:true,
+                askVisible:false,
                 inputValue:"",
                 searchValue:"",
                 // searchVisible:false,
@@ -264,6 +265,75 @@
                 })
                 // this.$refs.childMethod.change();
             },
+            //效果切换
+            activeTab:function(index){
+                if(this.fileData.length == 1){
+                    //提示用户打开文件
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.value = "readonly";
+                    this.changeFileData([]);
+                }else{
+                    this.editorVisible = true;
+                    this.tipsVisible = false;
+                    if(this.select == index){
+                        let result = this.fileData;
+                        result.splice(index,1);
+                        this.changeFileData(result);
+                        //如果当前高亮为0
+                        if(this.select == 0){
+                            this.select = index ;
+                            this.currentView = index ;
+                            this.value = this.fileData[index].value;
+                            this.name = this.fileData[index].name;
+                            this.keyId = this.fileData[index].keyId;
+                        }else{
+                            this.select = index - 1;
+                            this.currentView = index - 1;
+                            this.value = this.fileData[index - 1].value;
+                            this.name = this.fileData[index - 1].name;
+                            this.keyId = this.fileData[index - 1].keyId;
+
+                        }
+                    }else if(this.select > index){
+                        console.log('高亮>删除相同')
+                        let result = this.fileData;
+                        result.splice(index,1);
+                        this.changeFileData(result);
+                        this.select = this.select - 1;
+                        this.currentView = this.select - 1;
+                        this.value= this.fileData[this.select].value;
+                        this.name = this.fileData[this.select].name;
+                        this.keyId = this.fileData[this.select].keyId;
+                    }else if(this.select < index){
+                        console.log('高亮<删除相同')
+                        let result = this.fileData;
+                        result.splice(index,1);
+                        this.changeFileData(result);
+                        this.select = this.select;
+                        this.currentView = this.select;
+                        this.value = this.fileData[this.select].value;
+                        this.name = this.fileData[this.select].name;
+                        this.keyId = this.fileData[this.select].keyId;
+                    }
+                }
+            },
+            //yes
+            yes:function(e){
+                console.log(e.target.getAttribute("data-index"))
+                // this.saveEditorFile();
+                // this.activeTab(this.select);
+            },
+            //no
+            no:function(){
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
+            //calcel
+            calcel:function(){
+
+            },
             //关闭当前窗口
             remove:function(index,id){
                 console.log(index);
@@ -275,63 +345,19 @@
                     return item.keyId == id;
                 });
                 if(arr.length!=0){
-                    //存在，提示用户保存
-
+                    //存在，
+                    this.askVisible = true;
+                    this.dataindex = index;
+                }else{
+                    //不存在
+                    this.askVisible = false;
+                    this.activeTab(index);
                 }
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
                 //关闭窗口时，提示用户是否已保存
-                if(this.fileData.length == 1){
-                    //提示用户打开文件
-                    this.editorVisible = false;
-                    this.tipsVisible = true;
-                    this.value = "readonly";
-	                this.changeFileData([]);
-                }else{
-                    this.editorVisible = true;
-                    this.tipsVisible = false;
-                    if(this.select == index){
-                        let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
-                        //如果当前高亮为0
-                        if(this.select == 0){
-                            this.select = index ;
-                            this.currentView = index ;
-                            this.value = this.fileData[index].value;
-                            this.name = this.fileData[index].name;
-	                        this.keyId = this.fileData[index].keyId;
-                        }else{
-                            this.select = index - 1;
-                            this.currentView = index - 1;
-                            this.value = this.fileData[index - 1].value;
-                            this.name = this.fileData[index - 1].name;
-                            this.keyId = this.fileData[index - 1].keyId;
 
-                        }
-                    }else if(this.select > index){
-                        console.log('高亮>删除相同')
-	                    let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
-                        this.select = this.select - 1;
-                        this.currentView = this.select - 1;
-                        this.value= this.fileData[this.select].value;
-                        this.name = this.fileData[this.select].name;
-	                    this.keyId = this.fileData[this.select].keyId;
-                    }else if(this.select < index){
-                        console.log('高亮<删除相同')
-	                    let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
-                        this.select = this.select;
-                        this.currentView = this.select;
-                        this.value = this.fileData[this.select].value;
-                        this.name = this.fileData[this.select].name;
-	                    this.keyId = this.fileData[this.select].keyId;
-                    }
-                }
             },
             //关闭所有窗口
             close:function(){

@@ -144,17 +144,19 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
+
+                let red ;
 	            this.editor.on("focus",()=>{
-			         this.editor.getSession().on('change', (e)=> {
-				        console.log("开始监听")
-				        this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-				        this.initChange();
-				        this.getResult();
-                     })
+		            red = this.editor.getSession().on('change', (e)=> {
+				            console.log("开始监听")
+				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+				            this.initChange();
+				            this.getResult();
+                        })
 	            });
 
 	            this.editor.on("blur",()=>{
-		            this.editor.getSession().removeAllListeners('change')
+		            this.editor.getSession().off('change',red)
 	            });
             },
 
