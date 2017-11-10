@@ -1,5 +1,5 @@
 <template>
-    <div class="index" @mousedown="topFn">
+    <div class="index no-chose" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
         <div class="main">
@@ -39,6 +39,7 @@
     import compileService from '@/services/compile-exe/compile-service';
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
+    import file from '@/services/API-file'
 
     export default {
         //组件名
@@ -58,11 +59,11 @@
         props: {},
         //计算
         computed: {
-
+	        ...mapGetters(['activeFile','getUrl','editFile'])
         },
         //方法
         methods: {
-	        ...mapActions(['updateRightMenuBlock','saveEditorFile']),
+	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -124,67 +125,145 @@
                 }
             },
 	        hotkeysFn(){
-            	// 注册快捷键
-                const that = this;
-                // 新建
-		        hotkeys('ctrl+n', function(event,handler){
-                    alert('ctrl+n');
+		        // 注册快捷键
+		        // 新建
+		        hotkeys('ctrl+a', (event,handler)=>{
+			        alert('ctrl+n');
+			        this.newFile();
 		        });
 
 		        // 新建文件夹
-		        hotkeys('ctrl+w', function(event,handler){
+		        hotkeys('ctrl+q', (event,handler)=>{
 			        alert('ctrl+w');
+			        this.newDir();
 		        });
 
 		        // 导入本地文件
-		        hotkeys('ctrl+shift+o', function(event,handler){
+		        hotkeys('ctrl+shift+o', (event,handler)=>{
+			        this.exportFile('file')
 			        alert('ctrl+shift+o');
 		        });
 
 		        // 导入本地文件夹
-		        hotkeys('ctrl+o', function(event,handler){
+		        hotkeys('ctrl+o', (event,handler)=>{
 			        alert('ctrl+o');
+			        this.exportFile('dir')
 		        });
 
 		        // 保存
-		        hotkeys('ctrl+s', function(event,handler){
-		        	console.log('ctrl+s')
-			        that.saveEditorFile()
+		        hotkeys('ctrl+s', (event,handler)=>{
+			        console.log('ctrl+s')
+			        this.saveEditorFile()
 		        });
 
 		        // 另存为
-		        hotkeys('ctrl+shift+s', function(event,handler){
-			        alert('ctrl+shift+s');
+		        hotkeys('ctrl+shift+s', (event,handler)=>{
+			        this.saveOtherPath(1)
 		        });
 
 		        // 全部保存
-		        hotkeys('ctrl+alt+s', function(event,handler){
-			        alert('ctrl+alt+s');
+		        hotkeys('ctrl+alt+s', (event,handler)=>{
+			        this.saveAllFile();
 		        });
 
 		        // 删除
-		        hotkeys('ctrl+delete', function(event,handler){
+		        hotkeys('ctrl+delete', (event,handler)=>{
 			        alert('ctrl+delete');
 		        });
 
 		        // 删除所有文件
-		        hotkeys('ctrl+shift+delete', function(event,handler){
+		        hotkeys('ctrl+shift+delete', (event,handler)=>{
 			        alert('ctrl+shift+delete');
+			        this.removeAllFile();
 		        });
 
-            },
+	        },
 	        topFn(){
 		        this.updateRightMenuBlock(false);
+            },
+	        newFile(){
+		        this.open((name)=>{
+			        file.newFile(this.activeFile.value,name,(res)=>{
+				        if(res.code === 0){
+					        this.queryFileListData();
+					        this.updateEditFile({
+						        name:file.uffixName(name),
+						        value:res.value,
+						        keyId:res.keyId
+					        })
+					        console.log(this.editFile);
+				        }else if(res.code === 1){
+					        this.tipOpen()
+				        }else if(res.code === 2){
+					        const url = this.getUrl;
+					        url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+					        this.updateUrl(url);
+					        this.updateEditFile({
+						        name:file.uffixName(name),
+						        value:res.value,
+						        keyId:res.keyId
+					        })
+				        }
+				        this.updateRightMenuBlock(false);
+			        })
+		        });
+	        },
+	        newDir(){
+		        this.open((name)=>{
+			        file.newMkdir(this.activeFile.value,name,(res)=>{
+				        if(res.code === 0){
+					        this.queryFileListData();
+				        }else if(res.code === 1){
+					        this.tipOpen()
+				        }else if(res.code === 2){
+
+				        }
+				        this.updateRightMenuBlock(false);
+			        })
+		        });
+	        },
+	        open(fn) {
+		        this.updateRightMenuBlock(false);
+		        this.$prompt('请输入邮箱', '提示', {
+			        confirmButtonText: '确定',
+			        cancelButtonText: '取消',
+		        }).then(({ value }) => {
+			        fn && fn(value)
+		        })
+	        },
+	        tipOpen() {
+		        this.$alert('文件已存在，请更换文件名', '提示', {
+			        confirmButtonText: '确定',
+		        });
+	        },
+	        exportFile(type){
+		        file.exportFile(type,(filename)=>{
+			        if(filename){
+				        const url = this.getUrl;
+				        console.log(file.basename(filename));
+				        url.push({value:filename,name:file.basename(filename)});
+				        this.updateUrl(url);
+			        }
+		        });
+	        },
+            initUrlFn(){
+	        	let data = localStorage.getItem('dirPath') ? JSON.parse(localStorage.getItem('dirPath')): [];
+	            data = data.filter((item,index)=>{
+		            if(file.exists(item.value)){
+			            return true;
+		            }
+                });
+	            this.updateUrl(data)
             }
         },
         //生命周期函数
         created() {
             contractServies.setProvider('http://10.10.8.202:6789')
-	        this.hotkeysFn();
         },
         beforeMount() {},
         mounted() {
-
+            this.initUrlFn();
+	        this.hotkeysFn();
         },
         //监视
         watch: {},

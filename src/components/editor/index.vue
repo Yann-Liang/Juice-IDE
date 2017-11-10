@@ -116,7 +116,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible','removeData'])
         },
         //方法
         methods: {
@@ -250,14 +250,10 @@
             },
             //关闭当前窗口
             remove:function(index){
-                console.log(index);
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
                 //关闭窗口时，提示用户是否已保存
-
-                console.log("数组长度")
-                console.log(this.fileData.length)
                 if(this.fileData.length == 1){
                     //提示用户打开文件
                     this.editorVisible = false;
@@ -265,11 +261,9 @@
                     this.value = "readonly";
 	                this.changeFileData([]);
                 }else{
-                    console.log("hahahahah")
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
-                        console.log('高亮与删除相同')
                         let result = this.fileData;
 	                    result.splice(index,1);
 	                    this.changeFileData(result);
@@ -475,6 +469,9 @@
                 // this.$refs.childMethod.initChange();
                 // this.$refs.childMethod.change();
             },
+            'removeData.id':function(){
+            	this.remove(this.removeData.index)
+            }
 
         },
         //组件

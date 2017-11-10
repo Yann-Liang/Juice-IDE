@@ -29,6 +29,9 @@ export const editor = {
         searchVisible:false,
         replaceVisible:false,
 	    fileData:[],
+	    removeData:{
+        	id:''
+	    },
         copyText:"",
     },
     actions: editorAction,
