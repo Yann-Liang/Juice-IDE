@@ -144,23 +144,18 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                // this.editor.getSession().on('change', (e)=> {
-                //     console.log("ccccccccc")
-                //     // this.initChange();
-                //     // ();
-                // });
+	            this.editor.on("focus",()=>{
+			         this.editor.getSession().on('change', (e)=> {
+				        console.log("开始监听")
+				        this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+				        this.initChange();
+				        this.getResult();
+                     })
+	            });
 
-                this.editor.on("focus",()=>{
-                  this.editor.getSession().on('change', (e)=> {
-                   console.log("开始监听")
-                   this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                   this.initChange();
-                   // this.getResult();
-                           })
-                });
-
-
-
+	            this.editor.on("blur",()=>{
+		            this.editor.getSession().removeAllListeners('change')
+	            });
             },
 
             //设置错误警示css
@@ -222,21 +217,6 @@
             getValue:function(){
                 return this.editor.getValue();
             },
-            //失去焦点
-            loseBlur:function(){
-                // this.editor.on('blur',()=>{
-                //     this.updateTreeData({value:this.value,name:this.name,save:true});
-                // });
-                this.editor.on("blur",()=>{
-                   // alert(1111);
-                 this.editor.getSession().off('change', (e)=> {
-                  console.log("解除监听")
-                  this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                  this.initChange();
-                  // this.getResult();
-                 })
-                });
-            },
             //鼠标hover事件
             mouseHover:function(str){
                 //点击报错行显示报错的是啥信息
@@ -247,6 +227,7 @@
                     // console.log(row);
                     var className = e.domEvent.toElement.className;
                     // console.log(className);
+
                     if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
                         e.domEvent.toElement.title=str;
                         return false;
@@ -293,10 +274,7 @@
             this.editor.clearSelection();
             var sourceAnnotations = [];
             // this.getResult();
-            //监听鼠标获得焦点
-            this.editor.on("focus",()=>{
-                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-            });
+
             //监听光标移动
             this.editor.getSession().selection.on('changeCursor', (e)=> {
 
@@ -350,8 +328,9 @@
         //监视
         watch: {
             keyId:function(){
-                console.log(this.keyId);
-                this.setValue();
+            	if(!this.editFile.unWatch){
+		            this.setValue();
+                }
             },
         },
         //组件

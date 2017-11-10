@@ -1,5 +1,5 @@
 <template>
-    <div class="file">
+    <div class="file no-chose">
         <ul class="tab-list">
             <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
             <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
@@ -15,7 +15,7 @@
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
                     <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
                     <li @click="saveFile()" @mousedown.stop="">保存</li>
-                    <li @click="saveOtherPath()" @mousedown.stop="">另存为</li>
+                    <li @click="saveOtherPathFn()" @mousedown.stop="">另存为</li>
                     <li @click="rename" @mousedown.stop="">重命名</li>
                     <li @click="removeFileFn" @mousedown.stop="">删除</li>
                 </ul>
@@ -49,7 +49,8 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock','updateTreeData','saveAllFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
+                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus']),
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
@@ -92,6 +93,7 @@
 		        });
             },
 	        open(fn) {
+		        this.updateRightMenuBlock(false);
 		        this.$prompt('请输入邮箱', '提示', {
 			        confirmButtonText: '确定',
 			        cancelButtonText: '取消',
@@ -132,9 +134,7 @@
                })
             },
 	        saveFile(){
-	        	file.saveFile('','123456','2222',()=>{
-
-                })
+	        	this.saveEditorFile();
             },
 	        saveAllFileFn(){
 		        this.saveAllFile()
@@ -146,6 +146,7 @@
 				        this.updateUrlFn(this.activeFile);
 				        this.queryFileListData();
 				        console.log('删除文件成功');
+				        this.updateDeleteStatus(filesList)
 			        })
 		        }else{
 			        this.updateUrlFn(this.activeFile);
@@ -153,19 +154,14 @@
 		        this.updateRightMenuBlock(false);
 		        return false;
 	        },
-            rename(){
-
+            rename(){ // 重命名
+	            this.open((name)=>{
+	            	this.renameFile(name)
+	            });
             },
-	        saveOtherPath(){
-		        file.fsReadFile(this.activeFile.value,(err,data)=>{
-		        	if(!err){
-				        file.saveFile('',this.activeFile.name,data,()=>{
-
-                        })
-                    }else{
-
-                    }
-                });
+	        saveOtherPathFn(){
+		        this.updateRightMenuBlock(false);
+		        this.saveOtherPath(2);
             }
         },
         //生命周期函数
@@ -198,6 +194,7 @@
 </script>
 
 <style lang="less" scoped>
+    @import '../../../less/modules/theme.less';
     .file{
         flex-grow: 1;
         display: flex;
@@ -224,29 +221,29 @@
     }
     .file-content{
         .file-item{
-            height:40px;
-            line-height:40px;
+
         }
     }
     .right-menu{
         position:fixed;
         left:0px;
         top:0px;
-        width:200px;
-        padding-bottom:20px;
-        background:#ccc;
-        z-index:100
+        width:150px;
+        background:#f7f7f7;
+        z-index:100;
+        box-shadow: 0 0 5px #ccc;
     }
     .wrap-menu-list{
         li{
-            height:35px;
-            line-height:35px;
+            height:30px;
+            line-height:30px;
             text-align: center;
-            border-bottom:1px solid #fff;
+            border-bottom:1px solid #e5e5e5;
             cursor:pointer;
+            color:#333;
         }
         li:hover{
-            background:#fff;
+            background:@blue
         }
     }
 </style>

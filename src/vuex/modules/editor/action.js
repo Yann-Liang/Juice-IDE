@@ -9,7 +9,6 @@ export const editorAction = {
 		commit('UPDATE_SAVE_CODE',code)
 	},
 	updateData({commit,state},data){
-		// alert(11111111111111111111111111111111111111111111111111)
 		localStorage.setItem('editFileData',JSON.stringify(data))
 		commit('UPLOAD_EDIT_FILEDATA',data)
 	},
@@ -24,9 +23,10 @@ export const editorAction = {
 			if(err){
 
 			}else{
+				const oldKeyId = state.activeEditor.keyId;
 				if(filepath){
-					console.log(state.fileData);
 					const keyId = file.keyIdFn(filepath);
+					
 					dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
 
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
@@ -40,36 +40,33 @@ export const editorAction = {
 							return;
 						}
 					})
-
 					dispatch('updateUrl',url,{ root: true });
-
-					// 更新未保存vuex的状态
-					let editData = state.editData;
-					state.editData.forEach((item,index)=>{
-						console.log(item.keyId ==  state.activeEditor.keyId);
-						if(item.keyId ==  state.activeEditor.keyId){
-							editData.splice(index,1);
-							return;
-						}
-					});
-
-
-					console.log(editData);
-
-					dispatch('updateData',editData,{ root: true });
-
-
+					
+					// 更新当前激活的文件状态
+					dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath),unWatch:true},{ root: true });
+					
 					commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
 						value: filepath,
 						name: file.basename(filepath),
 						keyId:keyId,
 						source: state.activeEditor.source
 					})
-					// 更新当前激活的文件状态
-					dispatch('updateEditFile',{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},{ root: true });
+				
 				}else{
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 				}
+				// 更新未保存vuex的状态
+				let edit = [];
+				console.log(state.editData.length)
+				state.editData.forEach((item,index)=>{
+					console.log(oldKeyId);
+					console.log(item.keyId)
+					if(item.keyId !==  oldKeyId){
+						edit.push(item);
+					}
+				})
+				edit = JSON.stringify(edit)
+				dispatch('updateData',JSON.parse(edit),{ root: true });
                 if(cb && typeof(cb)=='function'){
                     cb();
                 }
@@ -127,6 +124,35 @@ export const editorAction = {
 	changeFileData({commit,state},data){
 		commit('UPDATE_File_DATA',data)
 	},
+	// 删除文件后更新状态
+	updateDeleteStatus({dispatch,commit,state,rootState},fileItem){
+		// 判断tabs列表有没有
+		const data1 = state.fileData;
+		data1.forEach((item,index)=>{
+			if(fileItem.keyId === item.keyId){
+				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
+				return ;
+			}
+		});
+		
+		// 更新未保存vuex的状态
+		let edit = state.editData;
+		edit.forEach((item,index,data)=>{
+			if(item.keyId === fileItem.keyId){
+				data.splice(index,1);
+				dispatch('updateData',edit,{ root: true });
+			}
+		})
+	},
+	updateRemoveData({commit,state},index){
+		let id = state.removeData.id + 1
+		const data = {
+			id: id,
+			index:index
+		}
+		commit('UPDATE_REMOVE_DATA',data)
+	},
+
 	//复制信息保存
 	updateCopyText({commit,state},data){
 		commit('UPDATE_COPY_TEXT',data)

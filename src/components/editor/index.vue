@@ -67,11 +67,26 @@
 
                 </div>
             </div>
+            <div class="ask-model" v-if='askVisible'>
+                <div class="ask-content">
+                    <ul>
+                        <li><i class="iconfont dark">&#xe61f;</i></li>
+                        <li>确定要关闭窗口吗？</li>
+                        <li>
+                            <span class='btn-info'>是</span>
+                            <span class='btn-info'>否</span>
+                            <span class='btn-info'>取消</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
         <div class="tips default" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
+        <!-- 弹窗 -->
+
     </div>
 </template>
 
@@ -95,6 +110,7 @@
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
+                askVisible:true,
                 inputValue:"",
                 searchValue:"",
                 // searchVisible:false,
@@ -117,7 +133,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible','removeData'])
         },
         //方法
         methods: {
@@ -235,8 +251,6 @@
             },
             //切换tab
             selectProp: function (index,item) {
-                this.editor.session.clearBreakpoints();
-                this.$refs.childMethod.loseBlur();
                 this.select = index;
                 this.currentView = index;
                 this.value = item.value;
@@ -253,6 +267,7 @@
             //关闭当前窗口
             remove:function(index,id){
                 console.log(index);
+
                 /*
                     关闭当前窗口之前，获取到当前的keyId，与vuex中editdata中的keyId进行对比，如果存在，在比较source中的
                 */
@@ -267,9 +282,6 @@
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
                 //关闭窗口时，提示用户是否已保存
-
-                console.log("数组长度")
-                console.log(this.fileData.length)
                 if(this.fileData.length == 1){
                     //提示用户打开文件
                     this.editorVisible = false;
@@ -277,11 +289,9 @@
                     this.value = "readonly";
 	                this.changeFileData([]);
                 }else{
-                    console.log("hahahahah")
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
-                        console.log('高亮与删除相同')
                         let result = this.fileData;
 	                    result.splice(index,1);
 	                    this.changeFileData(result);
@@ -487,6 +497,9 @@
                 // this.$refs.childMethod.initChange();
                 // this.$refs.childMethod.change();
             },
+            'removeData.id':function(){
+            	this.remove(this.removeData.index)
+            }
 
         },
         //组件
@@ -687,6 +700,48 @@
         }
     }
 
+
+}
+.ask-model{
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -240px;
+    width: 440px;
+    height: 125px;
+    border: solid 1px #e5e5e5;
+    border-radius: 3px;
+    ul{
+        height: 125px;
+        li{
+            &:nth-child(1){
+                padding:5px;
+                height:20px;
+                line-height: 20px;
+                text-align: right;
+                // background:@blue;
+            }
+            &:nth-child(2){
+                height: 48px;
+                line-height: 30px;
+                padding-left: 20px;
+            }
+            &:nth-child(3){
+                height: 35px;
+                line-height: 35px;
+                span{
+                    display: inline-block;
+                    height: 35px;
+                    line-height: 40px;
+                    width: 80px;
+                    text-align: center;
+                    border-radius: 3px;
+                    margin: 0 29px;
+                }
+            }
+        }
+    }
 
 }
 .javascript-editor{
