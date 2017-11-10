@@ -8,8 +8,8 @@
                     <!--<span class="direction" @click="near(-1)">↑</span>-->
                     <!--<span class="direction" @click="near(1)">↓</span>-->
                      <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
-                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
-                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
+                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
+                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
                 </span>
             </h4>
         </div>
@@ -21,14 +21,14 @@
                             <div v-if="typeof(item)=='object'">
                                 <div v-if="item.path">
                                     <p v-if="item.path">{{item.path}}:</p>
-                                    <ul v-if="item.error" class="error">
+                                    <ul v-if="item.error" class="danger">
                                         <li v-for="(errorItem,errorIndex) in item.error" :key="errorIndex"> {{errorItem}} </li>
                                     </ul>
                                     <div v-if="item.data">
                                         <ul>
                                             <li v-for="(value,key) in item.data" :key="key" class="console-item">
                                                 <p v-for="(obj,objKey) in value" :key="objKey">
-                                                    <span class="log-title">{{objKey}}</span>
+                                                    <span class="log-title info">{{objKey}}</span>
                                                     <span >{{obj}}</span>
                                                 </p>
                                             </li>
@@ -238,6 +238,8 @@
         }
     }
     .log-output{
+        box-sizing:border-box;
+        width:100%;
         height:200px;
         overflow-x: hidden;
         overflow-y: auto;
