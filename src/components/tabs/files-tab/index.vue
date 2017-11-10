@@ -1,5 +1,5 @@
 <template>
-    <div class="file">
+    <div class="file no-chose">
         <ul class="tab-list">
             <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
             <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
@@ -194,6 +194,7 @@
 </script>
 
 <style lang="less" scoped>
+    @import '../../../less/modules/theme.less';
     .file{
         flex-grow: 1;
         display: flex;
@@ -220,29 +221,29 @@
     }
     .file-content{
         .file-item{
-            height:40px;
-            line-height:40px;
+
         }
     }
     .right-menu{
         position:fixed;
         left:0px;
         top:0px;
-        width:200px;
-        padding-bottom:20px;
-        background:#ccc;
-        z-index:100
+        width:150px;
+        background:#f7f7f7;
+        z-index:100;
+        box-shadow: 0 0 5px #ccc;
     }
     .wrap-menu-list{
         li{
-            height:35px;
-            line-height:35px;
+            height:30px;
+            line-height:30px;
             text-align: center;
-            border-bottom:1px solid #fff;
+            border-bottom:1px solid #e5e5e5;
             cursor:pointer;
+            color:#333;
         }
         li:hover{
-            background:#fff;
+            background:@blue
         }
     }
 </style>

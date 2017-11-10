@@ -1,5 +1,5 @@
 <template>
-    <div class="index" @mousedown="topFn">
+    <div class="index no-chose" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
         <div class="main">

@@ -145,9 +145,14 @@
             change:function(){
                 //监听编辑区的change事件
                 this.editor.getSession().on('change', (e)=> {
-                    console.log("ccccccccc")
-                    this.initChange();
-                    this.getResult();
+	                //监听鼠标获得焦点
+                    console.log("cccccccccccccccccccccccccccccccc")
+	                this.editor.on("focus",()=>{
+		                console.log("focusssssssssssssssssssssssss")
+		                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+		                this.initChange();
+		                this.getResult();
+	                });
                 });
             },
             //设置错误警示css
@@ -269,10 +274,7 @@
             this.editor.clearSelection();
             var sourceAnnotations = [];
             // this.getResult();
-            //监听鼠标获得焦点
-            this.editor.on("focus",()=>{
-                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-            });
+
             //监听光标移动
             this.editor.getSession().selection.on('changeCursor', (e)=> {
 

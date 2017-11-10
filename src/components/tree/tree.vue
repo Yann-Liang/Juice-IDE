@@ -1,14 +1,17 @@
 <template>
     <div >
-        <li class="tree">
+        <li class="tree-file">
             <div
                 class="ellipsis root-file"
-                :class="{bold: isFolder,activeFile:filesList.value == activeFile.value && filesList.name ==  activeFile.name}"
+                :class="{bold: isFolder,activeFile:filesList.keyId == activeFile.keyId}"
                 @mousedown.stop="rightMenu(filesList, $event)"
                 @click="toggle(filesList)">
                 <!--@dblclick="changeType">-->
-                <i class="el-icon-date dir-icon" v-show="filesList.children"></i>
-                <i class="el-icon-document dir-icon" v-show="!filesList.children"></i>
+                <!--<i class="el-icon-date dir-icon" v-show="filesList.children"></i>-->
+                <i class="el-icon-caret-bottom tip" v-show="open" v-if="isFolder"></i>
+                <i class="el-icon-caret-right tip" v-show="!open" v-if="isFolder"></i>
+                <img src="./images/dir.png" v-if="isFolder">
+                <img src="./images/file-default.png" v-if="!isFolder">
                 {{filesList.name}}
                 <span class="no-save danger" v-if="!filesList.save">未保存</span>
                 <div class="wrap-delete">
@@ -109,9 +112,7 @@
                 }
             },
 			rightMenu(filesList,e){
-            	console.log(filesList)
-            	console.log(e)
-            	if(e.button === 2){
+            	if(e.button === 2 && !this.isFolder){
 		            this.setActiveFile(filesList);
                     const position = {
                     	x:e.clientX,
@@ -135,48 +136,65 @@
 </script>
 
 <style lang="less" scoped>
-    body {
-        font-family: Menlo, Consolas, monospace;
-        color: #444;
-    }
-    .item {
-        cursor: pointer;
-    }
-    .bold {
-        font-weight: bold;
-    }
-    ul {
-        padding-left: 13px;
-        line-height: 23px;
-        list-style-type:none;
-    }
-    .index{
+    .tree-file{
+        .item {
+            cursor: pointer;
+        }
+        .bold {
 
-    }
-    .file-img{
-        display:inline-block;
-        width:14px;
-        height:14px;
-    }
-    .root-file{
-        cursor: pointer;
-        position: relative;
-    }
-    .dir-icon{
-        color: #f0fffc;
-    }
-    .wrap-delete{
-        position: absolute;
-        right:10px;
-        top:0px;
-        width:16px;
-        height:15px;
-        display:none;
-    }
-    .root-file:hover .wrap-delete{
-        display:block;
-    }
-    .no-save{
-        margin-left:20px;
+        }
+        ul {
+            padding-left: 20px;
+            line-height: 35px;
+            list-style-type:none;
+        }
+        .index{
+
+        }
+        .file-img{
+            display:inline-block;
+            width:14px;
+            height:14px;
+        }
+        .root-file{
+            cursor: pointer;
+            position: relative;
+            height:35px;
+            line-height:35px;
+            padding-left:20px;
+            img{
+                display:inline-block;
+            }
+        }
+        .root-file:hover{
+            background-color: #6ad0ee;
+        }
+        .dir-icon{
+            color: #5458ff;
+            font-size: 14px;
+        }
+        .dir-icon:hover{
+            font-size: 16px;
+        }
+        .wrap-delete{
+            position: absolute;
+            right:10px;
+            top:0px;
+            width:16px;
+            height:15px;
+            display:none;
+        }
+        .root-file:hover .wrap-delete{
+            display:block;
+        }
+        .no-save{
+            margin-left:20px;
+        }
+        .tip{
+            font-size:8px;
+            display:inline-block;
+            vertical-align: top;
+            line-height:35px;
+        }
     }
 </style>
