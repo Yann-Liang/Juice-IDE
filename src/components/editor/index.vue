@@ -8,7 +8,7 @@
                 <ul class='files white' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
+                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'>X</span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
@@ -41,29 +41,30 @@
             </div>
             <div class="replace-model" v-if='replaceVisible'>
                 <div class="replace-content">
-                    <div>
-                        <p>
-                            <label for="" style="width:80px">form:</label>
+                    <ul class="left">
+                        <li>
+                            <label for="">form:</label>
                             <input type="text" name="" v-model='fromValue' @input='fromSearch'/>
-                        </p>
-                        <p>
-                           <label for="" style="width:80px">to  :</label>
+                        </li>
+                        <li>
+                            <label for="">to:</label>
                            <input type="text" name="" v-model="toValue"/>
-                        </p>
-                        <!-- <span> -->
-                            <!-- <label for="">form:</label>
-                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/> -->
-                        <!-- </span>
-                        <span> -->
-                            <!-- <label for="">to  :</label>
-                            <input type="text" name="" v-model="toValue"/> -->
-                        <!-- </span> -->
-                    </div>
-                    <div>
-                        <span @click='replaceSign'>Replace</span>
-                        <span @click='replaceAll'>ReplaceAll</span>
-                    </div>
-                    <div @click='offReplace' class="icon icon-close"></div>
+                        </li>
+                    </ul>
+                    <ul class="center">
+                        <li>
+                            <span @click='replaceSign' class='btn-info'>Replace</span>
+                        </li>
+                        <li>
+                            <span @click='replaceAll' class='btn-info'>ReplaceAll</span>
+                        </li>
+                    </ul>
+                    <ul class="right">
+                        <li @click='offReplace' class="close-search">
+                            <i class="iconfont dark">&#xe61f;</i>
+                        </li>
+                    </ul>
+
                 </div>
             </div>
         </div>
@@ -234,6 +235,7 @@
             },
             //切换tab
             selectProp: function (index,item) {
+                this.editor.session.clearBreakpoints();
                 this.$refs.childMethod.loseBlur();
                 this.select = index;
                 this.currentView = index;
@@ -249,8 +251,18 @@
                 // this.$refs.childMethod.change();
             },
             //关闭当前窗口
-            remove:function(index){
+            remove:function(index,id){
                 console.log(index);
+                /*
+                    关闭当前窗口之前，获取到当前的keyId，与vuex中editdata中的keyId进行对比，如果存在，在比较source中的
+                */
+                let arr = this.editData.filter((item)=>{
+                    return item.keyId == id;
+                });
+                if(arr.length!=0){
+                    //存在，提示用户保存
+
+                }
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
                 */
@@ -624,7 +636,7 @@
     margin-left: -260px;
     padding: 0 10px;
     width: 520px;
-    height: 100px;
+    height: 80px;
     line-height: 100px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
@@ -633,57 +645,48 @@
         flex-wrap:nowrap;
         flex-direction:row;
         justify-content:flex-start;
-        div{
-            border:1px solid red;
-            height:100px;
-            // span{
-            //     display: inline-block;
-            //     height:30px;
-            //     input{
-            //         // height:30px;
-            //         // vertical-align: top;
-            //     }
-            // }
-            p{
-                height:30px;
-                background:red;
+        height:80px;
+        ul{
+            height:80px;
+            margin-top:0;
+            padding-left:0;
+            flex-grow:1;
+            li{
+                height:40px;
+                line-height: 40px;
+                label{
+                    display: inline-block;
+                    width:50px;
+                }
                 input{
+                    display: inline-block;
+                    width:300px;
                     height:25px;
+                    line-height: 25px;
+                    &:focus{
+                        outline:none;
+                        border:solid 1px @blue;
+                    }
+                }
+
+                span{
+                    display: inline-block;
+                    height:30px;
+                    line-height: 28px;
+                    width:80px;
+                    text-align: center;
+                    border-radius:3px;
                 }
             }
-            &:bth-child(2){
-                margin-top:10px;
+            .close-search{
+                height:80px;
+                line-height: 80px;
+                cursor: pointer;
+                text-align: center;
             }
-        }
-        .btn{
-            margin:0 10px;
-            display: inline-block;
-            width:60px;
-            height:38px;
-            line-height:38px;
-            text-align: center;
-            border-radius:3px;
-        }
-        .icon-close{
-            position:absolute;
-            right:10px;
-            top:23px;
-            margin-right:0;
         }
     }
 
-
-    // input{
-    //     padding-left:10px;
-    //     width:300px;
-    //     height:38px;
-    //     line-height:38px;
-    //     border:solid 1px #bfbfbf;
-    //     &:focus{
-    //         outline:none;
-    //         border:solid 1px @blue;
-    //      }
-    // }
 
 }
 .javascript-editor{

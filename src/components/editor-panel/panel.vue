@@ -135,7 +135,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
-                // console.log(editorData.source)
+                console.log( "设置值")
 	            this.updateActiveEditor(editorData);
                 if(cb && typeof(cb)=='function'){
                     cb();
@@ -144,12 +144,25 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                this.editor.getSession().on('change', (e)=> {
-                    console.log("ccccccccc")
-                    this.initChange();
-                    this.getResult();
+                // this.editor.getSession().on('change', (e)=> {
+                //     console.log("ccccccccc")
+                //     // this.initChange();
+                //     // ();
+                // });
+
+                this.editor.on("focus",()=>{
+                  this.editor.getSession().on('change', (e)=> {
+                   console.log("开始监听")
+                   this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                   this.initChange();
+                   // this.getResult();
+                           })
                 });
+
+
+
             },
+
             //设置错误警示css
             setBreakpoint:function(row,css){
                 console.log(row,css)
@@ -193,7 +206,7 @@
                     keyId:this.keyId,
                     source:this.editor.getValue()
                 }
-	            this.setActiveEditor();
+	            this.setActiveEditor(this.getResult);
                 console.log("当前item为");
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.keyId === data[i].keyId){
@@ -211,8 +224,17 @@
             },
             //失去焦点
             loseBlur:function(){
-                this.editor.on('blur',()=>{
-                    this.updateTreeData({value:this.value,name:this.name,save:true});
+                // this.editor.on('blur',()=>{
+                //     this.updateTreeData({value:this.value,name:this.name,save:true});
+                // });
+                this.editor.on("blur",()=>{
+                   // alert(1111);
+                 this.editor.getSession().off('change', (e)=> {
+                  console.log("解除监听")
+                  this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                  this.initChange();
+                  // this.getResult();
+                 })
                 });
             },
             //鼠标hover事件
@@ -222,9 +244,9 @@
                     var target = e.domEvent.target;
                     // console.log('guttermousemove',e)
                     var row = e.getDocumentPosition().row;
-                    console.log(row);
+                    // console.log(row);
                     var className = e.domEvent.toElement.className;
-                    console.log(className);
+                    // console.log(className);
                     if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
                         e.domEvent.toElement.title=str;
                         return false;
@@ -232,7 +254,9 @@
                         e.domEvent.toElement.title=""
                     }
                 });
-            }
+            },
+            //resize事件
+
 
         },
         //生命周期函数
@@ -246,7 +270,7 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            console.log(this.editor)
+            console.log(this.editor,this.editor.on,this.editor.off)
             var _this = this;
             require('brace/ext/language_tools')
             ace.acequire('ace/ext/language_tools')
@@ -257,7 +281,7 @@
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
-                enableSnippets: true,
+                // enableSnippets: true,
                 enableLiveAutocompletion: true
             });
             //字体大小
@@ -277,8 +301,10 @@
             this.editor.getSession().selection.on('changeCursor', (e)=> {
 
             });
-
-
+            this.editor.resize(true);
+            this.editor.on("changeSession",(e)=>{
+                    console.log("eeeeeeeeeeeeeeeeeeeeeee")
+                })
 
             //设置格式化
             this.editor.commands.addCommand({
