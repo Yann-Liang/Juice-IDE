@@ -47,7 +47,7 @@
         //实例的数据对象
         data() {
             return {
-                filesTabFlag: true,
+                filesTabFlag: false,
                 deployTabFlag: false,
                 queryTabFlag: false,
                 ghostbarFlag:false,
@@ -258,11 +258,11 @@
         },
         //生命周期函数
         created() {
-        	this.initUrlFn();
             contractServies.setProvider('http://10.10.8.202:6789')
         },
         beforeMount() {},
         mounted() {
+            this.initUrlFn();
 	        this.hotkeysFn();
         },
         //监视
