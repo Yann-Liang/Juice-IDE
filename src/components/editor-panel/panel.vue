@@ -144,16 +144,30 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                this.editor.getSession().on('change', (e)=> {
-	                //监听鼠标获得焦点
-                    console.log("cccccccccccccccccccccccccccccccc")
-	                this.editor.on("focus",()=>{
-		                console.log("focusssssssssssssssssssssssss")
-		                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-		                this.initChange();
-		                this.getResult();
-	                });
-                });
+                console.log(this.editor.getSession().on)
+	            console.log(this.editor.getSession().off)
+//                this.editor.getSession().on('change', (e)=> {
+//	                //监听鼠标获得焦点
+//                    console.log("cccccccccccccccccccccccccccccccc")
+//	                this.editor.on("focus",()=>{
+//		                console.log("focusssssssssssssssssssssssss")
+//		                this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+//		                this.initChange();
+//		                this.getResult();
+//	                });
+//                });
+	            this.editor.on("focus",()=>{
+			            this.editor.getSession().on('change', (e)=> {
+				            console.log("开始监听")
+				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+				            this.initChange();
+				            this.getResult();
+                        })
+	            });
+
+	            this.editor.on("blur",()=>{
+		            this.editor.getSession().removeAllListeners('change')
+	            });
             },
             //设置错误警示css
             setBreakpoint:function(row,css){
@@ -227,9 +241,9 @@
                     var target = e.domEvent.target;
                     // console.log('guttermousemove',e)
                     var row = e.getDocumentPosition().row;
-                    console.log(row);
+//                    console.log(row);
                     var className = e.domEvent.toElement.className;
-                    console.log(className);
+//                    console.log(className);
                     if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
                         e.domEvent.toElement.title=str;
                         return false;
