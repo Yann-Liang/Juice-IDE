@@ -42,6 +42,8 @@
             },
             close(){
                 win.close();
+                // 清空编辑的localStorage
+                localStorage.setItem('editFileData',[]);
             },
         },
         //生命周期函数

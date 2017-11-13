@@ -19,8 +19,15 @@ export const fileAction = {
 		let dirPathArr = state.url.filter((item)=>{
 			return item.value;
 		});
-		file.watchFile(dirPathArr,()=>{
+		file.watchFile(dirPathArr,(data)=>{
+			if(data.type === 'add'){
 			
+			}else if(data.type === 'unlink'){
+				const keyId = file.keyIdFn(data.path);
+				dispatch('updateDeleteStatus',{keyId:keyId,value:data.path},{ root: true });
+			}else if(data.type === 'change'){
+			
+			}
 			dispatch('queryFileListData',null,{ root: true });
 		});
 		dispatch('queryFileListData',null,{ root: true });
@@ -236,5 +243,5 @@ export const fileAction = {
 				})
 			}
 		})
-	},
+	}
 }

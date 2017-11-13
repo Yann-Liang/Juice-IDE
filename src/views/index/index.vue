@@ -231,14 +231,17 @@
 			        fn && fn(value)
 		        })
 	        },
-	        tipOpen() {
-		        this.$alert('文件已存在，请更换文件名', '提示', {
+	        tipOpen(str) {
+	        	 str = str || '文件已存在，请更换文件名'
+		        this.$alert(str, '提示', {
 			        confirmButtonText: '确定',
 		        });
 	        },
 	        exportFile(type){
-		        file.exportFile(type,(filename)=>{
-			        if(filename){
+		        file.exportFile(type,this.fileTreeData,(filename)=>{
+			        if(filename && file.isObject(filename)){
+                        this.tipOpen('文件已存在在项目中');
+			        }else if(filename){
 				        const url = this.getUrl;
 				        console.log(file.basename(filename));
 				        url.push({value:filename,name:file.basename(filename)});

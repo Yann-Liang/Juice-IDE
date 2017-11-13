@@ -15,7 +15,7 @@ export const file = {
 	    	x:0,
 		    y:0
 	    },
-	    rightMenuBlock:false
+	    rightMenuBlock:false,
     },
     actions: fileAction,
     getters: fileGetter,

@@ -9,7 +9,7 @@
             <li title="删除所有文件" @click="removeAllFile()"><i class="iconfont info">&#xe623;</i></li>
         </ul>
         <ul class="file-content">
-            <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item"></item>
+            <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item" ref="treeItem"></item>
             <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
                 <ul class="wrap-menu-list">
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
@@ -54,6 +54,10 @@
             newFile(){
             	this.open((name)=>{
 		            file.newFile(this.activeFile.value,name,(res)=>{
+			            const child = this.$refs.treeItem;
+			            console.log(child);
+			            child.toggle(this.activeFile);
+
 			            if(res.code === 0){
 				            this.queryFileListData();
 				            this.updateEditFile({
@@ -101,14 +105,17 @@
 			        fn && fn(value)
 		        })
 	        },
-            tipOpen() {
-	            this.$alert('文件已存在，请更换文件名', '提示', {
-		            confirmButtonText: '确定',
-	            });
-            },
+	        tipOpen(str) {
+		        str = str || '文件已存在，请更换文件名'
+		        this.$alert(str, '提示', {
+			        confirmButtonText: '确定',
+		        });
+	        },
 	        exportFile(type){
-            	file.exportFile(type,(filename)=>{
-            		if(filename){
+            	file.exportFile(type,this.fileTreeData,(filename)=>{
+            		if(filename && file.isObject(filename)){
+			            this.tipOpen('文件已存在在项目中');
+                    }else if(filename){
 			            const url = this.getUrl;
 			            console.log(file.basename(filename));
 			            url.push({value:filename,name:file.basename(filename)});
@@ -135,10 +142,8 @@
             },
 	        saveFile(){
 	        	this.saveEditorFile();
+		        this.updateRightMenuBlock(false);
             },
-	        saveAllFileFn(){
-		        this.saveAllFile()
-	        },
 	        removeFileFn(){
 		        if(this.activeFile.value){
 		        	console.log(this.activeFile.value);

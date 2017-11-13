@@ -64,10 +64,10 @@
 		//方法
 		methods: {
 
-			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock','compileWatch','updateDeleteStatus']),
+			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock',
+                'compileWatch','updateDeleteStatus']),
 			toggle(itemInfo) {
 				console.log('正在点击的→→→→→→→→→→→→→→→→');
-				console.log(itemInfo);
 				this.compileWatch(0);//编译状态重置
 				this.setActiveFile(itemInfo);
 				if (this.isFolder) {

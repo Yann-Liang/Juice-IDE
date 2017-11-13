@@ -146,18 +146,22 @@
                 //监听编辑区的change事件
                 console.log(this.editor.getSession().on)
 	            console.log(this.editor.getSession().off)
-                let red ;
+                let red = null;
 	            this.editor.on("focus",()=>{
-		            red = this.editor.getSession().on('change', (e)=> {
+	            	if(!red){
+			            red = this.editor.getSession().on('change', (e)=> {
 				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
 				            this.initChange();
 				            this.getResult();
-                        })
+			            })
+                    }
+
 	            });
 
 	            this.editor.on("blur",()=>{
-		            this.editor.getSession().off('change',red)
+		            this.editor.getSession().off('change',red);
+		            red = null;
 	            });
             },
             //设置错误警示css

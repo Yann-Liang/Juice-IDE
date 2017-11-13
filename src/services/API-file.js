@@ -6,7 +6,9 @@
  */
 const [fs,path] = [require('fs-extra'),require('path')];
 const{dialog} = require('electron').remote;
-const watch = require('watch');
+// const watch = require('watch');
+const chokidar = require('chokidar');
+console.log(chokidar);
 
 
 // id标识文件的类型 save标识是否保存
@@ -278,7 +280,7 @@ class file {
 	}
 
 	// 导入文件
-	exportFile(type,fn){
+	exportFile(type,data,fn){
 		let properties;
 		if(type == 'dir'){
 			properties = ['openFile', 'openDirectory', 'multiSelections']
@@ -290,7 +292,12 @@ class file {
 			filters:[{name: 'Custom File Type', extensions: ['js']},]
 		},(filename)=>{
 			const filepath = filename ? path.normalize(filename[0]).replace(/\\/g,'/') :'';
-			fn && fn(filepath)
+			const item = this.GetByValue(data,filepath);
+			if(item){
+				fn && fn(item)
+			}else{
+				fn && fn(filepath)
+			}
 		})
 	}
 
@@ -313,6 +320,23 @@ class file {
 		data.forEach(x => x.children && (x.children = that.updateFile(x.children, obj)))
 		return data;
 	}
+	
+	// 根据value来获取树结构的值
+	GetByValue = function(Data,value){
+		var Deep,T,F;
+		for (F = Data.length;F;)
+		{
+			T = Data[--F]
+			if (value === T.value) return T
+			if (T.children)
+			{
+				Deep = this.GetByValue(T.children,value)
+				if (Deep) return Deep
+			}
+		}
+	}
+	
+	
 
 	// 获取文件的信息
 	fileDetail(path){
@@ -332,7 +356,11 @@ class file {
 		name = name + suffix;
 		return name;
 	}
-
+	
+	isObject(OBJ){
+		return typeof OBJ == "object" && OBJ.constructor == Object;
+	}
+	
 	keyIdFn(path,id){
 		let keyId;
 		if(path){
@@ -347,26 +375,34 @@ class file {
 	// 监听文件变化
 	watchFile(pathArr,fn){
 		pathArr.forEach((item,index)=>{
-			if(this.isDir(item.value)){
-				watch.watchTree(item.value,  (f, curr, prev)=> {
-					if (typeof f == "object" && prev === null && curr === null) {
-						// Finished walking the tree
-					} else if (prev === null) {
-						// f is a new file
-						console.log('新建文件')
-						console.log(f)
-						fn && fn()
-					} else if (curr.nlink === 0) {
-						// f was removed
-						console.log('删除文件')
-						console.log(f)
-						fn && fn()
-					} else {
-						// f was changed
-					}
-				})
-			}else if(this.isFile(item.value)){
+			if(item.value){
+				var watcher = chokidar.watch(item.value, {
+					ignored: /(^|[\/\\])\../,
+					persistent: true
+				});
 				
+				watcher
+					.on('add', path => {
+						console.log(`File ${path} has been added`)
+						fn && fn({
+							type:'add',
+							path:path
+						})
+					})
+					.on('change', path => {
+						console.log(`File ${path} has been changed`)
+						fn && fn({
+							type:'change',
+							path:path
+						})
+					})
+					.on('unlink', path => {
+						console.log(`File ${path} has been removed`)
+						fn && fn({
+							type:'unlink',
+							path:path
+						})
+					});
 			}
 		})
 
