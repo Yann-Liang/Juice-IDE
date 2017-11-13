@@ -67,29 +67,37 @@
 
                 </div>
             </div>
-            <div class="ask-model" v-if='askVisible'>
-                <div class="ask-content">
-                    <ul>
-                        <li><i class="iconfont dark" @click='calcel'>&#xe61f;</i></li>
-                        <li>此文件已经被更改过，确定关闭？</li>
-                        <li>
-                            <span class='btn-info' @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
-                            <span class='btn-info' @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
-                            <span class='btn-info' @click='calcel' :data-index='dataindex'>取消</span>
-                        </li>
-                    </ul>
+            <div class="popup" v-if='askVisible'>
+                <div class="mask">
+                   <div class="ask-model">
+                        <div class="ask-content">
+                            <ul>
+                                <li><i class="iconfont dark" @click='calcel'>&#xe61f;</i></li>
+                                <li>此文件已经被更改过，确定关闭？</li>
+                                <li>
+                                    <span class='btn-info' @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
+                                    <span class='btn-info' @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
+                                    <span class='btn-info' @click='calcel' :data-index='dataindex'>取消</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="ask-model" v-if='asksVisible'>
-                <div class="ask-content">
-                    <ul>
-                        <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
-                        <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
-                        <li>
-                            <span class='btn-info' @click='yess($event)'>是</span>
-                            <span class='btn-info' @click='nos($event)'>否</span>
-                        </li>
-                    </ul>
+            <div class="popup"  v-if='asksVisible'>
+                <div class="mask">
+                    <div class="ask-model">
+                        <div class="ask-content">
+                            <ul>
+                                <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
+                                <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
+                                <li>
+                                    <span class='btn-info' @click='yess($event)'>是</span>
+                                    <span class='btn-info' @click='nos($event)'>否</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -447,6 +455,10 @@
             yess:function(e){
                 this.saveAllFile(()=>{
                     this.asksVisible = false;
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.value = "readonly";
+                    this.changeFileData([]);
                 });
 
             },
@@ -845,9 +857,24 @@
 
 
 }
+.popup {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(0, 0, 0, .4);
+    z-index: 1500;
+    top: 0;
+    left: 0;
+
+}
+.mask {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
 .ask-model{
     position: absolute;
-    top: 60px;
+    top: 140px;
     left: 50%;
     z-index: 100000;
     margin-left: -240px;
@@ -894,6 +921,8 @@
     }
 
 }
+
+
 .javascript-editor{
     width:100%;
     flex-grow:1;
