@@ -15,7 +15,7 @@
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
         <el-button class="tab-btn btn-info" @click="getContractLog">日志</el-button>
-        <run v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
+        <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
 
     </div>
 </template>
