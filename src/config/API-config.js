@@ -1,9 +1,9 @@
 //请求地址
-const BASE = 'http://192.168.9.75:9200/', //process.env.API_ROOT,
+const BASE = 'http://192.168.9.75:9200/',//'http://192.168.9.94:9200/juevm/'//process.env.API_ROOT,
     USER_URL = `${BASE}/user/`,
 
     LOG = {
-        search:`${BASE}_search`,
+        search:`${BASE}/_search`,
     },
     //用户
     USER = {
