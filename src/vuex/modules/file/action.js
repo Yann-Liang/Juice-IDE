@@ -20,7 +20,7 @@ export const fileAction = {
 			return item.value;
 		});
 		file.watchFile(dirPathArr,()=>{
-			
+
 			dispatch('queryFileListData',null,{ root: true });
 		});
 		dispatch('queryFileListData',null,{ root: true });
@@ -39,7 +39,7 @@ export const fileAction = {
 		const data = file.updateFile(state.treeData,OBJ)
 		commit('UPDATE_FILE_DATA', data);
 	},
-	saveAllFile({ commit, state,rootState,dispatch}){
+	saveAllFile({ commit, state,rootState,dispatch},cb){
 		// 获取编辑未保存的文件数据
 		const data = rootState.editor.editData;
 		console.log('下面是编辑未保存的数据：')
@@ -54,12 +54,12 @@ export const fileAction = {
 			// 递归调用保存有地址的文件
 			file.saveAllHaveFile(fileData,(err,item)=>{
 				if(err){
-				
+
 				}else{
 					dispatch('updateTreeData',{keyId:item.keyId,save:true},{ root: true });
 				}
 			})
-			
+
 			// 递归调用保存没有地址的文件
 			function saveAllNoFile(dialogFile){
 				if(dialogFile.length>0){
@@ -71,11 +71,11 @@ export const fileAction = {
 						if(filepath){
 							file.writeFile(filepath,currentFile.source,(err)=>{
 								if(err){
-								
+
 								}else{
 									const keyId = file.keyIdFn(filepath);
 									dispatch('updateFileData',{param:{keyId:currentFile.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
-									
+
 									dispatch('updateTreeData',{keyId:currentFile.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
 									// 更新url
 									const url = rootState.file.url;
@@ -87,7 +87,7 @@ export const fileAction = {
 										}
 									})
 									dispatch('updateUrl',url,{ root: true });
-									
+
 									if(currentFile.keyId == rootState.editor.activeEditor.keyId){
 										commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
 											value: filepath,
@@ -98,7 +98,7 @@ export const fileAction = {
 										// 更新当前激活的文件状态
 										dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath)},{ root: true });
 									}
-									
+
 								}
 							})
 						}
@@ -110,6 +110,9 @@ export const fileAction = {
 			// 更新未保存vuex的状态
 			dispatch('updateData',[],{ root: true });
 			saveAllNoFile(dialogFile);
+			if(cb && typeof(cb)=='function'){
+                cb();
+            }
 		}
 	},
 	renameFile({ commit, state,rootState,dispatch},name){
@@ -120,7 +123,7 @@ export const fileAction = {
 			name = file.uffixName(name);
 			// 更新updateFileData编辑去tabs
 			dispatch('updateFileData',{param:{keyId:keyId,value:newFilePath,name:name}},{ root: true });
-			
+
 			// 更新当前编辑的状态
 			if(keyId == rootState.editor.activeEditor.keyId){
 				dispatch('updateActiveEditor',{
@@ -132,7 +135,7 @@ export const fileAction = {
 				// 更新当前激活的文件状态
 				dispatch('updateEditFile',{keyId:keyId,value:newFilePath,name:name},{ root: true });
 			}
-			
+
 			// 更新未保存vuex的状态
 			let edit = rootState.editor.editData;
 			rootState.editor.editData.forEach((item,index)=>{
@@ -157,7 +160,7 @@ export const fileAction = {
 					if(!err){
 						file.saveFile('',activeFile.name,data,()=>{})
 					}else{
-					
+
 					}
 				});
 			}else{
@@ -168,14 +171,14 @@ export const fileAction = {
 				const source =  data.length ? data[0].source : '';
 				file.saveFile('',name,source,(err,filepath)=>{
 					if(err){
-					
+
 					}else{
 						const oldKeyId = activeFile.keyId;
 						if(filepath){
 							const keyId = file.keyIdFn(filepath);
-							
+
 							dispatch('updateFileData',{param:{keyId:oldKeyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
-							
+
 							dispatch('updateTreeData',{keyId:oldKeyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
 							// 更新url
 							let url = rootState.file.url;
@@ -189,7 +192,7 @@ export const fileAction = {
 							})
 							dispatch('updateUrl',url,{ root: true });
 							console.log(rootState.file.url);
-							
+
 							if(oldKeyId == rootState.editor.activeEditor.keyId){
 								commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
 									value: filepath,
@@ -200,7 +203,7 @@ export const fileAction = {
 								// 更新当前激活的文件状态
 								dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath)},{ root: true });
 							}
-							
+
 						}else{
 							dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 						}

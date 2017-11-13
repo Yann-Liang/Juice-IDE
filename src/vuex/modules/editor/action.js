@@ -19,14 +19,16 @@ export const editorAction = {
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
 	saveEditorFile({dispatch,commit,state,rootState},cb){
+		console.log('不比不比不不不不不',state.activeEditor.value,state.activeEditor.name,state.activeEditor.source)
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
+			console.log("filepath+keyId",filepath)
 			if(err){
-
+				console.log(err)
 			}else{
 				const oldKeyId = state.activeEditor.keyId;
 				if(filepath){
 					const keyId = file.keyIdFn(filepath);
-					
+
 					dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
 
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
@@ -41,17 +43,18 @@ export const editorAction = {
 						}
 					})
 					dispatch('updateUrl',url,{ root: true });
-					
+
 					// 更新当前激活的文件状态
 					dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath),unWatch:true},{ root: true });
-					
+
 					commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
 						value: filepath,
 						name: file.basename(filepath),
 						keyId:keyId,
 						source: state.activeEditor.source
 					})
-				
+					// console.log('宝宝宝宝宝宝啊')
+
 				}else{
 					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 				}
@@ -134,7 +137,7 @@ export const editorAction = {
 				return ;
 			}
 		});
-		
+
 		// 更新未保存vuex的状态
 		let edit = state.editData;
 		edit.forEach((item,index,data)=>{

@@ -214,6 +214,7 @@ class file {
 
 	// 保存文件
 	saveFile(path,name,source,fn){
+		console.log('path+name+source',path+name+source)
 		if(path){
 			this.writeFile(path,source,(err)=>{
 				fn && fn(err,'')
