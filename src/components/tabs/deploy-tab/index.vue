@@ -14,27 +14,9 @@
         </el-form>
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
-        <div v-if="flag">
-            <el-form :label-position="'top'" label-width="80px" :model="form2">
-                <el-select v-model="form2.selectDeployData" filterable  placeholder="选择合约文件">
-                    <el-option v-for="(item,index) in deployedData" :key="index" :label="item.contractAddress" :value="item.contractAddress"></el-option>
-                </el-select>
-            </el-form>
-            <el-form :label-position="'top'" label-width="80px" :model="form2">
-                <el-form-item label="选择需要运行的函数">
-                    <el-select v-model="form2.selectFnIndex" placeholder="运行选择需要运行的函数">
-                        <el-option v-for="(item,index) in contractFn" :key="index" :label="item.name" :value="index"></el-option>
-                    </el-select>
-                </el-form-item>
-                <p class="darker">输入函数运行所需参数</p>
-                <el-form-item v-for="(item,index) in contractFn[form2.selectFnIndex].inputs" :key="index" :label="item.name">
-                    <el-input v-model="args[index].arg" :placeholder="item.type"></el-input>
-                </el-form-item>
+        <el-button class="tab-btn btn-info" @click="getContractLog">日志</el-button>
+        <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
 
-                <el-button class="tab-btn btn-info" @click="run" :disabled="runDisabled">运行</el-button>
-            </el-form>
-
-        </div>
     </div>
 </template>
 
@@ -43,6 +25,7 @@
     import {mapState, mapActions, mapGetters} from 'vuex';
     import contractServies from '@/services/contract-servies';
     import APIServies from '@/services/API-servies';
+    import run from "@/components/run/";
 
     export default {
         //组件名
@@ -50,17 +33,14 @@
         //实例的数据对象
         data() {
             return {
+                abi:[],
                 form:{
                     select:'',
                     contractItem:'',
-                },
-                form2:{
-                    selectDeployData:'',
-                    selectFnIndex:0,//运行的函数的下标
-
+                    address:'',
                 },
                 flag:false,
-                args:[{arg:''},{arg:''}],
+                args:[],
                 deployedData:contractServies.data
             }
         },
@@ -76,7 +56,7 @@
             },
             contractFn:function() {
                 console.log(this.deployedData,this.form2.selectDeployData)
-                return this.deployedData[this.form2.selectDeployData].contract.abi
+                // return this.deployedData[this.form2.selectDeployData].contract.abi
             },
             runDisabled:function() {
                 let bool=false;
@@ -94,39 +74,15 @@
         methods: {
             deploy(){
                 let item=this.form.contractItem;
-                contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x2619db00823169359d24697fb38fff5062e11334').then((address)=>{
+                contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x859376269bb8a56f63f8b8964430c68f69e1cba0').then((address)=>{
                     console.log('address',address)
-                     this.form2.selectDeployData=address;
-                    let length=this.contractFn[address].inputs.length;
-                    for(let i=0;i<length;i++){
-                        this.args[i]={arg:''};
-                    }
+                     this.form.address=address;
+                     this.flag=true;
                 })
             },
-            queryContract(){
-                console.log('queryContract',this.form.input)
-            },
-            run(){
-                console.log(this.args);
-                let argsList=[],
-                    inputs=this.contractFn[this.form2.selectFnIndex].inputs;
-                for(let i=0;i<this.args.length;i++){
-                    if(inputs[i].type=='string'){
-                        argsList[i]=this.args[i].arg;
-                    }else{
-                        try{
-                            argsList[i]=Number(this.args[i].arg);
-                        }catch(e){
-                            console.warn(e);
-                            argsList[i]=this.args[i].arg;
-                        }
-                    }
-                }
-                contractServies.run(this.form2.selectDeployData,this.contractFn[this.form2.selectFnIndex].name,this.form2.selectFnIndex,argsList).then((res)=>{
-                    console.log('run result=',res)
-                })
-            },
-
+            getContractLog(){
+                contractServies.getContractLog()
+            }
         },
         //生命周期函数
         created() {
@@ -140,17 +96,11 @@
         },
         //监视
         watch: {
-            'form2.selectFnIndex':function () {
-                let length=this.contractFn[this.form2.selectFnIndex].inputs.length;
-                this.args=[];
-                for(let i=0;i<length;i++){
-                     this.args[i]={arg:''};
-                }
-            }
+
         },
         //组件
         components: {
-
+            run
         },
         //过滤器
         filters:{
