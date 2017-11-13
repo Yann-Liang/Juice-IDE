@@ -135,7 +135,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
-                // console.log(editorData.source)
+                console.log( "设置值",editorData)
 	            this.updateActiveEditor(editorData);
                 if(cb && typeof(cb)=='function'){
                     cb();
@@ -164,6 +164,7 @@
 		            red = null;
 	            });
             },
+
             //设置错误警示css
             setBreakpoint:function(row,css){
                 console.log(row,css)
@@ -207,7 +208,7 @@
                     keyId:this.keyId,
                     source:this.editor.getValue()
                 }
-	            this.setActiveEditor();
+	            this.setActiveEditor(this.getResult);
                 console.log("当前item为");
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.keyId === data[i].keyId){
@@ -223,12 +224,6 @@
             getValue:function(){
                 return this.editor.getValue();
             },
-            //失去焦点
-            loseBlur:function(){
-                this.editor.on('blur',()=>{
-                    this.updateTreeData({value:this.value,name:this.name,save:true});
-                });
-            },
             //鼠标hover事件
             mouseHover:function(str){
                 //点击报错行显示报错的是啥信息
@@ -236,9 +231,10 @@
                     var target = e.domEvent.target;
                     // console.log('guttermousemove',e)
                     var row = e.getDocumentPosition().row;
-//                    console.log(row);
+                    // console.log(row);
                     var className = e.domEvent.toElement.className;
-//                    console.log(className);
+                    // console.log(className);
+
                     if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
                         e.domEvent.toElement.title=str;
                         return false;
@@ -246,7 +242,9 @@
                         e.domEvent.toElement.title=""
                     }
                 });
-            }
+            },
+            //resize事件
+
 
         },
         //生命周期函数
@@ -260,7 +258,7 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            console.log(this.editor)
+            console.log(this.editor,this.editor.on,this.editor.off)
             var _this = this;
             require('brace/ext/language_tools')
             ace.acequire('ace/ext/language_tools')
@@ -271,7 +269,7 @@
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
-                enableSnippets: true,
+                // enableSnippets: true,
                 enableLiveAutocompletion: true
             });
             //字体大小
@@ -288,8 +286,7 @@
             this.editor.getSession().selection.on('changeCursor', (e)=> {
 
             });
-
-
+            this.editor.resize(true);
 
             //设置格式化
             this.editor.commands.addCommand({
@@ -307,7 +304,7 @@
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
                     _this.saveEditorFile()
-	                _this.editor.blur();
+	                // _this.editor.blur();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });

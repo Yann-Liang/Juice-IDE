@@ -8,7 +8,7 @@
                 <ul class='files white' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index)" v-if='cha'>X</span>
+                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'>X</span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
@@ -41,29 +41,63 @@
             </div>
             <div class="replace-model" v-if='replaceVisible'>
                 <div class="replace-content">
-                    <div>
-                        <p>
-                            <label for="" style="width:80px">form:</label>
+                    <ul class="left">
+                        <li>
+                            <label for="">form:</label>
                             <input type="text" name="" v-model='fromValue' @input='fromSearch'/>
-                        </p>
-                        <p>
-                           <label for="" style="width:80px">to  :</label>
+                        </li>
+                        <li>
+                            <label for="">to:</label>
                            <input type="text" name="" v-model="toValue"/>
-                        </p>
-                        <!-- <span> -->
-                            <!-- <label for="">form:</label>
-                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/> -->
-                        <!-- </span>
-                        <span> -->
-                            <!-- <label for="">to  :</label>
-                            <input type="text" name="" v-model="toValue"/> -->
-                        <!-- </span> -->
+                        </li>
+                    </ul>
+                    <ul class="center">
+                        <li>
+                            <span @click='replaceSign' class='btn-info'>Replace</span>
+                        </li>
+                        <li>
+                            <span @click='replaceAll' class='btn-info'>ReplaceAll</span>
+                        </li>
+                    </ul>
+                    <ul class="right">
+                        <li @click='offReplace' class="close-search">
+                            <i class="iconfont dark">&#xe61f;</i>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="popup" v-if='askVisible'>
+                <div class="mask">
+                   <div class="ask-model">
+                        <div class="ask-content">
+                            <ul>
+                                <li><i class="iconfont dark" @click='calcel'>&#xe61f;</i></li>
+                                <li>此文件已经被更改过，确定关闭？</li>
+                                <li>
+                                    <span class='btn-info' @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
+                                    <span class='btn-info' @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
+                                    <span class='btn-info' @click='calcel' :data-index='dataindex'>取消</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <span @click='replaceSign'>Replace</span>
-                        <span @click='replaceAll'>ReplaceAll</span>
+                </div>
+            </div>
+            <div class="popup"  v-if='asksVisible'>
+                <div class="mask">
+                    <div class="ask-model">
+                        <div class="ask-content">
+                            <ul>
+                                <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
+                                <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
+                                <li>
+                                    <span class='btn-info' @click='yess($event)'>是</span>
+                                    <span class='btn-info' @click='nos($event)'>否</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div @click='offReplace' class="icon icon-close"></div>
                 </div>
             </div>
         </div>
@@ -71,6 +105,8 @@
         <div class="tips default" v-if='tipsVisible'>
             请在文件管理器面板中点击打开一个文件
         </div>
+        <!-- 弹窗 -->
+
     </div>
 </template>
 
@@ -90,10 +126,14 @@
         //实例的数据对象
         data() {
             return {
+                dataarr:[],
+                dataindex:"",
                 cha:true,
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
+                askVisible:false,
+                asksVisible:false,
                 inputValue:"",
                 searchValue:"",
                 // searchVisible:false,
@@ -120,7 +160,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -195,6 +235,7 @@
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
+                console.log(this.name)
                 this.saveEditorFile();
             },
             //代码格式化
@@ -234,13 +275,12 @@
             },
             //切换tab
             selectProp: function (index,item) {
-                this.$refs.childMethod.loseBlur();
                 this.select = index;
                 this.currentView = index;
                 this.value = item.value;
                 this.name = item.name;
                 this.keyId = item.keyId;
-	            console.log('切换tab现在的keyId:'+this.keyId)
+	            console.log('切换tab现在的keyId:'+this.keyId+this.name);
                 this.updateEditFile({
 	                name:this.name,
 	                value:this.value,
@@ -248,32 +288,32 @@
                 })
                 // this.$refs.childMethod.change();
             },
-            //关闭当前窗口
-            remove:function(index){
-                /*
-                    如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
-                */
-                //关闭窗口时，提示用户是否已保存
+            //效果切换
+            activeTab:function(index){
+                console.log('index',index)
+                console.log('this.select',this.select);
                 if(this.fileData.length == 1){
                     //提示用户打开文件
                     this.editorVisible = false;
                     this.tipsVisible = true;
                     this.value = "readonly";
-	                this.changeFileData([]);
+                    this.changeFileData([]);
                 }else{
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
+                        console.log('高亮=删除')
                         let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
+                        result.splice(index,1);
+                        this.changeFileData(result);
                         //如果当前高亮为0
                         if(this.select == 0){
-                            this.select = index ;
+                            // debugger;
+                            this.select = index;
                             this.currentView = index ;
                             this.value = this.fileData[index].value;
                             this.name = this.fileData[index].name;
-	                        this.keyId = this.fileData[index].keyId;
+                            this.keyId = this.fileData[index].keyId;
                         }else{
                             this.select = index - 1;
                             this.currentView = index - 1;
@@ -284,33 +324,176 @@
                         }
                     }else if(this.select > index){
                         console.log('高亮>删除相同')
-	                    let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
+                        let result = this.fileData;
+                        result.splice(index,1);
+                        this.changeFileData(result);
                         this.select = this.select - 1;
                         this.currentView = this.select - 1;
                         this.value= this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
-	                    this.keyId = this.fileData[this.select].keyId;
+                        this.keyId = this.fileData[this.select].keyId;
                     }else if(this.select < index){
                         console.log('高亮<删除相同')
-	                    let result = this.fileData;
-	                    result.splice(index,1);
-	                    this.changeFileData(result);
+                        let result = this.fileData;
+                        result.splice(index,1);
+                        this.changeFileData(result);
                         this.select = this.select;
                         this.currentView = this.select;
                         this.value = this.fileData[this.select].value;
                         this.name = this.fileData[this.select].name;
-	                    this.keyId = this.fileData[this.select].keyId;
+                        this.keyId = this.fileData[this.select].keyId;
                     }
+                    this.updateEditFile({
+                        name:this.name,
+                        value:this.value,
+                        keyId:this.keyId
+                    })
                 }
+
+            },
+            //yes
+            yes:function(e){
+                var index = e.target.getAttribute("data-index");
+                var arr = e.target.getAttribute("data-arr");
+                console.log("当前关闭窗口的位置以及信息",index+arr);
+                arr = JSON.parse(arr);
+                if(this.select == index){
+                    console.log('当前关闭和当前高亮显示一样')
+                    /*
+                        当前高亮和要关闭的当前窗口相等
+                        保存当前文件，并进行更改状态，tab切换，关闭弹窗操作操作
+                    */
+                    this.saveEditorFile(()=>{
+                        this.activeTab(index);
+                        this.askVisible = false;
+                    });
+                }else{
+                    /*
+                        当前高亮和要关闭的当前窗口不相等
+                        分为两种情况：
+                        1》要关闭的当前窗口大于当前高亮显示的
+                        2》要关闭的当前窗口小于当前高亮显示的
+                        之后保存要关闭的那个窗口文件，并进行左边状态更改，tab切换，fileData状态更改，关闭弹窗操作
+                    */
+                    console.log('当前关闭和当前高亮显示不同',arr[0])
+                    console.log(arr[0].value,arr[0].name,arr[0].source)
+                    file.saveFile(arr[0].value,arr[0].name,arr[0].source,()=>{
+                        console.log(111)
+                        //更改左边文件栏状态
+                        this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
+                        //更新未保存vuex的状态
+                        let edit = [];
+                        this.editData.forEach((item,index)=>{
+                            if(item.keyId !== arr[0].keyId){
+                                edit.push(item);
+                            }
+                        })
+                        edit = JSON.stringify(edit);
+                        this.updateData(JSON.parse(edit));
+                        //更改tab切换
+                        this.activeTab(index);
+                        //关闭弹窗
+                        this.askVisible = false;
+                    });
+                }
+            },
+            //no
+            no:function(e){
+                var index = e.target.getAttribute("data-index");
+                var arr = e.target.getAttribute("data-arr");
+                console.log("当前关闭窗口的位置以及信息",index+arr);
+                arr = JSON.parse(arr);
+                //更改左边文件栏状态
+                this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
+                //更新未保存vuex状态
+                let edit = [];
+                this.editData.forEach((item,index)=>{
+                    if(item.keyId !== arr[0].keyId){
+                        edit.push(item);
+                    }
+                })
+                edit = JSON.stringify(edit);
+                this.updateData(JSON.parse(edit));
+                //更改tab切换
+                this.activeTab(index);
+                //关闭弹窗
+                this.askVisible = false;
+
+            },
+            //calcel
+            calcel:function(){
+                this.askVisible = false;
+            },
+            //关闭当前窗口
+            remove:function(index,id){
+                console.log('index',index);
+                /*
+                    关闭当前窗口，判断当前高亮this.select与要关闭的index是否相等
+                    然后判断要关闭的这个窗口是否是未保存状态
+                    然后进行状态更改，tab切换操作
+                */
+                let arr = this.editData.filter((item)=>{
+                    return item.keyId == id;
+                });
+                if(arr.length != 0){
+                    //存在，
+                    this.askVisible = true;
+                    this.dataindex = index;
+                    this.dataarr = JSON.stringify(arr);
+                }else{
+                    //不存在
+                    this.askVisible = false;
+                    this.activeTab(index);
+                }
+                /*
+                    如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
+                */
+                //关闭窗口时，提示用户是否已保存
+
+            },
+            //yess
+            yess:function(e){
+                this.saveAllFile(()=>{
+                    this.asksVisible = false;
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.value = "readonly";
+                    this.changeFileData([]);
+                });
+
+            },
+            //nos
+            nos:function(e){
+                this.asksVisible = false;
+            },
+            //calcels
+            calcels:function(){
+                this.asksVisible = false;
             },
             //关闭所有窗口
             close:function(){
-                this.editorVisible = false;
-                this.tipsVisible = true;
-                this.value = "readonly";
-	            this.changeFileData([]);
+                /*
+                    判断editData是否为空，为空则没有需要保存的文件，直接更新fileDaa为空即可
+                    不为空则有需要保存的文件，此时处理：
+                    new一个数组
+                    遍历fileData和editData，根据keyId是否相等
+                    相等：
+                    则push进新数组中
+                    然后更新未保存vuex状态
+                    保存所有文件
+                    更新左边文件管理处状态
+                    更新fileData为空
+                */
+                if(this.editData.length == 0){
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.asksVisible = false;
+                    this.value = "readonly";
+                    this.changeFileData([]);
+                }else{
+                    //保存所有
+                    this.asksVisible = true;
+                }
             },
             //新建文件
             newFile(){
@@ -621,7 +804,7 @@
     margin-left: -260px;
     padding: 0 10px;
     width: 520px;
-    height: 100px;
+    height: 80px;
     line-height: 100px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
@@ -630,59 +813,116 @@
         flex-wrap:nowrap;
         flex-direction:row;
         justify-content:flex-start;
-        div{
-            border:1px solid red;
-            height:100px;
-            // span{
-            //     display: inline-block;
-            //     height:30px;
-            //     input{
-            //         // height:30px;
-            //         // vertical-align: top;
-            //     }
-            // }
-            p{
-                height:30px;
-                background:red;
+        height:80px;
+        ul{
+            height:80px;
+            margin-top:0;
+            padding-left:0;
+            flex-grow:1;
+            li{
+                height:40px;
+                line-height: 40px;
+                label{
+                    display: inline-block;
+                    width:50px;
+                }
                 input{
+                    display: inline-block;
+                    width:300px;
                     height:25px;
+                    line-height: 25px;
+                    &:focus{
+                        outline:none;
+                        border:solid 1px @blue;
+                    }
+                }
+
+                span{
+                    display: inline-block;
+                    height:30px;
+                    line-height: 28px;
+                    width:80px;
+                    text-align: center;
+                    border-radius:3px;
                 }
             }
-            &:bth-child(2){
-                margin-top:10px;
+            .close-search{
+                height:80px;
+                line-height: 80px;
+                cursor: pointer;
+                text-align: center;
             }
-        }
-        .btn{
-            margin:0 10px;
-            display: inline-block;
-            width:60px;
-            height:38px;
-            line-height:38px;
-            text-align: center;
-            border-radius:3px;
-        }
-        .icon-close{
-            position:absolute;
-            right:10px;
-            top:23px;
-            margin-right:0;
         }
     }
 
 
-    // input{
-    //     padding-left:10px;
-    //     width:300px;
-    //     height:38px;
-    //     line-height:38px;
-    //     border:solid 1px #bfbfbf;
-    //     &:focus{
-    //         outline:none;
-    //         border:solid 1px @blue;
-    //      }
-    // }
+}
+.popup {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(0, 0, 0, .4);
+    z-index: 1500;
+    top: 0;
+    left: 0;
 
 }
+.mask {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.ask-model{
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -240px;
+    width: 440px;
+    height: 125px;
+    border: solid 1px #e5e5e5;
+    border-radius: 3px;
+    background-color:#fff;
+    ul{
+        height: 125px;
+        li{
+            &:nth-child(1){
+                padding:5px;
+                height:20px;
+                line-height: 20px;
+                text-align: right;
+                i{
+                    display: inline-block;
+                    width:100px;
+                    cursor: pointer;
+                }
+                // background:@blue;
+            }
+            &:nth-child(2){
+                height: 48px;
+                line-height: 30px;
+                padding-left: 20px;
+            }
+            &:nth-child(3){
+                height: 35px;
+                line-height: 35px;
+                span{
+                    display: inline-block;
+                    height: 35px;
+                    line-height: 40px;
+                    width: 80px;
+                    text-align: center;
+                    border-radius: 3px;
+                    margin: 0 29px;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+}
+
+
 .javascript-editor{
     width:100%;
     flex-grow:1;
