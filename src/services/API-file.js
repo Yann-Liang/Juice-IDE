@@ -366,15 +366,15 @@ class file {
 					}
 				})
 			}else if(this.isFile(item.value)){
-				
+
 			}
 		})
 
 	}
-	
+
 	// 另存为
 	saveOtherPath(activeFile,source){
-	
+
 	}
 }
 

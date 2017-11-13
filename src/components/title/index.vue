@@ -7,7 +7,26 @@
             <li class="close" @click="close"></li>
         </ul>
         <p>JUICE IDE</p>
-
+        <!--
+        	作者：liangyanxiangde@163.com
+        	时间：2017-08-16
+        	描述：提示弹窗
+        -->
+		<div class="modal" v-if="info.flag">
+			<div class="modal-main  info-model">
+				<el-row class="modal-title">
+					<span>{{info.title}}</span>
+					<i class="modal-close" @click="closeModal()"></i>
+				</el-row>
+				<ul class="modal-content">
+					<p class="info-text"><i class="info-icon fl" :class="info.class"></i>{{info.text}}</p>
+				</ul>
+				<div class="modal-btn">
+					<el-button class="cancel-btn" @click="closeModal()">取消</el-button>
+					<el-button class="" type="primary" @click="infoConfirm()">确定</el-button>
+				</div>
+			</div>
+		</div>
     </header>
 </template>
 
@@ -23,6 +42,12 @@
         data() {
             return {
                 isMaximized:false,
+                info: {
+					flag: false,
+					title: '',
+					text: '',
+					class: '',
+				},
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -41,8 +66,25 @@
                 this.isMaximized=!this.isMaximized;
             },
             close(){
+                this.info={
+					flag: true,
+					title: '是否退出IDE?',
+					text: '是否退出IDE？退出前，请确保所有文件已经保存！',
+					class: 'warning',
+				}
+
+            },
+            infoConfirm(){
                 win.close();
             },
+            closeModal(){
+                this.info={
+					flag: false,
+					title: '',
+					text: '',
+					class: '',
+				}
+            }
         },
         //生命周期函数
         created() {
@@ -116,4 +158,34 @@
         background: url(./images/close.png);
     }
 
+    .info-model{
+		.modal-content {
+			width: 650px;
+			color: #000;
+			padding: 50px 0 60px 45px;
+		}
+		.info-icon {
+			margin: 0 10px 0 0;
+			width: 40px;
+			height: 40px;
+			background-repeat: no-repeat;
+		}
+		.warning {
+			background: url(./images/hint_big.png);
+		}
+		.info-text {
+			font-size: 18px;
+			line-height: 40px;
+		}
+		.success {
+			background: url(./images/complete.png);
+		}
+		.error {
+			background: url(./images/error.png);
+		}
+	}
+
+	.info-text {
+		line-height: 40px;
+	}
 </style>

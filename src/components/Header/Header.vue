@@ -22,7 +22,7 @@
                         </li>
                     </ul>
                 </li>
-                <li>
+                <li @click="help">
                     帮助
                 </li>
             </ul>
@@ -33,7 +33,9 @@
 <script>
 	import {mapState, mapActions, mapGetters} from 'vuex';
     import file from '@/services/API-file'
-    var beautify = require('js-beautify').js_beautify
+    const beautify = require('js-beautify').js_beautify,
+        {shell} = require('electron');
+
     export default {
         name: 'header',
         data() {
@@ -297,6 +299,9 @@
                         _this.format();//格式化
                         break;
                 }
+            },
+            help(){
+                shell.openExternal('https://www.baidu.com');
             }
 
         },
