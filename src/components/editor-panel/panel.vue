@@ -135,7 +135,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
-                console.log( "设置值")
+                console.log( "设置值",editorData)
 	            this.updateActiveEditor(editorData);
                 if(cb && typeof(cb)=='function'){
                     cb();
@@ -282,9 +282,6 @@
 
             });
             this.editor.resize(true);
-            this.editor.on("changeSession",(e)=>{
-                    console.log("eeeeeeeeeeeeeeeeeeeeeee")
-                })
 
             //设置格式化
             this.editor.commands.addCommand({
@@ -302,7 +299,7 @@
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
                     _this.saveEditorFile()
-	                _this.editor.blur();
+	                // _this.editor.blur();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });

@@ -70,12 +70,24 @@
             <div class="ask-model" v-if='askVisible'>
                 <div class="ask-content">
                     <ul>
-                        <li><i class="iconfont dark">&#xe61f;</i></li>
-                        <li>确定要关闭窗口吗？</li>
+                        <li><i class="iconfont dark" @click='calcel'>&#xe61f;</i></li>
+                        <li>此文件已经被更改过，确定关闭？</li>
                         <li>
-                            <span class='btn-info' @click='yes($event)' :data-index='dataindex'>是</span>
-                            <span class='btn-info' @click='no($event)' :data-index='dataindex'>否</span>
-                            <span class='btn-info' @click='calcel($event)' :data-index='dataindex'>取消</span>
+                            <span class='btn-info' @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
+                            <span class='btn-info' @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
+                            <span class='btn-info' @click='calcel' :data-index='dataindex'>取消</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ask-model" v-if='asksVisible'>
+                <div class="ask-content">
+                    <ul>
+                        <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
+                        <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
+                        <li>
+                            <span class='btn-info' @click='yess($event)'>是</span>
+                            <span class='btn-info' @click='nos($event)'>否</span>
                         </li>
                     </ul>
                 </div>
@@ -106,12 +118,14 @@
         //实例的数据对象
         data() {
             return {
+                dataarr:[],
                 dataindex:"",
                 cha:true,
                 dian:false,
                 tipsVisible:false,
                 editorVisible:false,
                 askVisible:false,
+                asksVisible:false,
                 inputValue:"",
                 searchValue:"",
                 // searchVisible:false,
@@ -138,7 +152,7 @@
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -213,6 +227,7 @@
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
+                console.log(this.name)
                 this.saveEditorFile();
             },
             //代码格式化
@@ -257,7 +272,7 @@
                 this.value = item.value;
                 this.name = item.name;
                 this.keyId = item.keyId;
-	            console.log('切换tab现在的keyId:'+this.keyId)
+	            console.log('切换tab现在的keyId:'+this.keyId+this.name);
                 this.updateEditFile({
 	                name:this.name,
 	                value:this.value,
@@ -267,6 +282,8 @@
             },
             //效果切换
             activeTab:function(index){
+                console.log('index',index)
+                console.log('this.select',this.select);
                 if(this.fileData.length == 1){
                     //提示用户打开文件
                     this.editorVisible = false;
@@ -277,12 +294,14 @@
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
+                        console.log('高亮=删除')
                         let result = this.fileData;
                         result.splice(index,1);
                         this.changeFileData(result);
                         //如果当前高亮为0
                         if(this.select == 0){
-                            this.select = index ;
+                            // debugger;
+                            this.select = index;
                             this.currentView = index ;
                             this.value = this.fileData[index].value;
                             this.name = this.fileData[index].name;
@@ -316,38 +335,103 @@
                         this.name = this.fileData[this.select].name;
                         this.keyId = this.fileData[this.select].keyId;
                     }
+                    this.updateEditFile({
+                        name:this.name,
+                        value:this.value,
+                        keyId:this.keyId
+                    })
                 }
+
             },
             //yes
             yes:function(e){
-                console.log(e.target.getAttribute("data-index"))
-                // this.saveEditorFile();
-                // this.activeTab(this.select);
+                var index = e.target.getAttribute("data-index");
+                var arr = e.target.getAttribute("data-arr");
+                console.log("当前关闭窗口的位置以及信息",index+arr);
+                arr = JSON.parse(arr);
+                if(this.select == index){
+                    console.log('当前关闭和当前高亮显示一样')
+                    /*
+                        当前高亮和要关闭的当前窗口相等
+                        保存当前文件，并进行更改状态，tab切换，关闭弹窗操作操作
+                    */
+                    this.saveEditorFile(()=>{
+                        this.activeTab(index);
+                        this.askVisible = false;
+                    });
+                }else{
+                    /*
+                        当前高亮和要关闭的当前窗口不相等
+                        分为两种情况：
+                        1》要关闭的当前窗口大于当前高亮显示的
+                        2》要关闭的当前窗口小于当前高亮显示的
+                        之后保存要关闭的那个窗口文件，并进行左边状态更改，tab切换，fileData状态更改，关闭弹窗操作
+                    */
+                    console.log('当前关闭和当前高亮显示不同',arr[0])
+                    console.log(arr[0].value,arr[0].name,arr[0].source)
+                    file.saveFile(arr[0].value,arr[0].name,arr[0].source,()=>{
+                        console.log(111)
+                        //更改左边文件栏状态
+                        this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
+                        //更新未保存vuex的状态
+                        let edit = [];
+                        this.editData.forEach((item,index)=>{
+                            if(item.keyId !== arr[0].keyId){
+                                edit.push(item);
+                            }
+                        })
+                        edit = JSON.stringify(edit);
+                        this.updateData(JSON.parse(edit));
+                        //更改tab切换
+                        this.activeTab(index);
+                        //关闭弹窗
+                        this.askVisible = false;
+                    });
+                }
             },
             //no
-            no:function(){
-                if(cb && typeof(cb)=='function'){
-                    cb();
-                }
+            no:function(e){
+                var index = e.target.getAttribute("data-index");
+                var arr = e.target.getAttribute("data-arr");
+                console.log("当前关闭窗口的位置以及信息",index+arr);
+                arr = JSON.parse(arr);
+                //更改左边文件栏状态
+                this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
+                //更新未保存vuex状态
+                let edit = [];
+                this.editData.forEach((item,index)=>{
+                    if(item.keyId !== arr[0].keyId){
+                        edit.push(item);
+                    }
+                })
+                edit = JSON.stringify(edit);
+                this.updateData(JSON.parse(edit));
+                //更改tab切换
+                this.activeTab(index);
+                //关闭弹窗
+                this.askVisible = false;
+
             },
             //calcel
             calcel:function(){
-
+                this.askVisible = false;
             },
             //关闭当前窗口
             remove:function(index,id){
-                console.log(index);
-
+                console.log('index',index);
                 /*
-                    关闭当前窗口之前，获取到当前的keyId，与vuex中editdata中的keyId进行对比，如果存在，在比较source中的
+                    关闭当前窗口，判断当前高亮this.select与要关闭的index是否相等
+                    然后判断要关闭的这个窗口是否是未保存状态
+                    然后进行状态更改，tab切换操作
                 */
                 let arr = this.editData.filter((item)=>{
                     return item.keyId == id;
                 });
-                if(arr.length!=0){
+                if(arr.length != 0){
                     //存在，
                     this.askVisible = true;
                     this.dataindex = index;
+                    this.dataarr = JSON.stringify(arr);
                 }else{
                     //不存在
                     this.askVisible = false;
@@ -359,12 +443,45 @@
                 //关闭窗口时，提示用户是否已保存
 
             },
+            //yess
+            yess:function(e){
+                this.saveAllFile(()=>{
+                    this.asksVisible = false;
+                });
+
+            },
+            //nos
+            nos:function(e){
+                this.asksVisible = false;
+            },
+            //calcels
+            calcels:function(){
+                this.asksVisible = false;
+            },
             //关闭所有窗口
             close:function(){
-                this.editorVisible = false;
-                this.tipsVisible = true;
-                this.value = "readonly";
-	            this.changeFileData([]);
+                /*
+                    判断editData是否为空，为空则没有需要保存的文件，直接更新fileDaa为空即可
+                    不为空则有需要保存的文件，此时处理：
+                    new一个数组
+                    遍历fileData和editData，根据keyId是否相等
+                    相等：
+                    则push进新数组中
+                    然后更新未保存vuex状态
+                    保存所有文件
+                    更新左边文件管理处状态
+                    更新fileData为空
+                */
+                if(this.editData.length == 0){
+                    this.editorVisible = false;
+                    this.tipsVisible = true;
+                    this.asksVisible = false;
+                    this.value = "readonly";
+                    this.changeFileData([]);
+                }else{
+                    //保存所有
+                    this.asksVisible = true;
+                }
             },
             //新建文件
             newFile(){
@@ -738,6 +855,7 @@
     height: 125px;
     border: solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     ul{
         height: 125px;
         li{
@@ -746,6 +864,11 @@
                 height:20px;
                 line-height: 20px;
                 text-align: right;
+                i{
+                    display: inline-block;
+                    width:100px;
+                    cursor: pointer;
+                }
                 // background:@blue;
             }
             &:nth-child(2){
@@ -764,6 +887,7 @@
                     text-align: center;
                     border-radius: 3px;
                     margin: 0 29px;
+                    cursor: pointer;
                 }
             }
         }
