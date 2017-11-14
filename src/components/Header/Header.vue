@@ -58,7 +58,7 @@
                     {
                         id:"3",
                         ZH:"导入本地文件",
-                        keys:"O",
+                        keys:"Ctrl+Shift+O",
                     },
                     {
                         id:"4",
@@ -141,10 +141,10 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editor','copyText'])
+            ...mapGetters(['editor','copyText','activeFile','getUrl','editFile'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -216,18 +216,21 @@
                     case '1':
                     case 1:
                         //新建文件
+                        _this.newFile();
                         break;
                     case '2':
                     case 2:
                         //新建文件夹
+                        _this.newDir();
                         break;
                     case '3':
                     case 3:
-                        console.log('复制');//导入本地文件
+                        _this.exportFile('file');//导入本地文件
                         break;
                     case '4':
                     case 4:
                         //导入本地文件夹
+                        _this.exportFile('dir')
                         break;
                     case '5':
                     case 5:
@@ -236,10 +239,12 @@
                     case '6':
                     case 6:
                         //另存为
+                        _this.saveOtherPath(1)
                         break;
                     case '7':
                     case 7:
                         //全部保存
+                        _this.saveAllFile();
                         break;
                     case '8':
                     case 8:
@@ -248,6 +253,7 @@
                     case '9':
                     case 9:
                         //删除所有文件
+                        _this.removeAllFile();
                         break;
                 }
             },
@@ -302,8 +308,87 @@
             },
             help(){
                 shell.openExternal('https://www.baidu.com');
-            }
+            },
+            topFn(){
+                this.updateRightMenuBlock(false);
+            },
+            newFile(){
+                this.open((name)=>{
+                    file.newFile(this.activeFile.value,name,(res)=>{
+                        if(res.code === 0){
+                            this.queryFileListData();
+                            this.updateEditFile({
+                                name:file.uffixName(name),
+                                value:res.value,
+                                keyId:res.keyId
+                            })
+                            console.log(this.editFile);
+                        }else if(res.code === 1){
+                            this.tipOpen()
+                        }else if(res.code === 2){
+                            const url = this.getUrl;
+                            url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+                            this.updateUrl(url);
+                            this.updateEditFile({
+                                name:file.uffixName(name),
+                                value:res.value,
+                                keyId:res.keyId
+                            })
+                        }
+                        this.updateRightMenuBlock(false);
+                    })
+                });
+            },
+            newDir(){
+                this.open((name)=>{
+                    file.newMkdir(this.activeFile.value,name,(res)=>{
+                        if(res.code === 0){
+                            this.queryFileListData();
+                        }else if(res.code === 1){
+                            this.tipOpen()
+                        }else if(res.code === 2){
 
+                        }
+                        this.updateRightMenuBlock(false);
+                    })
+                });
+            },
+            open(fn) {
+                this.updateRightMenuBlock(false);
+                this.$prompt('请输入邮箱', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    fn && fn(value)
+                })
+            },
+            tipOpen(str) {
+                 str = str || '文件已存在，请更换文件名'
+                this.$alert(str, '提示', {
+                    confirmButtonText: '确定',
+                });
+            },
+            exportFile(type){
+                file.exportFile(type,this.fileTreeData,(filename)=>{
+                    if(filename && file.isObject(filename)){
+                        this.tipOpen('文件已存在在项目中');
+                    }else if(filename){
+                        const url = this.getUrl;
+                        console.log(file.basename(filename));
+                        url.push({value:filename,name:file.basename(filename)});
+                        this.updateUrl(url);
+                    }
+                });
+            },
+            initUrlFn(){
+                let data = localStorage.getItem('dirPath') ? JSON.parse(localStorage.getItem('dirPath')): [];
+                data = data.filter((item,index)=>{
+                    if(file.exists(item.value)){
+                        return true;
+                    }
+                });
+                this.updateUrl(data)
+            }
         },
         beforeDestroy () {
             this.hideFile();

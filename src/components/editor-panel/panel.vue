@@ -100,6 +100,7 @@
             },
             //设置值
             setValue:function(){
+                // this.editor.session.clearBreakpoints();
                 console.log('setvalue》》》》》》》》》》》》》》》》》》')
                 let arr = this.editData.filter((item)=>{
                     return item.keyId === this.keyId
@@ -154,7 +155,7 @@
 				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
 				            this.initChange();
-				            this.getResult();
+
 			            })
                     }
 
@@ -168,13 +169,14 @@
 
             //设置错误警示css
             setBreakpoint:function(row,css){
-                console.log(row,css)
+                // console.log(row,css)
                 this.editor.session.setBreakpoint(row,css);
             },
             //语法检查
             getResult:function(){
                 //语法检查
                 // var _this = this;
+                this.editor.session.clearBreakpoints();
                 compileService.grammarCheck((result, missingInputs, source)=>{
                     console.log('语法检查',result)
                     console.log('文件信息',source)
@@ -189,12 +191,15 @@
                             var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
                             console.log(rowId[1],tips[1]);
                             if(tips[1] == 'Warning'){
-                                css = 'ace_warning'
+                                css = 'ace_warning';
+
+
                             }else{
-                                css = 'ace_error'
+                                css = 'ace_error';
+                                // this.setBreakpoint(rowId[1]-1,css);
                             }
                             this.setBreakpoint(rowId[1]-1,css);
-                            // this.mouseHover(error)
+                            this.mouseHover(error,rowId[1]-1);
                         });
                     }else{
                         console.log('没有错误警示')
@@ -210,7 +215,7 @@
                     keyId:this.keyId,
                     source:this.editor.getValue()
                 }
-	            this.setActiveEditor();
+	            this.setActiveEditor(this.getResult);
                 console.log("当前item为");
                 for (let i = data.length - 1; i >= 0; i--) {
                     if(item.keyId === data[i].keyId){
@@ -227,22 +232,29 @@
                 return this.editor.getValue();
             },
             //鼠标hover事件
-            mouseHover:function(str){
-                //点击报错行显示报错的是啥信息
+            mouseHover:function(str,r){
+                //hover报错行显示报错的是啥信息
                 this.editor.on('guttermousemove',(e)=>{
                     var target = e.domEvent.target;
-                    // console.log('guttermousemove',e)
-                    var row = e.getDocumentPosition().row;
-                    // console.log(row);
                     var className = e.domEvent.toElement.className;
-                    // console.log(className);
-
-                    if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
-                        e.domEvent.toElement.title=str;
-                        return false;
+                    if(className.indexOf('ace_error') >= 0 || className.indexOf('ace_warning') >= 0){
+                        //hover的每一行显示存在这些，则需要给每行的title赋值
+                        //获取行数
+                        var row = e.getDocumentPosition().row;
+                        console.log(className,row);
+                        if(row == r){
+                            //即出错行和当前鼠标hover上去的行数相等，赋值
+                            e.domEvent.toElement.title = str;
+                            return false;
+                        }else{
+                            //不赋值
+                        }
                     }else{
+                        //hover的每一行不显示存在这些，则不需要给每行的title赋值
+                        console.log(className)
                         e.domEvent.toElement.title=""
                     }
+
                 });
             },
             //resize事件
@@ -322,6 +334,8 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
+
+
 
 
         },
