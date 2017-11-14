@@ -5,14 +5,26 @@ import file from '@/services/API-file'
 const{dialog} = require('electron').remote;
 
 export const fileAction = {
-	queryFileListData({ commit, state }){
-		const data = file.getFileList(state.url);
+	queryFileListData({ commit, state,rootState, dispatch}){
+		let data = file.getFileList(state.url);
+		rootState.editor.editData.forEach((item,index)=>{
+			data = file.updateFile(data,{keyId:item.keyId,save:false})
+		});
 		commit('UPDATE_FILE_DATA', data);
 	},
 	setActiveFile({ commit, state },activeFile){
 		commit('SET_ACTIVE_FILE', activeFile);
 	},
-	updateUrl({ dispatch,commit, state },url){
+	doneUrlFn({ commit, state ,dispatch},filesList){
+		state.url.forEach((item,index,data)=>{
+			if(filesList.value === item.value){
+				data.splice(index,1);
+				dispatch('updateUrl',data,{ root: true });
+				return;
+			}
+		})
+	},
+	updateUrl({ dispatch,commit, state,rootState },url){
 		localStorage.setItem('dirPath',JSON.stringify(url))
 		commit('UPDATE_URL', url);
 		// 监听文件变化
@@ -20,15 +32,33 @@ export const fileAction = {
 			return item.value;
 		});
 		file.watchFile(dirPathArr,(data)=>{
-			if(data.type === 'add'){
-			
+			if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
+				dispatch('queryFileListData',null,{ root: true });
 			}else if(data.type === 'unlink'){
-				const keyId = file.keyIdFn(data.path);
-				dispatch('updateDeleteStatus',{keyId:keyId,value:data.path},{ root: true });
+				dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
+				dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
+				dispatch('queryFileListData',null,{ root: true });
 			}else if(data.type === 'change'){
-			
+				rootState.editor.fileData.forEach((item,index,fileData)=>{
+					if(item.value === data.path){
+						if(rootState.editor.activeEditor.value === data.path){
+							//  设置值
+							const source = file.readFileSync(data.path);
+							rootState.editor.editor.setValue(source.toString());
+						}else{
+							// 更新source
+							const arr = rootState.editor.editData;
+							arr.forEach((itm,ind,result)=>{
+								if(itm.value === data.path){
+									const source = file.readFileSync(data.path);
+									result[ind].source = source;
+									dispatch('updateData',result,{ root: true });
+								}
+							})
+						}
+					}
+				})
 			}
-			dispatch('queryFileListData',null,{ root: true });
 		});
 		dispatch('queryFileListData',null,{ root: true });
 	},
@@ -163,13 +193,21 @@ export const fileAction = {
 		}else if(type == 2){
 			let activeFile = state.activeFile;
 			if(activeFile.value){
-				file.fsReadFile(activeFile.value,(err,data)=>{
-					if(!err){
-						file.saveFile('',activeFile.name,data,()=>{})
+				// file.fsReadFile(activeFile.value,(err,data)=>{
+				// 	if(!err){
+				// 		file.saveFile('',activeFile.name,data,()=>{})
+				// 	}else{
+				//
+				// 	}
+				// });
+				file.saveFile('',activeFile.name,null,(err,filename)=>{
+					if(err){
+						if (err) return console.error(err)
 					}else{
-
+						file.copeFn(activeFile.value,filename)
 					}
-				});
+				})
+				
 			}else{
 				let data = rootState.editor.editData.filter((item)=>{
 					return item.keyId === activeFile.keyId
@@ -214,16 +252,6 @@ export const fileAction = {
 						}else{
 							dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 						}
-						// 更新未保存vuex的状态
-						// let edit = rootState.editor.editData;
-						// rootState.editor.editData.forEach((item,index)=>{
-						// 	if(item.keyId ===  oldKeyId){
-						// 		edit[index].value = filepath;
-						// 		edit[index].name = file.basename(filepath);
-						// 		edit[index].keyId = keyId;
-						// 		return;
-						// 	}
-						// })
 						let edit = [];
 						rootState.editor.editData.forEach((item,index)=>{
 							if(item.keyId !==  oldKeyId){
@@ -246,5 +274,11 @@ export const fileAction = {
 				})
 			}
 		})
+	},
+	
+	// 更新当前新建文件
+	updateCurrentId({ commit, state}){
+		let id = state.fileCurrentId + 1;
+		commit('UPDATE_CURRENT_ID', id);
 	}
 }

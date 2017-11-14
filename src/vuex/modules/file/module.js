@@ -16,6 +16,8 @@ export const file = {
 		    y:0
 	    },
 	    rightMenuBlock:false,
+	    fileCurrentId:1,
+	    currentName:''
     },
     actions: fileAction,
     getters: fileGetter,

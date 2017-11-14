@@ -59,11 +59,12 @@
         props: {},
         //计算
         computed: {
-	        ...mapGetters(['activeFile','getUrl','editFile'])
+	        ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','currentName'])
         },
         //方法
         methods: {
-	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
+	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
+                ,'updateEditFile','updateUrl','updateCurrentId']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -182,31 +183,38 @@
 		        this.updateRightMenuBlock(false);
             },
 	        newFile(){
-		        this.open((name)=>{
+		        if(this.activeFile.value){
+			        this.open((name)=>{
+				        file.newFile(this.activeFile.value,name,(res)=>{
+					        if(res.code === 0){
+						        this.queryFileListData();
+						        this.updateEditFile({
+							        name:file.uffixName(name),
+							        value:res.value,
+							        keyId:res.keyId
+						        })
+						        console.log(this.editFile);
+					        }else if(res.code === 1){
+						        this.tipOpen()
+					        }
+				        })
+			        });
+		        }else{
 			        file.newFile(this.activeFile.value,name,(res)=>{
-				        if(res.code === 0){
-					        this.queryFileListData();
-					        this.updateEditFile({
-						        name:file.uffixName(name),
-						        value:res.value,
-						        keyId:res.keyId
-					        })
-					        console.log(this.editFile);
-				        }else if(res.code === 1){
-					        this.tipOpen()
-				        }else if(res.code === 2){
+				        if(res.code === 2){
 					        const url = this.getUrl;
-					        url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+					        url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
 					        this.updateUrl(url);
 					        this.updateEditFile({
-						        name:file.uffixName(name),
+						        name:file.uffixName(this.currentName),
 						        value:res.value,
 						        keyId:res.keyId
 					        })
+					        this.updateCurrentId() // 更新id
 				        }
-				        this.updateRightMenuBlock(false);
 			        })
-		        });
+		        }
+		        this.updateRightMenuBlock(false);
 	        },
 	        newDir(){
 		        this.open((name)=>{

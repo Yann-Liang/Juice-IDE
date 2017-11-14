@@ -156,11 +156,13 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor','searchVisible','replaceVisible','removeData'])
+            ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor'
+                ,'searchVisible','replaceVisible','removeData','currentName'])
         },
         //方法
         methods: {
-            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile','changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile']),
+            ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile'
+                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -496,32 +498,22 @@
                 }
             },
             //新建文件
-            newFile(){
-                this.open((name)=>{
-	                file.newFile(this.activeFile.value,name,(res)=>{
-		                if(res.code === 0){
-			                this.queryFileListData();
-			                this.updateEditFile({
-				                name:file.uffixName(name),
-				                value:res.value,
-				                keyId:res.keyId
-			                })
-			                console.log(this.editFile);
-		                }else if(res.code === 1){
-			                this.tipOpen()
-		                }else if(res.code === 2){
-			                const url = this.getUrl;
-			                url.push({value:'',name:file.uffixName(name)});
-			                this.updateUrl(url);
-			                this.updateEditFile({
-				                name:file.uffixName(name),
-				                value:res.value,
-				                keyId:res.keyId
-			                })
-		                }
-	                })
-                });
-            },
+	        newFile(){
+		        file.newFile('','',(res)=>{
+			        if(res.code === 2){
+				        const url = this.getUrl;
+				        url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
+				        this.updateUrl(url);
+				        this.updateEditFile({
+					        name:file.uffixName(this.currentName),
+					        value:res.value,
+					        keyId:res.keyId
+				        })
+				        this.updateCurrentId() // 更新id
+			        }
+		        })
+		        this.updateRightMenuBlock(false);
+	        },
             open(fn) {
                 this.$prompt('请输入邮箱', '提示', {
                     confirmButtonText: '确定',
@@ -635,22 +627,6 @@
         watch: {
             editFile:function(){
                 this.pushArray();
-
-                // 保存当前激活的文件
-//                console.log(this.$refs.childMethod.getValue());
-//                const editorData = {
-//	                value: this.editFile.value,
-//	                name: this.editFile.name,
-//	                source: this.$refs.childMethod.getValue()
-//                }
-//                console.log(editorData);
-//	            this.updateActiveEditor(editorData);
-
-
-
-
-                // this.$refs.childMethod.initChange();
-                // this.$refs.childMethod.change();
             },
             'removeData.id':function(){
             	this.remove(this.removeData.index)

@@ -19,7 +19,6 @@ export const editorAction = {
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
 	saveEditorFile({dispatch,commit,state,rootState},cb){
-		console.log('不比不比不不不不不',state.activeEditor.value,state.activeEditor.name,state.activeEditor.source)
 		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
 			console.log("filepath+keyId",filepath)
 			if(err){
@@ -132,10 +131,13 @@ export const editorAction = {
 		// 判断tabs列表有没有
 		const data1 = state.fileData;
 		data1.forEach((item,index)=>{
-			if(fileItem.keyId === item.keyId){
+			if(fileItem.value && fileItem.value === item.value){
 				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
 				return ;
+			}else if(fileItem.keyId === item.keyId){
+				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
 			}
+			
 		});
 
 		// 更新未保存vuex的状态
