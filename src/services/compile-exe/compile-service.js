@@ -108,9 +108,11 @@ class compileServies {
     //语法检查
     grammarCheck(cb){
         var _this = this;
+        var sourceText = store.state.editor.activeEditor.source;
+        sourceText = sourceText.replace(/import\s+[\"|\'][\w|.|\\|\/]+[\"|\']\;*/ig,'');
         var source = {
             sources:{
-                [store.state.editor.activeEditor.name]:store.state.editor.activeEditor.source
+                [store.state.editor.activeEditor.name]:sourceText
             },
             target:store.state.editor.activeEditor.name
         };
