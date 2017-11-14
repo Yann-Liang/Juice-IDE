@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-13 11:51:21
+ * @Last Modified time: 2017-11-14 09:48:04
  */
 //引入web3
 let Web3 = require('web3'),
@@ -11,7 +11,7 @@ let Web3 = require('web3'),
 import consoleService from '@/services/console/console-service';
 import APIServies from '@/services/API-servies';
 //import store from '@/vuex/store';
-import DeployLogService from '@/services/deploy/deployLogServises'
+import DeployLogService from '@/services/deploy/deploy-log-servises'
 
 const deployLogService = new DeployLogService();
 

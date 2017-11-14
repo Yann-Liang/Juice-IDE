@@ -10,10 +10,16 @@
                 <li @click="queryTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray">
-                <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
-                <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
-                <query-tab class="tab" v-if="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
-                <i class="border bgblue" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <!-- if改为show -->
+                <files-tab class="tab" v-show="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
+                <keep-alive>
+                    <deploy-tab class="tab" v-show="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
+                    <query-tab class="tab" v-show="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
+                </keep-alive>
+                <keep-alive>
+                    <query-tab class="tab" v-show="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
+                </keep-alive>
+                <i class="border bgblue" v-show="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
