@@ -303,7 +303,6 @@
             help(){
                 shell.openExternal('https://www.baidu.com');
             }
-
         },
         beforeDestroy () {
             this.hideFile();
