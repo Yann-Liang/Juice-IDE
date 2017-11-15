@@ -141,7 +141,7 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editor','copyText','activeFile','getUrl','editFile'])
+            ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile'])
         },
         methods: {
 	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
