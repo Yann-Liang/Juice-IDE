@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-14 09:48:04
+ * @Last Modified time: 2017-11-15 13:58:24
  */
 //引入web3
 let Web3 = require('web3'),
@@ -358,7 +358,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: 'bbe111c6f12b88b65528d9c22628b9e43fb86ff5b07580ac865f0f2370240250', //用户私钥
+            privateKey: '19d493bf995d27c43730ffffc3214ed54dd00c9f6ae04084382af7d299cd1fe6', //用户私钥
             userAddress: '', //用户钱包地址
         }
 
@@ -420,13 +420,27 @@ class DeployService {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
             try {
-                debugger;
-                let myContractReturned = calcContract.new({
+
+
+                // let myContractReturned = calcContract.new({
+                //     data: bin,
+                //     from: userAddress,
+                //     gasPrice: 21000000000,
+                //     gasLimit: 843314949521407,
+                // }, (err, myContract) => {
+                const txParams = {
+                    nonce: this.web3.nonce(),
+                    //gasPrice: 0x3b9aca00,//0x174876e800,
+                    //gasLimit: 843314949521407,//843314949521407,
+                    gasPrice: 0x98bca5a00,
+                    //gasLimit: 0xe8d4a50fff,
+                    gas: 0x9184e729fff,
+                    value: 0,
                     data: bin,
-                    from: userAddress,
-                    gasPrice: 21000000000,
-                    gasLimit: 843314949521407,
-                }, (err, myContract) => {
+                }
+                    , serializedTxHex = this.sign(txParams);//签名后的数据
+
+                calcContract.deploy(serializedTxHex,txParams, (err, myContract) => {
                     console.log('err', err, myContract)
                     if (!err) {
                         if (!myContract.address) {
@@ -575,7 +589,7 @@ class DeployService {
                 if (isArray(argumentList)) { //数组
                     data = contract[contractFnName].getData.apply(null, argumentList);
                 } else if (typeof argumentList == 'string') { //字符串
-                    data = contract.getData(argumentList);
+                    data = contract[contractFnName].getData(argumentList);
                 } else {
                     console.warn('argumentList参数类型不正确！！！');
                 }
@@ -661,7 +675,7 @@ class DeployService {
         consoleService.output('[运行结果]', {
             logError: 'Invoke failure'
         }, {
-            info: err.message
+            logError: err.message
         });
         return true;
     }
