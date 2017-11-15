@@ -100,7 +100,8 @@
             },
             //设置值
             setValue:function(){
-                console.log('setvalue')
+                // this.editor.session.clearBreakpoints();
+                console.log('setvalue》》》》》》》》》》》》》》》》》》')
                 let arr = this.editData.filter((item)=>{
                     return item.keyId === this.keyId
                 });
@@ -128,6 +129,7 @@
                     }
                 }
             },
+            //设置当前高亮显示即正在编辑状态的文件信息
             setActiveEditor(cb){
 	            const editorData = {
 		            value: this.editFile.value,
@@ -135,7 +137,7 @@
 		            keyId:this.editFile.keyId,
 		            source: this.getValue()
 	            }
-                console.log( "设置值",editorData)
+                console.log( "设置当前高亮即正在编辑状态的文件信息》》》》》》》》》》》》》》》")
 	            this.updateActiveEditor(editorData);
                 if(cb && typeof(cb)=='function'){
                     cb();
@@ -144,8 +146,8 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-                console.log(this.editor.getSession().on)
-	            console.log(this.editor.getSession().off)
+             //    console.log(this.editor.getSession().on)
+	            // console.log(this.editor.getSession().off)
                 let red = null;
 	            this.editor.on("focus",()=>{
 	            	if(!red){
@@ -153,7 +155,7 @@
 				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
 				            this.initChange();
-				            this.getResult();
+
 			            })
                     }
 
@@ -167,15 +169,17 @@
 
             //设置错误警示css
             setBreakpoint:function(row,css){
-                console.log(row,css)
+                // console.log(row,css)
                 this.editor.session.setBreakpoint(row,css);
             },
             //语法检查
             getResult:function(){
                 //语法检查
                 // var _this = this;
+                this.editor.session.clearBreakpoints();
                 compileService.grammarCheck((result, missingInputs, source)=>{
                     console.log('语法检查',result)
+                    console.log('文件信息',source)
                     if(result.errors && result.errors.length>0){
                         /*
                             语法检查：依次遍历错误数组，获取错误行数，然后依次显示在编辑区的相应位置，每次切换tab时去掉class
@@ -187,12 +191,15 @@
                             var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
                             console.log(rowId[1],tips[1]);
                             if(tips[1] == 'Warning'){
-                                css = 'ace_warning'
+                                css = 'ace_warning';
+
+
                             }else{
-                                css = 'ace_error'
+                                css = 'ace_error';
+                                // this.setBreakpoint(rowId[1]-1,css);
                             }
                             this.setBreakpoint(rowId[1]-1,css);
-                            this.mouseHover(error)
+                            this.mouseHover(error,rowId[1]-1);
                         });
                     }else{
                         console.log('没有错误警示')
@@ -225,22 +232,29 @@
                 return this.editor.getValue();
             },
             //鼠标hover事件
-            mouseHover:function(str){
-                //点击报错行显示报错的是啥信息
+            mouseHover:function(str,r){
+                //hover报错行显示报错的是啥信息
                 this.editor.on('guttermousemove',(e)=>{
                     var target = e.domEvent.target;
-                    // console.log('guttermousemove',e)
-                    var row = e.getDocumentPosition().row;
-                    // console.log(row);
                     var className = e.domEvent.toElement.className;
-                    // console.log(className);
-
-                    if(className.indexOf("ace_error")>=0 || className.indexOf("ace_warning")>=0){
-                        e.domEvent.toElement.title=str;
-                        return false;
+                    if(className.indexOf('ace_error') >= 0 || className.indexOf('ace_warning') >= 0){
+                        //hover的每一行显示存在这些，则需要给每行的title赋值
+                        //获取行数
+                        var row = e.getDocumentPosition().row;
+                        console.log(className,row);
+                        if(row == r){
+                            //即出错行和当前鼠标hover上去的行数相等，赋值
+                            e.domEvent.toElement.title = str;
+                            return false;
+                        }else{
+                            //不赋值
+                        }
                     }else{
+                        //hover的每一行不显示存在这些，则不需要给每行的title赋值
+                        console.log(className)
                         e.domEvent.toElement.title=""
                     }
+
                 });
             },
             //resize事件
@@ -258,7 +272,7 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            console.log(this.editor,this.editor.on,this.editor.off)
+            // console.log(this.editor,this.editor.on,this.editor.off)
             var _this = this;
             require('brace/ext/language_tools')
             ace.acequire('ace/ext/language_tools')
@@ -279,13 +293,7 @@
             this.setValue();
             this.change();
             this.editor.clearSelection();
-            var sourceAnnotations = [];
-            // this.getResult();
 
-            //监听光标移动
-            this.editor.getSession().selection.on('changeCursor', (e)=> {
-
-            });
             this.editor.resize(true);
 
             //设置格式化
@@ -326,6 +334,8 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
+
+
 
 
         },

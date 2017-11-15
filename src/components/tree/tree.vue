@@ -114,7 +114,7 @@
                 }
             },
 			rightMenu(filesList,e){
-            	if(e.button === 2 && !this.isFolder){
+            	if(e.button === 2){
 		            this.setActiveFile(filesList);
                     const position = {
                     	x:e.clientX,

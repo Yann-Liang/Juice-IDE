@@ -12,9 +12,7 @@ export const editorMutation = {
         state.editData = data
     },
 	['UPDATE_ACTION_EDITOR'](state,data){
-
 		state.activeEditor = data
-        console.log('activeEditor',state.activeEditor)
 	},
     ['SAVE_EDITOR'](state,obj){
         state.editor = obj

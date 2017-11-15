@@ -20,5 +20,12 @@ export const fileGetter = {
 	},
 	rightMenuBlock(state){
 		return state.rightMenuBlock
+	},
+	fileCurrentId(state){
+		return state.fileCurrentId;
+	},
+	currentName(state){
+		let name = 'Untitled'+ state.fileCurrentId;
+		return name
 	}
 };

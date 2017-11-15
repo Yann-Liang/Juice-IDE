@@ -14,7 +14,7 @@ console.log(chokidar);
 // id标识文件的类型 save标识是否保存
 class file {
 	constructor() {
-
+	
 	}
 	//遍历文件夹，获取所有文件夹里面的文件信息
 	/*
@@ -55,7 +55,7 @@ class file {
 				this.readFile(item.value,item.children,targetObj);
 			}
 		});
-		console.log(JSON.stringify(filesList))
+		console.log(JSON.stringify(filesList));
 		return filesList;
 	}
 
@@ -101,6 +101,22 @@ class file {
 		}
 	}
 
+	//异步读写文件
+	readFileSync(path){
+		const result = fs.readFileSync(path);
+		return result;
+	}
+	
+	
+	
+	copeFn(oldPath,newPath){
+		fs.copy(oldPath, newPath, err => {
+			if (err) return console.error(err)
+			console.log('另存为成功')
+		})
+	}
+	
+	
 	//写入文件utf-8格式
 	writeFile(fileName,data,fn){
 		fs.writeFile(fileName,data,'utf-8',fn);
@@ -216,7 +232,6 @@ class file {
 
 	// 保存文件
 	saveFile(path,name,source,fn){
-		console.log('path+name+source',path+name+source)
 		if(path){
 			this.writeFile(path,source,(err)=>{
 				fn && fn(err,'')
@@ -301,6 +316,12 @@ class file {
 			}
 		})
 	}
+	
+	// 格式化路径
+	formatPath(filepath){
+		const iPath = filepath ? filepath.replace(/\\/g,'/') :'';
+		return iPath;
+	}
 
 	// 更新文件的状态
 	updateFile(data,obj){
@@ -377,33 +398,41 @@ class file {
 	watchFile(pathArr,fn){
 		pathArr.forEach((item,index)=>{
 			if(item.value){
-				var watcher = chokidar.watch(item.value, {
+				const watcher = chokidar.watch(item.value, {
 					ignored: /(^|[\/\\])\../,
 					persistent: true
 				});
-				
 				watcher
 					.on('add', path => {
-						console.log(`File ${path} has been added`)
 						fn && fn({
 							type:'add',
-							path:path
+							path:this.formatPath(path),
+						})
+					})
+					.on('addDir', path => {
+						fn && fn({
+							type:'addDir',
+							path:this.formatPath(path),
 						})
 					})
 					.on('change', path => {
-						console.log(`File ${path} has been changed`)
 						fn && fn({
 							type:'change',
-							path:path
+							path:this.formatPath(path),
 						})
 					})
 					.on('unlink', path => {
-						console.log(`File ${path} has been removed`)
 						fn && fn({
 							type:'unlink',
-							path:path
+							path:this.formatPath(path),
 						})
-					});
+					})
+					.on('unlinkDir',  path => {
+						fn && fn({
+							type:'unlinkDir',
+							path:this.formatPath(path),
+						})
+					})
 			}
 		})
 

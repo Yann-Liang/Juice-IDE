@@ -14,8 +14,8 @@
                 <ul class="wrap-menu-list">
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
                     <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
-                    <li @click="saveFile()" @mousedown.stop="">保存</li>
-                    <li @click="saveOtherPathFn()" @mousedown.stop="">另存为</li>
+                    <li @click="saveFile()" @mousedown.stop="" v-if="position.item && !position.item.children">保存</li>
+                    <li @click="saveOtherPathFn()" @mousedown.stop="" v-if="position.item && !position.item.children">另存为</li>
                     <li @click="rename" @mousedown.stop="">重命名</li>
                     <li @click="removeFileFn" @mousedown.stop="">删除</li>
                 </ul>
@@ -45,42 +45,45 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','position','rightMenuBlock'])
+            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','position','rightMenuBlock','currentName'])
         },
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
-                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus']),
+                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus','updateCurrentId']),
             newFile(){
-            	this.open((name)=>{
+            	if(this.activeFile.value){
+		            this.open((name)=>{
+			            file.newFile(this.activeFile.value,name,(res)=>{
+				            if(res.code === 0){
+					            this.queryFileListData();
+					            this.updateEditFile({
+						            name:file.uffixName(name),
+						            value:res.value,
+						            keyId:res.keyId
+					            })
+					            console.log(this.editFile);
+				            }else if(res.code === 1){
+					            this.tipOpen()
+				            }
+			            })
+		            });
+                }else{
 		            file.newFile(this.activeFile.value,name,(res)=>{
-			            const child = this.$refs.treeItem;
-			            console.log(child);
-			            child.toggle(this.activeFile);
-
-			            if(res.code === 0){
-				            this.queryFileListData();
-				            this.updateEditFile({
-					            name:file.uffixName(name),
-					            value:res.value,
-					            keyId:res.keyId
-				            })
-				            console.log(this.editFile);
-			            }else if(res.code === 1){
-				            this.tipOpen()
-			            }else if(res.code === 2){
+			            if(res.code === 2){
 				            const url = this.getUrl;
-				            url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+				            url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
 				            this.updateUrl(url);
 				            this.updateEditFile({
-					            name:file.uffixName(name),
+					            name:file.uffixName(this.currentName),
 					            value:res.value,
 					            keyId:res.keyId
 				            })
+				            this.updateCurrentId() // 更新id
 			            }
-			            this.updateRightMenuBlock(false);
 		            })
-                });
+                }
+	            this.updateRightMenuBlock(false);
             },
 	        newDir(){
 		        this.open((name)=>{

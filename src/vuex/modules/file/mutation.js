@@ -19,5 +19,8 @@ export const fileMutation = {
 	},
 	['UPDATE_RIGHT_MENU_BLOCK'] (state,blo) {
 		state.rightMenuBlock = blo
+	},
+	['UPDATE_CURRENT_ID'](state,id){
+		state.fileCurrentId = id;
 	}
 };
