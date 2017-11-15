@@ -16,6 +16,7 @@ export const editorMutation = {
 	},
     ['SAVE_EDITOR'](state,obj){
         state.editor = obj
+        console.log('state.editor',obj)
     },
     ['CHANGE_SEARCH_VISIBLE'](state,bool){
         state.searchVisible = bool

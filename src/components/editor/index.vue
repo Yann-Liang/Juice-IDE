@@ -774,6 +774,7 @@
     line-height: 60px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     input{
         padding-left:10px;
         width:300px;
@@ -811,6 +812,7 @@
     line-height: 100px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     .replace-content{
         display: flex;
         flex-wrap:nowrap;
@@ -872,6 +874,7 @@
     line-height: 60px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     .success-content{
         .icon{
             display: inline-block;

@@ -252,7 +252,7 @@
                         }
                     }else{
                         //hover的每一行不显示存在这些，则不需要给每行的title赋值
-                        console.log(className)
+                        // console.log(className)
                         e.domEvent.toElement.title=""
                     }
 
