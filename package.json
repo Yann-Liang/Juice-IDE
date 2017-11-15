@@ -62,7 +62,7 @@
         "vue-electron": "^1.0.6",
         "vue-router": "^2.5.3",
         "vuex": "^2.3.1",
-        "web3": "git+ssh://http://luchenqun:fendoubuxi@192.168.9.66/Juzix-ethereum/web3.git#master"
+        "web3": "git+ssh://http://luchenqun:fendoubuxi@192.168.9.66/Juzix-ethereum/web3.git#deploy"
     },
     "devDependencies": {
         "babel-core": "^6.22.1",
