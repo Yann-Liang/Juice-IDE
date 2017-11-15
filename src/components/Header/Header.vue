@@ -301,7 +301,7 @@
                 }
             },
             help(){
-                shell.openExternal('https://www.baidu.com');
+                shell.openExternal('http://www.juzhen.io/index.php');
             }
         },
         beforeDestroy () {

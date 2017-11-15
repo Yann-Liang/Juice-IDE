@@ -3,12 +3,12 @@
         <el-form :label-position="'top'" label-width="220px" :model="form">
             <el-form-item label="选择需要部署的合约">
                 <el-select v-model="form.select" placeholder="选择合约文件">
-                    <el-option v-for="(item,index) in compileResult" :key="index" :label="item.name" :value="item"></el-option>
+                    <el-option v-for="(item,key) in compileResult" :key="key" :label="item.name" :value="key"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="">
                 <el-select v-model="form.contractItem" placeholder="选择合约文件">
-                    <el-option v-for="(item,index) in form.select.data" :key="index" :label="item.contractName" :value="item"></el-option>
+                    <el-option v-for="(item,index) in compileData" :key="index" :label="item.contractName" :value="item"></el-option>
                 </el-select>
             </el-form-item>
         </el-form>
@@ -50,13 +50,13 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileResult',/*'deployedData'*/]),
+            ...mapGetters(['compileResult','activeEditor']),
             disabled:function(){
                 return !(this.form.select && this.form.contractItem);
             },
-            contractFn:function() {
-                console.log(this.deployedData,this.form2.selectDeployData)
-                // return this.deployedData[this.form2.selectDeployData].contract.abi
+            compileData(){
+                return this.form.select?this.compileResult[this.form.select].data :[];
+
             },
             runDisabled:function() {
                 let bool=false;
@@ -74,7 +74,7 @@
         methods: {
             deploy(){
                 let item=this.form.contractItem;
-                contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x859376269bb8a56f63f8b8964430c68f69e1cba0').then((address)=>{
+                contractServies.deploy(this.form.select.name,item.contractName,item.abi,item.bin,'0x3864bc90a9b8ee5f6d414d6ef3e459f2a3513668').then((address)=>{
                     console.log('address',address)
                      this.form.address=address;
                      this.flag=true;
@@ -82,10 +82,24 @@
             },
             getContractLog(){
                 contractServies.getContractLog()
+            },
+            //没有选择合约文件 选择编辑区当前编辑的文件
+            autoSelet(){
+                if(!this.form.select){
+                    for (const key in this.compileResult) {
+                        if (this.compileResult.hasOwnProperty(key)) {
+                            if(this.activeEditor.value== key){
+                                this.form.select=key;
+                            }
+
+                        }
+                    }
+                }
             }
         },
         //生命周期函数
         created() {
+            this.autoSelet();
 
         },
         beforeMount() {
