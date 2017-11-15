@@ -108,7 +108,8 @@
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
         <div class="tips default" v-if='tipsVisible'>
-            请在文件管理器面板中点击打开一个文件
+            <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
+
         </div>
         <!-- 弹窗 -->
 
@@ -963,6 +964,14 @@
     justify-content:center;
     width:100%;
     flex-grow:1;
+    .icons{
+        display: inline-block;
+        width: 252px;
+        height: 160px;
+        background: url(images/icon.png) no-repeat top center;
+        padding-top: 160px;
+        font-style: normal;
+    }
 
     // background-color:#000;
 }
