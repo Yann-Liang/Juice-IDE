@@ -16,6 +16,7 @@ import '../static/css/iconfont.css'
 //less
 import "./less/index.less"
 
+import { Notification } from 'element-ui';
 Vue.use(ElementUI)
 
 router.beforeEach((to, from, next) => {

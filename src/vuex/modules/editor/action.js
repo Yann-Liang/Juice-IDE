@@ -137,7 +137,7 @@ export const editorAction = {
 			}else if(fileItem.keyId === item.keyId){
 				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
 			}
-			
+
 		});
 
 		// 更新未保存vuex的状态
@@ -161,5 +161,8 @@ export const editorAction = {
 	//复制信息保存
 	updateCopyText({commit,state},data){
 		commit('UPDATE_COPY_TEXT',data)
+	},
+	boolSuccessVisible({commit,state},bool){
+		commit('CHANGE_SUCCESS_VISIBLE',bool)
 	}
 }

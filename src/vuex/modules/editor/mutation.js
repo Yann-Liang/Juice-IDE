@@ -31,5 +31,8 @@ export const editorMutation = {
 	},
     ['UPDATE_COPY_TEXT'](state,data){
         state.copyText = data
+    },
+    ['CHANGE_SUCCESS_VISIBLE'](state,bool){
+        state.successVisible = bool;
     }
 };

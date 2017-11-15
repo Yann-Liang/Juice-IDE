@@ -86,7 +86,7 @@
                         keys:"Ctrl+Delete",
                     },
                     {
-                        id:"8",
+                        id:"9",
                         ZH:"删除所有文件",
                         keys:"Ctrl+Shift+Del",
                     },
@@ -144,7 +144,7 @@
             ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -234,7 +234,7 @@
                         break;
                     case '5':
                     case 5:
-                        _this.saveEditorFile();//保存
+                        _this.saveEditorFile(_this.success);//保存
                         break;
                     case '6':
                     case 6:
@@ -308,6 +308,16 @@
             },
             help(){
                 shell.openExternal('https://www.baidu.com');
+            },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
             },
             topFn(){
                 this.updateRightMenuBlock(false);

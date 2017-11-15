@@ -72,17 +72,21 @@ function createWindow() {
 	tray.on('double-click', () => { //双击显示
 		mainWindow.show();
 	})
+	globalShortcut.unregister('CommandOrControl+W')
 
 	//注册开发者工具快捷键
 	const retClose = globalShortcut.register('CommandOrControl+B', () => {
 		BrowserWindow.getFocusedWindow().webContents.closeDevTools();
 	});
-	const retOpen = globalShortcut.register('CommandOrControl+N', () => {
+	const retOpen = globalShortcut.register('CommandOrControl+K', () => {
 		BrowserWindow.getFocusedWindow().webContents.openDevTools({
 			mode: 'undocked'
 		});
 	});
-	globalShortcut.unregister('ctrl+-')
+	// globalShortcut.unregister('CommandOrControl+-',()=>{
+	// 	console.log("aaaaaaaaaaaaa")
+	// });
+	console.log(globalShortcut.isRegistered('CommandOrControl+W'))
 
 };
 

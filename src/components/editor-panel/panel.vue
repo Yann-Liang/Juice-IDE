@@ -35,11 +35,12 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName'])
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor']),
+            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
+                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -257,9 +258,104 @@
 
                 });
             },
-            //resize事件
+            //绑定的一系列事件
+            topFn(){
+                this.updateRightMenuBlock(false);
+            },
+            newFile(){
+                if(this.activeFile.value){
+                    this.open((name)=>{
+                        file.newFile(this.activeFile.value,name,(res)=>{
+                            if(res.code === 0){
+                                this.queryFileListData();
+                                this.updateEditFile({
+                                    name:file.uffixName(name),
+                                    value:res.value,
+                                    keyId:res.keyId
+                                })
+                                console.log(this.editFile);
+                            }else if(res.code === 1){
+                                this.tipOpen()
+                            }
+                        })
+                    });
+                }else{
+                    file.newFile(this.activeFile.value,name,(res)=>{
+                        if(res.code === 2){
+                            const url = this.getUrl;
+                            url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
+                            this.updateUrl(url);
+                            this.updateEditFile({
+                                name:file.uffixName(this.currentName),
+                                value:res.value,
+                                keyId:res.keyId
+                            })
+                            this.updateCurrentId() // 更新id
+                        }
+                    })
+                }
+                this.updateRightMenuBlock(false);
+            },
+            newDir(){
+                this.open((name)=>{
+                    file.newMkdir(this.activeFile.value,name,(res)=>{
+                        if(res.code === 0){
+                            this.queryFileListData();
+                        }else if(res.code === 1){
+                            this.tipOpen()
+                        }else if(res.code === 2){
 
-
+                        }
+                        this.updateRightMenuBlock(false);
+                    })
+                });
+            },
+            open(fn) {
+                this.updateRightMenuBlock(false);
+                this.$prompt('请输入邮箱', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({ value }) => {
+                    fn && fn(value)
+                })
+            },
+            tipOpen(str) {
+                 str = str || '文件已存在，请更换文件名'
+                this.$alert(str, '提示', {
+                    confirmButtonText: '确定',
+                });
+            },
+            exportFile(type){
+                file.exportFile(type,this.fileTreeData,(filename)=>{
+                    if(filename && file.isObject(filename)){
+                        this.tipOpen('文件已存在在项目中');
+                    }else if(filename){
+                        const url = this.getUrl;
+                        console.log(file.basename(filename));
+                        url.push({value:filename,name:file.basename(filename)});
+                        this.updateUrl(url);
+                    }
+                });
+            },
+            initUrlFn(){
+                let data = localStorage.getItem('dirPath') ? JSON.parse(localStorage.getItem('dirPath')): [];
+                data = data.filter((item,index)=>{
+                    if(file.exists(item.value)){
+                        return true;
+                    }
+                });
+                this.updateUrl(data)
+            },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
         },
         //生命周期函数
         created() {
@@ -311,7 +407,7 @@
                 name: 'save',
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
-                    _this.saveEditorFile()
+                    _this.saveEditorFile(_this.success)
 	                // _this.editor.blur();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
@@ -334,9 +430,86 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
-
-
-
+            //绑定新建文件
+            this.editor.commands.addCommand({
+                name: 'newFile',
+                bindKey: {win: 'Ctrl-N',  mac: 'Command-N'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.newFile();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定新建文件夹
+            this.editor.commands.addCommand({
+                name: 'newDir',
+                bindKey: {win: 'Ctrl-W',  mac: 'Command-W'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.newDir();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定导入本地文件
+            this.editor.commands.addCommand({
+                name: 'exportFile',
+                bindKey: {win: 'Ctrl-Shift-O',  mac: 'Command-Shift-O'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.exportFile('file')
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定导入本地文件夹
+            this.editor.commands.addCommand({
+                name: 'exportDir',
+                bindKey: {win: 'Ctrl-O',  mac: 'Command-O'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.exportFile('dir')
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定另存为
+            this.editor.commands.addCommand({
+                name: 'saveOther',
+                bindKey: {win: 'Ctrl-Shift-S',  mac: 'Command-Shift-S'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.saveOtherPath(1);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定全部保存
+            this.editor.commands.addCommand({
+                name: 'saveAllFile',
+                bindKey: {win: 'Ctrl-Alt-S',  mac: 'Command-Alt-S'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.saveAllFile();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定删除
+            this.editor.commands.addCommand({
+                name: 'delete',
+                bindKey: {win: 'Ctrl-Delete',  mac: 'Command-Delete'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    // _
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定删除所有文件
+            this.editor.commands.addCommand({
+                name: 'removeAllFile',
+                bindKey: {win: 'Ctrl-Shift-Delete',  mac: 'Command-Shift-Delete'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.removeAllFile();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
 
         },
         //监视

@@ -70,7 +70,7 @@
         //方法
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
-                ,'updateEditFile','updateUrl','updateCurrentId']),
+                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -160,7 +160,7 @@
 		        // 保存
 		        hotkeys('ctrl+s', (event,handler)=>{
 			        console.log('ctrl+s')
-			        this.saveEditorFile()
+			        this.saveEditorFile(this.success)
 		        });
 
 		        // 另存为
@@ -185,6 +185,16 @@
 		        });
 
 	        },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
 	        topFn(){
 		        this.updateRightMenuBlock(false);
             },
