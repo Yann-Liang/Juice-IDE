@@ -50,7 +50,7 @@
         //实例的数据对象
         data() {
             return {
-                filesTabFlag: false,
+                filesTabFlag: true,
                 deployTabFlag: false,
                 queryTabFlag: false,
                 ghostbarFlag:false,
@@ -67,7 +67,7 @@
         //方法
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
-                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible']),
+                ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile','boolSuccessVisible']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -131,13 +131,13 @@
 	        hotkeysFn(){
 		        // 注册快捷键
 		        // 新建
-		        hotkeys('ctrl+a', (event,handler)=>{
+		        hotkeys('ctrl+n', (event,handler)=>{
 			        alert('ctrl+n');
 			        this.newFile();
 		        });
 
 		        // 新建文件夹
-		        hotkeys('ctrl+q', (event,handler)=>{
+		        hotkeys('ctrl+w', (event,handler)=>{
 			        alert('ctrl+w');
 			        this.newDir();
 		        });
@@ -162,23 +162,28 @@
 
 		        // 另存为
 		        hotkeys('ctrl+shift+s', (event,handler)=>{
+                    // alert(111111)
 			        this.saveOtherPath(1)
 		        });
 
 		        // 全部保存
 		        hotkeys('ctrl+alt+s', (event,handler)=>{
+                    // alert(123)
 			        this.saveAllFile();
 		        });
 
 		        // 删除
 		        hotkeys('ctrl+delete', (event,handler)=>{
-			        alert('ctrl+delete');
+                    if(this.activeFile){
+	                    this.changeDeleteFile(this.activeFile)
+	                    this.changeShowDeleteModal(true);
+                    }
 		        });
 
 		        // 删除所有文件
 		        hotkeys('ctrl+shift+delete', (event,handler)=>{
 			        alert('ctrl+shift+delete');
-			        this.removeAllFile();
+			        this.changeShowTipModal(true)
 		        });
 
 	        },
@@ -278,6 +283,9 @@
 		            }
                 });
 	            this.updateUrl(data)
+            },
+            deleteFile(){
+
             }
         },
         //生命周期函数

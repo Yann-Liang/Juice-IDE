@@ -39,8 +39,8 @@
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
-                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible']),
+            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
+                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',]),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -337,15 +337,6 @@
                     }
                 });
             },
-            initUrlFn(){
-                let data = localStorage.getItem('dirPath') ? JSON.parse(localStorage.getItem('dirPath')): [];
-                data = data.filter((item,index)=>{
-                    if(file.exists(item.value)){
-                        return true;
-                    }
-                });
-                this.updateUrl(data)
-            },
             //保存成功提示
             success:function(cb){
                 this.boolSuccessVisible(true);
@@ -476,6 +467,7 @@
                 bindKey: {win: 'Ctrl-Shift-S',  mac: 'Command-Shift-S'},
                 exec: function(editor) {
                     // _this.$emit("replaceFunction",true);
+                    console.log("Ctrl-Shift-S")
                     _this.saveOtherPath(1);
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
@@ -486,6 +478,7 @@
                 bindKey: {win: 'Ctrl-Alt-S',  mac: 'Command-Alt-S'},
                 exec: function(editor) {
                     // _this.$emit("replaceFunction",true);
+                    // alert(11111111111111111)
                     _this.saveAllFile();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
@@ -497,6 +490,10 @@
                 exec: function(editor) {
                     // _this.$emit("replaceFunction",true);
                     // _
+                    if(_this.activeFile){
+                        _this.changeDeleteFile(_this.activeFile)
+                        _this.changeShowDeleteModal(true);
+                    }
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
@@ -506,7 +503,7 @@
                 bindKey: {win: 'Ctrl-Shift-Delete',  mac: 'Command-Shift-Delete'},
                 exec: function(editor) {
                     // _this.$emit("replaceFunction",true);
-                    _this.removeAllFile();
+                    _this.changeShowTipModal(true);
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });

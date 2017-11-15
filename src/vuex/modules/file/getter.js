@@ -27,5 +27,14 @@ export const fileGetter = {
 	currentName(state){
 		let name = 'Untitled'+ state.fileCurrentId;
 		return name
+	},
+	showTipModal(state){
+		return state.showTipModal;
+	},
+	showDeleteModal(state){
+		return state.showDeleteModal;
+	},
+	deleteFile(state){
+		return state.deleteFile;
 	}
 };

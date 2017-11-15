@@ -141,10 +141,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile'])
+            ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile','currentName'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible','updateCurrentId','removeFileFn','changeShowDeleteModal','changeDeleteFile',]),
+
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -248,12 +249,16 @@
                         break;
                     case '8':
                     case 8:
-                        ;//删除
+                        if(_this.activeFile){
+                            _this.changeDeleteFile(_this.activeFile)
+                            _this.changeShowDeleteModal(true);
+                        };//删除
                         break;
                     case '9':
                     case 9:
                         //删除所有文件
-                        _this.removeAllFile();
+//                        _this.removeAllFile();
+	                    _this.changeShowTipModal(true)
                         break;
                 }
             },
@@ -327,31 +332,38 @@
                 this.updateRightMenuBlock(false);
             },
             newFile(){
-                this.open((name)=>{
+                if(this.activeFile.value){
+                    this.open((name)=>{
+                        file.newFile(this.activeFile.value,name,(res)=>{
+                            if(res.code === 0){
+                                this.queryFileListData();
+                                this.updateEditFile({
+                                    name:file.uffixName(name),
+                                    value:res.value,
+                                    keyId:res.keyId
+                                })
+                                console.log(this.editFile);
+                            }else if(res.code === 1){
+                                this.tipOpen()
+                            }
+                        })
+                    });
+                }else{
                     file.newFile(this.activeFile.value,name,(res)=>{
-                        if(res.code === 0){
-                            this.queryFileListData();
-                            this.updateEditFile({
-                                name:file.uffixName(name),
-                                value:res.value,
-                                keyId:res.keyId
-                            })
-                            console.log(this.editFile);
-                        }else if(res.code === 1){
-                            this.tipOpen()
-                        }else if(res.code === 2){
+                        if(res.code === 2){
                             const url = this.getUrl;
-                            url.push({value:'',name:file.uffixName(name),keyId:res.keyId});
+                            url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
                             this.updateUrl(url);
                             this.updateEditFile({
-                                name:file.uffixName(name),
+                                name:file.uffixName(this.currentName),
                                 value:res.value,
                                 keyId:res.keyId
                             })
+                            this.updateCurrentId() // 更新id
                         }
-                        this.updateRightMenuBlock(false);
                     })
-                });
+                }
+                this.updateRightMenuBlock(false);
             },
             newDir(){
                 this.open((name)=>{
@@ -394,15 +406,6 @@
                     }
                 });
             },
-            initUrlFn(){
-                let data = localStorage.getItem('dirPath') ? JSON.parse(localStorage.getItem('dirPath')): [];
-                data = data.filter((item,index)=>{
-                    if(file.exists(item.value)){
-                        return true;
-                    }
-                });
-                this.updateUrl(data)
-            }
         },
         beforeDestroy () {
             this.hideFile();

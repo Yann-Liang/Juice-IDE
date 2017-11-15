@@ -21,6 +21,45 @@
                 </ul>
             </div>
         </ul>
+
+        <!--删除所有提示-->
+        <div class="tip-modal modal" v-if="showTipModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    提示
+                    <span class="modal-close" @click="cancelFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <div class="content-tip">
+                        <p class="">确定删除全部文件吗！</p>
+                    </div>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelFn">取消</el-button>
+                    <el-button type="primary" @click="sureDeleteAllFile()">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+
+        <!--删除提示-->
+        <div class="tip-modal modal" v-if="showDeleteModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    提示
+                    <span class="modal-close" @click="cancelDeleteFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <div class="content-tip">
+                        <p class="">确定删除{{deleteFile.value}}文件吗！</p>
+                    </div>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelDeleteFn">取消</el-button>
+                    <el-button type="primary" @click="sureDeleteFile()">确定</el-button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -45,12 +84,13 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','position','rightMenuBlock','currentName'])
+            ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','position','rightMenuBlock','currentName','showTipModal','showDeleteModal','deleteFile'])
         },
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
-                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus','updateCurrentId']),
+                'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus'
+                ,'updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal']),
             newFile(){
             	if(this.activeFile.value){
 		            this.open((name)=>{
@@ -128,40 +168,19 @@
             },
 	        updateUrlFn(filesList){
 		        this.getUrl.forEach((item,index,data)=>{
-			        if(filesList.keyId == item.keyId){
+			        if(filesList.value == item.value && filesList.name == item.name){
 				        data.splice(index,1);
 				        this.updateUrl(data)
 			        }
 		        })
 	        },
 	        removeAllFile(){
-		        const arr = this.getUrl;
-		        arr.forEach((item,index)=>{
-	        		file.removeFile(item.value,()=>{
-	        			console.log('删除文件'+item.value+'成功');
-				        this.updateUrlFn(item)
-                    })
-               })
+		        this.changeShowTipModal(true);
             },
 	        saveFile(){
 	        	this.saveEditorFile();
 		        this.updateRightMenuBlock(false);
             },
-	        removeFileFn(){
-		        if(this.activeFile.value){
-		        	console.log(this.activeFile.value);
-			        file.removeFile(this.activeFile.value,()=>{
-				        this.updateUrlFn(this.activeFile);
-				        this.queryFileListData();
-				        console.log('删除文件成功');
-				        this.updateDeleteStatus(filesList)
-			        })
-		        }else{
-			        this.updateUrlFn(this.activeFile);
-		        }
-		        this.updateRightMenuBlock(false);
-		        return false;
-	        },
             rename(){ // 重命名
 	            this.open((name)=>{
 	            	this.renameFile(name)
@@ -170,6 +189,26 @@
 	        saveOtherPathFn(){
 		        this.updateRightMenuBlock(false);
 		        this.saveOtherPath(2);
+            },
+	        cancelFn(){
+	        	this.changeShowTipModal(false);
+            },
+	        sureDeleteAllFile(){
+		        const arr = this.getUrl;
+		        arr.forEach((item,index)=>{
+			        file.removeFile(item.value,()=>{
+				        console.log('删除文件'+item.value+'成功');
+				        this.updateUrlFn(item)
+			        })
+		        })
+		        this.changeShowTipModal(false);
+            },
+	        cancelDeleteFn(){
+	        	this.changeShowDeleteModal(false);
+            },
+	        sureDeleteFile(){
+		        this.removeFileFn();
+		        this.changeShowDeleteModal(false);
             }
         },
         //生命周期函数
@@ -252,6 +291,21 @@
         }
         li:hover{
             background:@blue
+        }
+    }
+
+
+
+    .tip-modal{
+        .modal-main{
+            width:511px;
+        }
+        .cancel{
+            background:#bfbfbf;
+            color:#fff;
+            &.el-button:hover{
+                border-color:#bfbfbf;
+            }
         }
     }
 </style>

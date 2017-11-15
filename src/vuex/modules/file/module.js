@@ -17,7 +17,10 @@ export const file = {
 	    },
 	    rightMenuBlock:false,
 	    fileCurrentId:1,
-	    currentName:''
+	    currentName:'',
+	    showTipModal: false,
+	    showDeleteModal: false,
+	    deleteFile:''
     },
     actions: fileAction,
     getters: fileGetter,
