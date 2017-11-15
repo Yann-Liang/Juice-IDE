@@ -272,7 +272,7 @@
         },
         //生命周期函数
         created() {
-            contractServies.setProvider('http://10.10.8.202:6789')
+            contractServies.setProvider('http://192.168.9.36:5788')
         },
         beforeMount() {},
         mounted() {

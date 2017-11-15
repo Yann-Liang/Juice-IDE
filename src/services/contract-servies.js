@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-14 18:36:11
+ * @Last Modified time: 2017-11-15 13:58:24
  */
 //引入web3
 let Web3 = require('web3'),
@@ -358,7 +358,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '8aa2e78b54fc3bf3c1ff2fd065830e876d76630f7a9c433909ca6d89881ffe18', //用户私钥
+            privateKey: '19d493bf995d27c43730ffffc3214ed54dd00c9f6ae04084382af7d299cd1fe6', //用户私钥
             userAddress: '', //用户钱包地址
         }
 
@@ -432,15 +432,14 @@ class DeployService {
                     nonce: this.web3.nonce(),
                     //gasPrice: 0x3b9aca00,//0x174876e800,
                     //gasLimit: 843314949521407,//843314949521407,
-                    gasPrice: 0x09184e72a000,
-                    gasLimit: 0x2710,
-                    gas:0x5af3107a3fff,
+                    gasPrice: 0x98bca5a00,
+                    //gasLimit: 0xe8d4a50fff,
+                    gas: 0x9184e729fff,
                     value: 0,
                     data: bin,
                 }
                     , serializedTxHex = this.sign(txParams);//签名后的数据
 
-                debugger;
                 calcContract.deploy(serializedTxHex,txParams, (err, myContract) => {
                     console.log('err', err, myContract)
                     if (!err) {
