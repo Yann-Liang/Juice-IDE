@@ -15,7 +15,7 @@
                 {{filesList.name}}
                 <span class="no-save danger" v-if="!filesList.save">未保存</span>
                 <div class="wrap-delete">
-                    <i class="el-icon-delete dir-icon" v-if="!filesList.children" @click.stop="removeFile(filesList)"></i>
+                    <i class="el-icon-delete dir-icon default" v-if="!filesList.children" @click.stop="removeFile(filesList)"></i>
                 </div>
             </div>
 
@@ -65,7 +65,7 @@
 		methods: {
 
 			...mapActions(['queryFileListData','setActiveFile','updateUrl','updateEditFile','updatePosition','updateRightMenuBlock',
-                'compileWatch','updateDeleteStatus']),
+                'compileWatch','updateDeleteStatus','changeShowDeleteModal','changeDeleteFile']),
 			toggle(itemInfo) {
 				console.log('正在点击的→→→→→→→→→→→→→→→→');
 				this.compileWatch(0);//编译状态重置
@@ -102,16 +102,18 @@
 	            })
             },
             removeFile(filesList){
-				if(filesList.value){
-					file.removeFile(filesList.value,()=>{
-						this.updateUrlFn(filesList);
-						this.queryFileListData();
-						console.log('删除文件成功');
-                        this.updateDeleteStatus(filesList)
-					})
-                }else{
-					this.updateUrlFn(filesList);
-                }
+            	this.changeDeleteFile(filesList);
+            	this.changeShowDeleteModal(true)
+//				if(filesList.value){
+//					file.removeFile(filesList.value,()=>{
+//						this.updateUrlFn(filesList);
+//						this.queryFileListData();
+//						console.log('删除文件成功');
+//                        this.updateDeleteStatus(filesList)
+//					})
+//                }else{
+//					this.updateUrlFn(filesList);
+//                }
             },
 			rightMenu(filesList,e){
             	if(e.button === 2){
@@ -172,7 +174,6 @@
             background-color: #6ad0ee;
         }
         .dir-icon{
-            color: #5458ff;
             font-size: 14px;
         }
         .dir-icon:hover{

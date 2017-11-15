@@ -19,61 +19,64 @@ export const editorAction = {
 		commit('UPDATE_ACTION_EDITOR',data)
 	},
 	saveEditorFile({dispatch,commit,state,rootState},cb){
-		file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
-			console.log("filepath+keyId",filepath)
-			if(err){
-				console.log(err)
-			}else{
-				const oldKeyId = state.activeEditor.keyId;
-				if(filepath){
-					const keyId = file.keyIdFn(filepath);
-
-					dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
-
-					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
-					// 更新url
-					let url = rootState.file.url;
-					rootState.file.url.forEach((item,index)=>{
-						if(item.name === state.activeEditor.name && item.value === state.activeEditor.value){
-							url[index].value = filepath;
-							url[index].name = file.basename(filepath);
-							url[index].keyId = keyId;
-							return;
+		if(state.fileData.length > 0){
+			file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
+				console.log("filepath+keyId",filepath)
+				if(err){
+					console.log(err)
+				}else{
+					const oldKeyId = state.activeEditor.keyId;
+					if(filepath){
+						const keyId = file.keyIdFn(filepath);
+						
+						dispatch('updateFileData',{param:{keyId:state.activeEditor.keyId,value:filepath,name:file.basename(filepath)},id:keyId},{ root: true });
+						
+						dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true,value:filepath,name:file.basename(filepath)},{ root: true });
+						// 更新url
+						let url = rootState.file.url;
+						rootState.file.url.forEach((item,index)=>{
+							if(item.name === state.activeEditor.name && item.value === state.activeEditor.value){
+								url[index].value = filepath;
+								url[index].name = file.basename(filepath);
+								url[index].keyId = keyId;
+								return;
+							}
+						})
+						dispatch('updateUrl',url,{ root: true });
+						
+						// 更新当前激活的文件状态
+						dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath),unWatch:true},{ root: true });
+						
+						commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
+							value: filepath,
+							name: file.basename(filepath),
+							keyId:keyId,
+							source: state.activeEditor.source
+						})
+						// console.log('宝宝宝宝宝宝啊')
+						
+					}else{
+						dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
+					}
+					// 更新未保存vuex的状态
+					let edit = [];
+					console.log(state.editData.length)
+					state.editData.forEach((item,index)=>{
+						console.log(oldKeyId);
+						console.log(item.keyId)
+						if(item.keyId !==  oldKeyId){
+							edit.push(item);
 						}
 					})
-					dispatch('updateUrl',url,{ root: true });
-
-					// 更新当前激活的文件状态
-					dispatch('updateEditFile',{keyId:keyId,value:filepath,name:file.basename(filepath),unWatch:true},{ root: true });
-
-					commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
-						value: filepath,
-						name: file.basename(filepath),
-						keyId:keyId,
-						source: state.activeEditor.source
-					})
-					// console.log('宝宝宝宝宝宝啊')
-
-				}else{
-					dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
-				}
-				// 更新未保存vuex的状态
-				let edit = [];
-				console.log(state.editData.length)
-				state.editData.forEach((item,index)=>{
-					console.log(oldKeyId);
-					console.log(item.keyId)
-					if(item.keyId !==  oldKeyId){
-						edit.push(item);
+					edit = JSON.stringify(edit)
+					dispatch('updateData',JSON.parse(edit),{ root: true });
+					if(cb && typeof(cb)=='function'){
+						cb();
 					}
-				})
-				edit = JSON.stringify(edit)
-				dispatch('updateData',JSON.parse(edit),{ root: true });
-                if(cb && typeof(cb)=='function'){
-                    cb();
-                }
-			}
-		})
+				}
+			})
+		}
+		
 	},
 	saveEditor({commit,state},obj){
 		commit('SAVE_EDITOR',obj);

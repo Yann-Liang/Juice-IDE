@@ -77,7 +77,7 @@ function createWindow() {
 	const retClose = globalShortcut.register('CommandOrControl+B', () => {
 		BrowserWindow.getFocusedWindow().webContents.closeDevTools();
 	});
-	const retOpen = globalShortcut.register('CommandOrControl+N', () => {
+	const retOpen = globalShortcut.register('CommandOrControl+K', () => {
 		BrowserWindow.getFocusedWindow().webContents.openDevTools({
 			mode: 'undocked'
 		});

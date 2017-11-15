@@ -22,5 +22,14 @@ export const fileMutation = {
 	},
 	['UPDATE_CURRENT_ID'](state,id){
 		state.fileCurrentId = id;
+	},
+	['CHANGE_SHOW_MODAL'](state,blo){
+		state.showTipModal = blo;
+	},
+	['CHANGE_DELETE_MODAL'](state,blo){
+		state.showDeleteModal = blo;
+	},
+	['CHANGE_DELETE_FILE'](state,deleteFile){
+		state.deleteFile = deleteFile;
 	}
 };

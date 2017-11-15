@@ -280,5 +280,37 @@ export const fileAction = {
 	updateCurrentId({ commit, state}){
 		let id = state.fileCurrentId + 1;
 		commit('UPDATE_CURRENT_ID', id);
+	},
+	
+	removeFileFn({ commit, state ,dispatch}){
+		function updateUrlFn(){
+			state.url.forEach((item,index,data)=>{
+				if(state.activeFile.value == item.value && state.activeFile.name == item.name){
+					data.splice(index,1);
+					dispatch('updateUrl',data,{root:true})
+				}
+			})
+		}
+		if(state.activeFile.value){
+			file.removeFile(state.activeFile.value,()=>{
+				updateUrlFn()
+				console.log(state.url);
+				console.log('删除文件成功');
+				dispatch('updateDeleteStatus',state.activeFile,{root:true})
+			})
+		}else{
+			updateUrlFn()
+		}
+		dispatch('setActiveFile','',{root:true})
+		dispatch('updateRightMenuBlock',false,{root:true})
+	},
+	changeShowTipModal({ commit, state },blo){
+		commit('CHANGE_SHOW_MODAL',blo);
+	},
+	changeShowDeleteModal({ commit, state },blo){
+		commit('CHANGE_DELETE_MODAL',blo);
+	},
+	changeDeleteFile({ commit, state },deleteFile){
+		commit('CHANGE_DELETE_FILE',deleteFile);
 	}
 }

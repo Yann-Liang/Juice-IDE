@@ -86,7 +86,7 @@
                         keys:"Ctrl+Delete",
                     },
                     {
-                        id:"8",
+                        id:"9",
                         ZH:"删除所有文件",
                         keys:"Ctrl+Shift+Del",
                     },
@@ -144,7 +144,7 @@
             ...mapGetters(['editor','copyText','activeFile','getUrl','editFile'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','queryFileListData','updateEditFile','updateUrl']),
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
                     console.log('文件')
@@ -253,7 +253,8 @@
                     case '9':
                     case 9:
                         //删除所有文件
-                        _this.removeAllFile();
+//                        _this.removeAllFile();
+	                    _this.changeShowTipModal(true)
                         break;
                 }
             },
