@@ -11,7 +11,7 @@ class compileServies {
     compiler(){
         var _this = this;
         var grammarError ,compileError=[];
-        store.dispatch('saveEditorFile',function(){
+        store.dispatch('saveEditorFile',()=>{
             //编译之前默认执行保存文件的操作
             var name = store.state.file.editFile.name,
                 path= store.state.file.editFile.value;
@@ -29,7 +29,7 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
-            free = spawn('static/solcs/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+            free = spawn(this.getSolcsPath(),['--overwrite','-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
                 if(result.errors && result.errors.length>0){
@@ -187,6 +187,12 @@ class compileServies {
                 });
             }
         });
+    }
+
+    //获取sols路径
+    getSolcsPath() {
+        const app = require('electron').remote.app;
+        return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : app.getAppPath('exe')+'/solcs/solc';
     }
 }
 

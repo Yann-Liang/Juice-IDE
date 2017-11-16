@@ -75,10 +75,7 @@ function createWindow() {
 	globalShortcut.unregister('CommandOrControl+W')
 
 	//注册开发者工具快捷键
-	const retClose = globalShortcut.register('CommandOrControl+B', () => {
-		BrowserWindow.getFocusedWindow().webContents.closeDevTools();
-	});
-	const retOpen = globalShortcut.register('CommandOrControl+K', () => {
+	const retOpen = globalShortcut.register('CommandOrControl+F12', () => {
 		BrowserWindow.getFocusedWindow().webContents.openDevTools({
 			mode: 'undocked'
 		});

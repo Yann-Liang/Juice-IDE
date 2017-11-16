@@ -25,6 +25,20 @@
         "files": [
             "dist/electron/**/*"
         ],
+        "extraFiles": [
+            {
+              "from": "build/icons/",
+              "to": "",
+              "filter": [
+                "48x48.png"
+              ]
+            },{
+                "from": "src/services/compile-exe/solcs/",
+                "to": "solcs",
+                "filter": [
+                ]
+              }
+          ],
         "dmg": {
             "contents": [
                 {
