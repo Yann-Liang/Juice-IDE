@@ -75,7 +75,6 @@
                 let item=this.form.contractItem;
                 contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,'0x00d3870deb0f243dc317cd685fcc9611e11b255c').then((address)=>{
                     if(address){
-                        console.log('address',address)
                         this.form.address=address;
                         this.flag=true;
                     }else{
