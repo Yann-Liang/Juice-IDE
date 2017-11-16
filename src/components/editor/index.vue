@@ -485,10 +485,13 @@
             yess:function(e){
                 this.saveAllFile(()=>{
                     this.asksVisible = false;
-                    this.editorVisible = false;
-                    this.tipsVisible = true;
-                    this.value = "readonly";
-                    this.changeFileData([]);
+                    this.success(()=>{
+                        this.editorVisible = false;
+                        this.tipsVisible = true;
+                        this.value = "readonly";
+                        this.changeFileData([]);
+                    });
+
                 });
 
             },
@@ -967,10 +970,11 @@
     .icons{
         display: inline-block;
         width: 252px;
-        height: 160px;
+        height: 100px;
         background: url(images/icon.png) no-repeat top center;
-        padding-top: 160px;
+        padding-top: 108px;
         font-style: normal;
+        // border:1px solid red;
     }
 
     // background-color:#000;
