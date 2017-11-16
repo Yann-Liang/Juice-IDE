@@ -14,7 +14,6 @@
         </el-form>
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
-        <el-button class="tab-btn btn-info" @click="getContractLog">日志</el-button>
         <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
 
     </div>
@@ -75,9 +74,14 @@
             deploy(){
                 let item=this.form.contractItem;
                 contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,'0x00d3870deb0f243dc317cd685fcc9611e11b255c').then((address)=>{
-                    console.log('address',address)
-                     this.form.address=address;
-                     this.flag=true;
+                    if(address){
+                        console.log('address',address)
+                        this.form.address=address;
+                        this.flag=true;
+                    }else{
+                        this.flag=false;
+                    }
+
                 })
             },
             getContractLog(){

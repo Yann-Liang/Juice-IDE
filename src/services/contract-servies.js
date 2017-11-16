@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-15 13:58:24
+ * @Last Modified time: 2017-11-16 10:45:22
  */
 //引入web3
 let Web3 = require('web3'),
@@ -408,7 +408,7 @@ class DeployService {
     };
 
     //部署合约187ca65697e1765a062313219481bf5817901096fd20a2c4e1df634965d0979a
-    deploy(fileName, contractName, abi, bin, userAddress) {
+    deploy(fileName, contractName, abi, bin, userAddress) {debugger;
         this.deployStart(fileName, contractName);
         this.user.userAddress = userAddress;
         this.result = {
@@ -419,8 +419,11 @@ class DeployService {
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
-            try {
 
+            //16进制 需要加上0x
+            bin.substring(0,2)=='0x'?"":bin='0x'+bin;
+
+            try {
 
                 // let myContractReturned = calcContract.new({
                 //     data: bin,
@@ -428,19 +431,19 @@ class DeployService {
                 //     gasPrice: 21000000000,
                 //     gasLimit: 843314949521407,
                 // }, (err, myContract) => {
+
                 const txParams = {
                     nonce: this.web3.nonce(),
-                    //gasPrice: 0x3b9aca00,//0x174876e800,
-                    //gasLimit: 843314949521407,//843314949521407,
-                    gasPrice: 0x98bca5a00,
-                    //gasLimit: 0xe8d4a50fff,
-                    gas: 0x9184e729fff,
+                    gasPrice: 20000000000,//0x174876e800,
+                    gasLimit: 4300000,//843314949521407,
+                    //gasPrice: 0x98bca5a00,
+                    //gas: 0x9184e729fff,
                     value: 0,
                     data: bin,
                 }
                     , serializedTxHex = this.sign(txParams);//签名后的数据
-
-                calcContract.deploy(serializedTxHex,txParams, (err, myContract) => {
+                debugger;
+                calcContract.deploy(serializedTxHex, (err, myContract) => {
                     console.log('err', err, myContract)
                     if (!err) {
                         if (!myContract.address) {
@@ -463,6 +466,7 @@ class DeployService {
                             resolve(myContract.address);
                         }
                     } else {
+                        resolve(err);
                         this.deployFailure(err);
                     }
                 });
@@ -513,7 +517,7 @@ class DeployService {
         deployLogService.push('[部署结果]', {
             logError: 'Deploy failure'
         }, {
-            info: err.message
+            logError: err.message
         });
         return new Promise((resolve, reject) => {
             resolve()
@@ -709,7 +713,7 @@ class DeployService {
     }
 
     sign(txParams) {
-        let tx = new EthereumTx(txParams);;
+        let tx = new EthereumTx(txParams);
         console.log('txParams', txParams);
         //钱包签名
         let privateKey = Buffer.from(this.user.privateKey, 'hex');
