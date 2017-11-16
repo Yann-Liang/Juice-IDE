@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-16 10:45:22
+ * @Last Modified time: 2017-11-16 15:43:55
  */
 //引入web3
 let Web3 = require('web3'),
@@ -372,6 +372,7 @@ class DeployService {
         this.data = {};
 
         this.queryTime = '';
+
     }
 
 
@@ -408,7 +409,7 @@ class DeployService {
     };
 
     //部署合约187ca65697e1765a062313219481bf5817901096fd20a2c4e1df634965d0979a
-    deploy(fileName, contractName, abi, bin, userAddress) {debugger;
+    deploy(fileName, contractName, abi, bin, userAddress) {
         this.deployStart(fileName, contractName);
         this.user.userAddress = userAddress;
         this.result = {
@@ -421,7 +422,7 @@ class DeployService {
             let calcContract = this.web3.eth.contract(abi);
 
             //16进制 需要加上0x
-            bin.substring(0,2)=='0x'?"":bin='0x'+bin;
+            bin.substring(0, 2) == '0x' ? "" : bin = '0x' + bin;
 
             try {
 
@@ -433,16 +434,16 @@ class DeployService {
                 // }, (err, myContract) => {
 
                 const txParams = {
-                    nonce: this.web3.nonce(),
-                    gasPrice: 20000000000,//0x174876e800,
-                    gasLimit: 4300000,//843314949521407,
-                    //gasPrice: 0x98bca5a00,
-                    //gas: 0x9184e729fff,
-                    value: 0,
-                    data: bin,
-                }
-                    , serializedTxHex = this.sign(txParams);//签名后的数据
-                debugger;
+                        nonce: this.web3.nonce(),
+                        gasPrice: 20000000000, //0x174876e800,
+                        gasLimit: 4300000, //843314949521407,
+                        //gasPrice: 0x98bca5a00,
+                        //gas: 0x9184e729fff,
+                        value: 0,
+                        data: bin,
+                    },
+                    serializedTxHex = this.sign(txParams); //签名后的数据
+
                 calcContract.deploy(serializedTxHex, (err, myContract) => {
                     console.log('err', err, myContract)
                     if (!err) {
@@ -605,27 +606,27 @@ class DeployService {
 
             console.log('data', data)
             const txParams = {
-                //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
-                //from: this.user.userAddress,
-                //防重 每次都生成一个新的nonce，用过之后就失效了
-                nonce: this.web3.nonce(),
-                gasPrice: 21000000000,
-                gasLimit: 843314949521407,
-                to: contract.address,
-                value: 0,
-                data: data,
-            },
-                serializedTxHex = this.sign(txParams);//签名后的数据
+                    //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
+                    //from: this.user.userAddress,
+                    //防重 每次都生成一个新的nonce，用过之后就失效了
+                    nonce: this.web3.nonce(),
+                    gasPrice: 21000000000,
+                    gasLimit: 843314949521407,
+                    to: contract.address,
+                    value: 0,
+                    data: data,
+                },
+                serializedTxHex = this.sign(txParams); //签名后的数据
 
             debugger;
 
-            let hash = this.web3.eth.sendRawTransaction(serializedTxHex);//交易的哈希
+            let hash = this.web3.eth.sendRawTransaction(serializedTxHex); //交易的哈希
             //let hash =this.web3.eth.sendTransaction(txParams)
             this.callbacks[hash] = {
                 cb: cb,
                 wrapCount: this.wrapCount,
             }
-            this.getContractLog(this.provider,this.getQueryTime());
+            this.getContractLog(this.provider, this.getQueryTime());
             this.getTransactionReceipt(hash);
         }
     }
@@ -726,17 +727,17 @@ class DeployService {
 
     //获取要查询的时间
     getQueryTime() {
-        const desendMinutes=(date,minutes)=>{
-            minutes=parseInt(minutes);
-            let interTimes=minutes*60*1000;
-            interTimes=parseInt(interTimes);
-            return new Date(Date.parse(date)-interTimes);
+        const desendMinutes = (date, minutes) => {
+            minutes = parseInt(minutes);
+            let interTimes = minutes * 60 * 1000;
+            interTimes = parseInt(interTimes);
+            return new Date(Date.parse(date) - interTimes);
         }
-        console.log(desendMinutes(new Date,5))
+        console.log(desendMinutes(new Date, 5))
         return this.queryTime ? this.queryTime : desendMinutes(new Date, 5);
     }
 
-    getContractLog(nodeId = '192.168.9.36',contractAddress='0xa7aecd267cdc0995cf7be374c26e394e385252a1', queryTime = '2017-10-25T03:20:09.516Z') {
+    getContractLog(nodeId = '192.168.9.36', contractAddress = '0xa7aecd267cdc0995cf7be374c26e394e385252a1', queryTime = '2017-10-25T03:20:09.516Z') {
         APIServies.log.search({
             "_source": ["address", "fields.ip", "message", "@timestamp"],
             "query": {
@@ -779,9 +780,9 @@ class DeployService {
                 arr.map((item, index) => {
                     consoleService.output('[合约日志]', {
                         ip: item._source.fields.ip,
-                        time:item._source['@timestamp'],
-                        address:item._source.address,
-                        message:item._source.message,
+                        time: item._source['@timestamp'],
+                        address: item._source.address,
+                        message: item._source.message,
                     });
                 })
             }

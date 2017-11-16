@@ -40,7 +40,10 @@
                 },
                 flag:false,
                 args:[],
-                deployedData:contractServies.data
+                deployedData:contractServies.data,
+                user:{
+                    address:''
+                }
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -72,16 +75,18 @@
         //方法
         methods: {
             deploy(){
-                let item=this.form.contractItem;
-                contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,'0x00d3870deb0f243dc317cd685fcc9611e11b255c').then((address)=>{
-                    if(address){
-                        this.form.address=address;
-                        this.flag=true;
-                    }else{
-                        this.flag=false;
-                    }
-
-                })
+                let item=this.form.contractItem,
+                deploy=()=>{
+                    contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.userAddress).then((address)=>{
+                        if(address){
+                            this.form.address=address;
+                            this.flag=true;
+                        }else{
+                            this.flag=false;
+                        }
+                    })
+                }
+                this.user.address?deploy():this.getUserInfo(deploy);
             },
             getContractLog(){
                 contractServies.getContractLog()
@@ -98,12 +103,23 @@
                         }
                     }
                 }
+            },
+            getUserInfo(callback){
+                this.user.address='0x00d3870deb0f243dc317cd685fcc9611e11b255c';
+                if(Juice){
+                    Juice.user.getUserInfo((res)=>{
+                        if(!res.code){
+                            this.user=res.data;
+                            callback&&callback();
+                        }
+                    })
+                }
             }
         },
         //生命周期函数
         created() {
             this.autoSelet();
-
+            this.getUserInfo();
         },
         beforeMount() {
 
