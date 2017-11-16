@@ -39,7 +39,7 @@
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
-    import compileService from '@/services/compile-exe/compile-service';
+    import compileService from '@/services/compileExe/compile-service';
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
     import file from '@/services/API-file'
@@ -297,11 +297,22 @@
             },
             deleteFile(){
 
+            },
+            //设置节点地址
+            setProvider(){
+                contractServies.setProvider('http://192.168.9.36:5788')
+                if(Juice){
+                    Juice.app.getAppInfo((res)=>{
+                        if(!res.code){
+                            contractServies.setProvider(res.data.chainUrl);
+                        }
+                    })
+                }
             }
         },
         //生命周期函数
         created() {
-            contractServies.setProvider('http://192.168.9.36:5788')
+            this.setProvider();
         },
         beforeMount() {},
         mounted() {
