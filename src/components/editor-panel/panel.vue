@@ -17,7 +17,7 @@
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
     import file from '@/services/API-file'
-    import compileService from '@/services/compile-exe/compile-service';
+    import compileService from '@/services/compileExe/compile-service';
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
     ace.acequire('ace/ext/language_tools')

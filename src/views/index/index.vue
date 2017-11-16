@@ -39,7 +39,7 @@
     import editor from "@/components/editor/";
     import {mapState, mapActions, mapGetters} from 'vuex';
     import consoleService from '@/services/console/console-service';
-    import compileService from '@/services/compile-exe/compile-service';
+    import compileService from '@/services/compileExe/compile-service';
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
     import file from '@/services/API-file'
