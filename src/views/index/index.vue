@@ -67,7 +67,7 @@
         //方法
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
-                ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile','boolSuccessVisible']),
+                ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile','boolSuccessVisible','boolSearchVisible','boolReplaceVisible']),
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -169,7 +169,7 @@
 		        // 全部保存
 		        hotkeys('ctrl+alt+s', (event,handler)=>{
                     // alert(123)
-			        this.saveAllFile();
+			        this.saveAllFile(this.success);
 		        });
 
 		        // 删除
@@ -185,6 +185,17 @@
 			        alert('ctrl+shift+delete');
 			        this.changeShowTipModal(true)
 		        });
+
+                //查找
+                hotkeys('ctrl+f', (event,handler)=>{
+                    alert('ctrl+f');
+                    this.boolSearchVisible(true);
+                });
+                //替换
+                hotkeys('ctrl+h', (event,handler)=>{
+                    alert('ctrl+h');
+                    this.boolReplaceVisible(true);
+                });
 
 	        },
             //保存成功提示

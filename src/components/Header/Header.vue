@@ -245,7 +245,7 @@
                     case '7':
                     case 7:
                         //全部保存
-                        _this.saveAllFile();
+                        _this.saveAllFile(_this.success);
                         break;
                     case '8':
                     case 8:
@@ -265,7 +265,7 @@
             //代码格式化
             format:function(){
                 console.log('设置格式化')
-                this.editor.setValue(beautify(this.editor.getValue()));
+                this.editor.setValue(beautify(this.editor.getValue()),1);
                 //引用了js-beautify库
             },
             //编辑每个li的点击事件

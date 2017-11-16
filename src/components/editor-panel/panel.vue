@@ -11,7 +11,7 @@
     //brace
     import * as ace from 'brace';
     import 'brace/mode/javascript';
-    import 'brace/theme/monokai';
+    import 'brace/theme/eclipse';
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
@@ -58,7 +58,7 @@
                     wholeWord: false,
                     regExp: false,
                     range:"",
-                    start:{row:1,column:1}
+                    // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
                 this.onSearchUp();
@@ -87,7 +87,7 @@
                     wholeWord: false,
                     regExp: false,
                     range:"",
-                    start:{row:1,column:1}
+                    // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
                 this.onSearchUp();
@@ -96,7 +96,7 @@
             },
             //代码格式化
             format:function(){
-                this.editor.setValue(beautify(this.editor.getValue()));
+                this.editor.setValue(beautify(this.editor.getValue()),1);
                 //引用了js-beautify库
             },
             //设置值
@@ -108,7 +108,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source);
+                    this.editor.setValue(arr[0].source,1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -120,12 +120,12 @@
                                     return console.error(err);
                                 }
                                 console.log('读取路径文件的值')
-                                this.editor.setValue(data.toString());
+                                this.editor.setValue(data.toString(),1);
 	                            this.setActiveEditor(this.getResult);
                             });
                         }
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;");
+                        this.editor.setValue("pragma solidity ^0.4.2;",1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -366,7 +366,7 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/clouds');
+            this.editor.setTheme('ace/theme/eclipse');
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
@@ -479,7 +479,7 @@
                 exec: function(editor) {
                     // _this.$emit("replaceFunction",true);
                     // alert(11111111111111111)
-                    _this.saveAllFile();
+                    _this.saveAllFile(_this.success);
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
