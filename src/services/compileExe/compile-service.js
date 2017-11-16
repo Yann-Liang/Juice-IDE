@@ -29,7 +29,7 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
-            free = spawn('src/services/compile-exe/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+            free = spawn('static/solcs/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
                 if(result.errors && result.errors.length>0){
