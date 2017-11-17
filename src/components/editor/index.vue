@@ -30,7 +30,7 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;">
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
                     <!--<span @click='onSearchUp'>↑</span>-->
@@ -44,7 +44,7 @@
                     <ul class="left">
                         <li>
                             <label for="">form:</label>
-                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/>
+                            <input type="text" name="" v-model='fromValue' @input='fromSearch'  autofocus="autofocus" v-focus/>
                         </li>
                         <li>
                             <label for="">to:</label>
@@ -194,6 +194,7 @@
             search:function(){
                 //弹窗出现
                 this.boolSearchVisible(true);
+
                 // this.searchVisible = !this.searchVisible;
             },
             //全局搜索
@@ -673,8 +674,15 @@
 
         },
         //自定义指令
-        directive:{
-
+        directives:{
+            focus: {
+                inserted: function (el) {
+                    el.focus();
+                    // if (value) {
+                    //     el.focus();
+                    // }
+                }
+            }
         }
     }
 </script>
@@ -719,9 +727,9 @@
             position: absolute;
             left:20px;
             overflow:hidden;
-            cursor: pointer;
+
             li{
-                padding:0 10px;
+                padding:0 5px 0 10px;
                 border-right:1px solid #fff;
                 display: flex;
                 flex-wrap:nowrap;
@@ -731,12 +739,19 @@
                 span{
                     display: inline-block;
                     white-space: nowrap;
+                    &:first-child{
+                        // float:right;
+                        padding-right:10px;
+
+                    }
                     &:last-child{
                         // float:right;
-                        padding:0 10px;
-                        /*&:hover{*/
+                        padding:0 5px;
+                        cursor: pointer;
+                        &:hover{
                             /*background-color:gray*/
-                        /*}*/
+                            color:#000;
+                        }
                     }
                 }
             }
