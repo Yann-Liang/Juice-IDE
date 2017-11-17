@@ -740,7 +740,7 @@
             position: absolute;
             left:20px;
             overflow:hidden;
-
+            cursor:default;
             li{
                 padding:0 5px 0 10px;
                 border-right:1px solid #fff;
