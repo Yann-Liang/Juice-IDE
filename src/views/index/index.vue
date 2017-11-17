@@ -68,7 +68,8 @@
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile'
-            ,'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateData']),
+            ,'boolSuccessVisible','boolSearchVisible','boolReplaceVisible','changeShowFileNameModal','changeDirNameModal','setHintInfo','updateData']),
+
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -157,18 +158,18 @@
 		        // 保存
 		        hotkeys('ctrl+s', (event,handler)=>{
 			        console.log('ctrl+s')
-			        this.saveEditorFile()
+			        this.saveEditorFile(this.success)
 		        });
 
 		        // 另存为
 		        hotkeys('ctrl+shift+s', (event,handler)=>{
+                    // alert(111111)
 			        this.saveOtherPath(1)
 		        });
 
 		        // 全部保存
 		        hotkeys('ctrl+alt+s', (event,handler)=>{
-		        	alert('ctrl+alt+s')
-			        this.saveAllFile();
+			        this.saveAllFile(this.success);
 		        });
 
 		        // 删除
@@ -185,7 +186,28 @@
 			        this.changeShowTipModal(true)
 		        });
 
+                //查找
+                hotkeys('ctrl+f', (event,handler)=>{
+                    alert('ctrl+f');
+                    this.boolSearchVisible(true);
+                });
+                //替换
+                hotkeys('ctrl+h', (event,handler)=>{
+                    alert('ctrl+h');
+                    this.boolReplaceVisible(true);
+                });
+
 	        },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
 	        topFn(){
 		        this.updateRightMenuBlock(false);
             },
@@ -242,11 +264,25 @@
             },
             deleteFile(){
 
+            },
+            //设置节点地址
+            setProvider(){
+                contractServies.setProvider('http://192.168.9.95:5788')//http://10.10.8.202:6789
+                try {
+                    Juice.app.getAppInfo((res)=>{
+                        if(!res.code){
+                            console.log('Juice.app.getAppInfo',res);
+                            contractServies.setProvider(res.data.chainUrl);
+                        }
+                    })
+                } catch (error) {
+
+                }
             }
         },
         //生命周期函数
         created() {
-            contractServies.setProvider('http://192.168.9.36:5788')
+            this.setProvider();
         },
         beforeMount() {},
         mounted() {

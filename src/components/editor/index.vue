@@ -30,9 +30,9 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;">
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
                     </span>
-                    <span class="btn btn-info">查找</span>
+                    <span class="btn btn-info" @click='onSearch'>查找</span>
                     <!--<span @click='onSearchUp'>↑</span>-->
                     <!--<span @click='onSearchDown'>↓</span>-->
                     <!--这里的上下切换，换成了input的键盘事件-->
@@ -44,7 +44,7 @@
                     <ul class="left">
                         <li>
                             <label for="">form:</label>
-                            <input type="text" name="" v-model='fromValue' @input='fromSearch'/>
+                            <input type="text" name="" v-model='fromValue' @input='fromSearch'  autofocus="autofocus" v-focus/>
                         </li>
                         <li>
                             <label for="">to:</label>
@@ -100,10 +100,16 @@
                     </div>
                 </div>
             </div>
+            <div class="success-model" v-if='successVisible'>
+                <div class="success-content">
+                    <i class='icon'>保存成功</i>
+                </div>
+            </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
         <div class="tips default" v-if='tipsVisible'>
-            请在文件管理器面板中点击打开一个文件
+            <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
+
         </div>
         <!-- 弹窗 -->
 
@@ -134,6 +140,7 @@
                 editorVisible:false,
                 askVisible:false,
                 asksVisible:false,
+                // successVisible:true,
                 inputValue:"",
                 searchValue:"",
                 // searchVisible:false,
@@ -157,12 +164,12 @@
         //计算
         computed: {
             ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor'
-                ,'searchVisible','replaceVisible','removeData','currentName'])
+                ,'searchVisible','replaceVisible','removeData','currentName','successVisible'])
         },
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile'
-                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId']),
+                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -187,11 +194,15 @@
             search:function(){
                 //弹窗出现
                 this.boolSearchVisible(true);
+
                 // this.searchVisible = !this.searchVisible;
             },
             //全局搜索
             onSearch:function(){
-                console.log('diandiandian',this.inputValue)
+                // console.log('diandiandian',this.inputValue)
+                //获取到当前选中的元素
+                // console.log('1111111111111111111111')
+                // console.log('getcopytext',this.editor.getCopyText());
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
             },
@@ -234,11 +245,23 @@
                 this.fromValue = "";
                 this.toValue = "";
             },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
             //保存当前文件
             save:function(){
                 console.log('保存当前文件')
                 console.log(this.name)
-                this.saveEditorFile();
+                this.saveEditorFile(()=>{
+                    this.success();
+                });
             },
             //代码格式化
             format:function(){
@@ -366,8 +389,11 @@
                         保存当前文件，并进行更改状态，tab切换，关闭弹窗操作操作
                     */
                     this.saveEditorFile(()=>{
-                        this.activeTab(index);
                         this.askVisible = false;
+                        this.success(()=>{
+                            this.activeTab(index);
+                        });
+
                     });
                 }else{
                     /*
@@ -380,7 +406,12 @@
                     console.log('当前关闭和当前高亮显示不同',arr[0])
                     console.log(arr[0].value,arr[0].name,arr[0].source)
                     file.saveFile(arr[0].value,arr[0].name,arr[0].source,()=>{
-                        console.log(111)
+                        //关闭弹窗
+                        this.askVisible = false;
+                        this.success(()=>{
+                            //更改tab切换
+                            this.activeTab(index);
+                        });
                         //更改左边文件栏状态
                         this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
                         //更新未保存vuex的状态
@@ -392,10 +423,8 @@
                         })
                         edit = JSON.stringify(edit);
                         this.updateData(JSON.parse(edit));
-                        //更改tab切换
-                        this.activeTab(index);
-                        //关闭弹窗
-                        this.askVisible = false;
+
+
                     });
                 }
             },
@@ -471,10 +500,13 @@
             yess:function(e){
                 this.saveAllFile(()=>{
                     this.asksVisible = false;
-                    this.editorVisible = false;
-                    this.tipsVisible = true;
-                    this.value = "readonly";
-                    this.changeFileData([]);
+                    this.success(()=>{
+                        this.editorVisible = false;
+                        this.tipsVisible = true;
+                        this.value = "readonly";
+                        this.changeFileData([]);
+                    });
+
                 });
 
             },
@@ -616,8 +648,8 @@
                 }
                 if(e && e.keyCode==27){ // 按 Esc
                     //要做的事情
-                    _this.boolSearchVisible(false);
-                    _this.boolReplaceVisible(false);
+                    _this.offSearch();
+                    _this.offReplace();
                 }
                 if (e.ctrlKey && e.keyCode == 187){ //按 ctrl++
                     console.log('方法')
@@ -655,8 +687,15 @@
 
         },
         //自定义指令
-        directive:{
-
+        directives:{
+            focus: {
+                inserted: function (el) {
+                    el.focus();
+                    // if (value) {
+                    //     el.focus();
+                    // }
+                }
+            }
         }
     }
 </script>
@@ -701,9 +740,9 @@
             position: absolute;
             left:20px;
             overflow:hidden;
-            cursor: pointer;
+
             li{
-                padding:0 10px;
+                padding:0 5px 0 10px;
                 border-right:1px solid #fff;
                 display: flex;
                 flex-wrap:nowrap;
@@ -713,12 +752,19 @@
                 span{
                     display: inline-block;
                     white-space: nowrap;
+                    &:first-child{
+                        // float:right;
+                        padding-right:10px;
+
+                    }
                     &:last-child{
                         // float:right;
-                        padding:0 10px;
-                        /*&:hover{*/
+                        padding:0 5px;
+                        cursor: pointer;
+                        &:hover{
                             /*background-color:gray*/
-                        /*}*/
+                            color:#000;
+                        }
                     }
                 }
             }
@@ -760,6 +806,7 @@
     line-height: 60px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     input{
         padding-left:10px;
         width:300px;
@@ -797,6 +844,7 @@
     line-height: 100px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
+    background-color:#fff;
     .replace-content{
         display: flex;
         flex-wrap:nowrap;
@@ -845,6 +893,30 @@
     }
 
 
+}
+.success-model{
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 100000;
+    margin-left: -240px;
+    padding: 0 10px;
+    width: 150px;
+    height: 60px;
+    line-height: 60px;
+    border:solid 1px #e5e5e5;
+    border-radius: 3px;
+    background-color:#fff;
+    .success-content{
+        .icon{
+            display: inline-block;
+            // width:26px;
+            height:60px;
+            padding-left:30px;
+            font-style: normal;
+            background: url(images/yes.png) no-repeat left center;
+        }
+    }
 }
 .popup {
     width: 100%;
@@ -923,6 +995,15 @@
     justify-content:center;
     width:100%;
     flex-grow:1;
+    .icons{
+        display: inline-block;
+        width: 252px;
+        height: 100px;
+        background: url(images/icon.png) no-repeat top center;
+        padding-top: 108px;
+        font-style: normal;
+        // border:1px solid red;
+    }
 
     // background-color:#000;
 }

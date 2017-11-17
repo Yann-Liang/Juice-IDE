@@ -31,35 +31,35 @@ export const fileAction = {
 		let dirPathArr = state.url.filter((item)=>{
 			return item.value;
 		});
-		file.watchFile(dirPathArr,(data)=>{
-			if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
-				dispatch('queryFileListData',null,{ root: true });
-			}else if(data.type === 'unlink'){
-				dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
-				dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
-				dispatch('queryFileListData',null,{ root: true });
-			}else if(data.type === 'change'){
-				rootState.editor.fileData.forEach((item,index,fileData)=>{
-					if(item.value === data.path){
-						if(rootState.editor.activeEditor.value === data.path){
-							//  设置值
-							const source = file.readFileSync(data.path);
-							rootState.editor.editor.setValue(source.toString());
-						}else{
-							// 更新source
-							const arr = rootState.editor.editData;
-							arr.forEach((itm,ind,result)=>{
-								if(itm.value === data.path){
-									const source = file.readFileSync(data.path);
-									result[ind].source = source;
-									dispatch('updateData',result,{ root: true });
-								}
-							})
-						}
-					}
-				})
-			}
-		});
+		// file.watchFile(dirPathArr,(data)=>{
+		// 	if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
+		// 		dispatch('queryFileListData',null,{ root: true });
+		// 	}else if(data.type === 'unlink'){
+		// 		dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
+		// 		dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
+		// 		dispatch('queryFileListData',null,{ root: true });
+		// 	}else if(data.type === 'change'){
+		// 		rootState.editor.fileData.forEach((item,index,fileData)=>{
+		// 			if(item.value === data.path){
+		// 				if(rootState.editor.activeEditor.value === data.path){
+		// 					//  设置值
+		// 					const source = file.readFileSync(data.path);
+		// 					rootState.editor.editor.setValue(source.toString());
+		// 				}else{
+		// 					// 更新source
+		// 					const arr = rootState.editor.editData;
+		// 					arr.forEach((itm,ind,result)=>{
+		// 						if(itm.value === data.path){
+		// 							const source = file.readFileSync(data.path);
+		// 							result[ind].source = source;
+		// 							dispatch('updateData',result,{ root: true });
+		// 						}
+		// 					})
+		// 				}
+		// 			}
+		// 		})
+		// 	}
+		// });
 		dispatch('queryFileListData',null,{ root: true });
 	},
 	updateEditFile({ commit, state },fileObj){
@@ -197,7 +197,7 @@ export const fileAction = {
 						file.copeFn(activeFile.value,filename)
 					}
 				})
-				
+
 			}else{
 				let data = rootState.editor.editData.filter((item)=>{
 					return item.keyId === activeFile.keyId
@@ -263,7 +263,7 @@ export const fileAction = {
 			}
 		})
 	},
-	
+
 	// 更新当前新建文件
 	updateCurrentId({ commit, state}){
 		let id = state.fileCurrentId + 1;

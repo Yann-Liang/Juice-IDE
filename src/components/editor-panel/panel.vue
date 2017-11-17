@@ -11,7 +11,7 @@
     //brace
     import * as ace from 'brace';
     import 'brace/mode/javascript';
-    import 'brace/theme/monokai';
+    import 'brace/theme/eclipse';
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
@@ -35,11 +35,13 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName'])
         },
         //方法
         methods: {
-            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor']),
+            ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
+                ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
+	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile']),
             //放大
             increase:function(){
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
@@ -57,7 +59,7 @@
                     wholeWord: false,
                     regExp: false,
                     range:"",
-                    start:{row:1,column:1}
+                    // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
                 this.onSearchUp();
@@ -86,7 +88,7 @@
                     wholeWord: false,
                     regExp: false,
                     range:"",
-                    start:{row:1,column:1}
+                    // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
                 this.onSearchUp();
@@ -95,7 +97,7 @@
             },
             //代码格式化
             format:function(){
-                this.editor.setValue(beautify(this.editor.getValue()));
+                this.editor.setValue(beautify(this.editor.getValue()),1);
                 //引用了js-beautify库
             },
             //设置值
@@ -107,7 +109,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source);
+                    this.editor.setValue(arr[0].source,1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -119,12 +121,12 @@
                                     return console.error(err);
                                 }
                                 console.log('读取路径文件的值')
-                                this.editor.setValue(data.toString());
+                                this.editor.setValue(data.toString(),1);
 	                            this.setActiveEditor(this.getResult);
                             });
                         }
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;");
+                        this.editor.setValue("pragma solidity ^0.4.2;",1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -251,15 +253,68 @@
                         }
                     }else{
                         //hover的每一行不显示存在这些，则不需要给每行的title赋值
-                        console.log(className)
+                        // console.log(className)
                         e.domEvent.toElement.title=""
                     }
 
                 });
             },
-            //resize事件
-
-
+            //绑定的一系列事件
+            topFn(){
+                this.updateRightMenuBlock(false);
+            },
+	        newFile(){
+		        if(this.activeFile.value){
+			        this.changeShowFileNameModal(true);
+		        }else{
+			        file.newFile(this.activeFile.value,name,(res)=>{
+				        if(this.activeFile.id === 1){
+					        this.updateNewOpenFile(this.activeFile);
+				        }
+				        if(res.code === 2){
+					        const url = this.getUrl;
+					        url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
+					        this.updateUrl(url);
+					        this.updateEditFile({
+						        name:file.uffixName(this.currentName),
+						        value:res.value,
+						        keyId:res.keyId
+					        })
+					        this.updateCurrentId() // 更新id
+				        }
+			        })
+		        }
+		        this.updateRightMenuBlock(false);
+	        },
+	        newDir(){
+		        this.changeDirNameModal(true);
+	        },
+	        exportFile(type){
+		        file.exportFile(type,this.fileTreeData,(filename)=>{
+			        if(filename && file.isObject(filename)){
+				        this.setHintInfo({
+					        show:true,
+					        title:'',
+					        message:type == 'file' ? '文件已存在在项目中' : '文件夹已存在项目中'
+				        })
+			        }else if(filename){
+				        const url = this.getUrl;
+				        console.log(file.basename(filename));
+				        url.push({value:filename,name:file.basename(filename)});
+				        this.updateUrl(url);
+			        }
+		        });
+	        },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
         },
         //生命周期函数
         created() {
@@ -279,7 +334,7 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/clouds');
+            this.editor.setTheme('ace/theme/eclipse');
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
@@ -311,7 +366,7 @@
                 name: 'save',
                 bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                 exec: function(editor) {
-                    _this.saveEditorFile()
+                    _this.saveEditorFile(_this.success)
 	                // _this.editor.blur();
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
@@ -334,9 +389,92 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
-
-
-
+            //绑定新建文件
+            this.editor.commands.addCommand({
+                name: 'newFile',
+                bindKey: {win: 'Ctrl-N',  mac: 'Command-N'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.newFile();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定新建文件夹
+            this.editor.commands.addCommand({
+                name: 'newDir',
+                bindKey: {win: 'Ctrl-W',  mac: 'Command-W'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.newDir();
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定导入本地文件
+            this.editor.commands.addCommand({
+                name: 'exportFile',
+                bindKey: {win: 'Ctrl-Shift-O',  mac: 'Command-Shift-O'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.exportFile('file')
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定导入本地文件夹
+            this.editor.commands.addCommand({
+                name: 'exportDir',
+                bindKey: {win: 'Ctrl-O',  mac: 'Command-O'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.exportFile('dir')
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定另存为
+            this.editor.commands.addCommand({
+                name: 'saveOther',
+                bindKey: {win: 'Ctrl-Shift-S',  mac: 'Command-Shift-S'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    console.log("Ctrl-Shift-S")
+                    _this.saveOtherPath(1);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定全部保存
+            this.editor.commands.addCommand({
+                name: 'saveAllFile',
+                bindKey: {win: 'Ctrl-Alt-S',  mac: 'Command-Alt-S'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+	                // alert(11111111111111111)
+                    _this.saveAllFile(_this.success);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定删除
+            this.editor.commands.addCommand({
+                name: 'delete',
+                bindKey: {win: 'Ctrl-Delete',  mac: 'Command-Delete'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    // _
+                    if(_this.activeFile){
+                        _this.changeDeleteFile(_this.activeFile)
+                        _this.changeShowDeleteModal(true);
+                    }
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //绑定删除所有文件
+            this.editor.commands.addCommand({
+                name: 'removeAllFile',
+                bindKey: {win: 'Ctrl-Shift-Delete',  mac: 'Command-Shift-Delete'},
+                exec: function(editor) {
+                    // _this.$emit("replaceFunction",true);
+                    _this.changeShowTipModal(true);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
 
         },
         //监视

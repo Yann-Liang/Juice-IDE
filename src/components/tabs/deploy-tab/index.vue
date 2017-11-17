@@ -14,7 +14,6 @@
         </el-form>
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
-        <el-button class="tab-btn btn-info" @click="getContractLog">日志</el-button>
         <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
 
     </div>
@@ -41,7 +40,10 @@
                 },
                 flag:false,
                 args:[],
-                deployedData:contractServies.data
+                deployedData:contractServies.data,
+                user:{
+                    address:''
+                }
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -73,12 +75,18 @@
         //方法
         methods: {
             deploy(){
-                let item=this.form.contractItem;
-                contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,'0x00d3870deb0f243dc317cd685fcc9611e11b255c').then((address)=>{
-                    console.log('address',address)
-                     this.form.address=address;
-                     this.flag=true;
-                })
+                let item=this.form.contractItem,
+                deploy=()=>{
+                    contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.userAddress).then((address)=>{
+                        if(address){
+                            this.form.address=address;
+                            this.flag=true;
+                        }else{
+                            this.flag=false;
+                        }
+                    })
+                }
+                this.user.address?deploy():this.getUserInfo(deploy);
             },
             getContractLog(){
                 contractServies.getContractLog()
@@ -95,12 +103,26 @@
                         }
                     }
                 }
+            },
+            getUserInfo(callback){
+                this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'//;'0x3864bc90a9b8ee5f6d414d6ef3e459f2a3513668'
+                try {
+                    Juice.user.getUserInfo((res)=>{
+                        if(!res.code){
+                            console.log('Juice.user.getUserInfo',res);
+                            this.user=res.data;
+                            callback&&callback();
+                        }
+                    })
+                } catch (error) {
+
+                }
             }
         },
         //生命周期函数
         created() {
             this.autoSelet();
-
+            this.getUserInfo();
         },
         beforeMount() {
 

@@ -169,7 +169,7 @@
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
                 'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus'
                 ,'updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeShowFileNameModal'
-                ,'changeDirNameModal','setHintInfo','updateNewOpenFile']),
+                ,'changeDirNameModal','setHintInfo','updateNewOpenFile','updateData','updateActiveEditor','changeFileData','setActiveFile']),
             newFile(){
             	if(this.activeFile.value){
             		this.title = 'SOL文件';
@@ -246,11 +246,22 @@
 	        sureDeleteAllFile(){
 		        const arr = this.getUrl;
 		        arr.forEach((item,index)=>{
-			        file.removeFile(item.value,()=>{
-				        console.log('删除文件'+item.value+'成功');
+		        	if(item.value){
+				        file.removeFile(item.value,()=>{
+					        console.log('删除文件'+item.value+'成功');
+					        this.updateUrlFn(item)
+				        })
+                    }else{
 				        this.updateUrlFn(item)
-			        })
-		        })
+                    }
+		        });
+		        // 更新初始状态
+                this.setActiveFile('');
+                this.updateEditFile({unWatch:true});
+                this.updateData([]);
+                this.updateActiveEditor({});
+                this.changeFileData([]);
+
 		        this.changeShowTipModal(false);
             },
 	        cancelDeleteFn(){

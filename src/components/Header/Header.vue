@@ -141,11 +141,11 @@
         },
         //计算
         computed: {
-            ...mapGetters(['editor','copyText','activeFile','getUrl','editFile','fileTreeData','currentName'])
+	        ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile','currentName'])
         },
         methods: {
 	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock'
-                ,'saveOtherPath','saveAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl',
+                ,'saveOtherPath','saveAllFile','removeAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible',
             'changeShowFileNameModal','changeDirNameModal','setHintInfo','changeShowDeleteModal','changeDeleteFile','updateNewOpenFile'
             ,'updateCurrentId']),
             setHeaderTab:function(e){
@@ -226,7 +226,7 @@
                         break;
                     case '5':
                     case 5:
-                        _this.saveEditorFile();//保存
+                        _this.saveEditorFile(_this.success);//保存
                         break;
                     case '6':
                     case 6:
@@ -236,7 +236,7 @@
                     case '7':
                     case 7:
                         //全部保存
-                        _this.saveAllFile();
+                        _this.saveAllFile(_this.success);
                         break;
                     case '8':
                     case 8:
@@ -254,7 +254,7 @@
             //代码格式化
             format:function(){
                 console.log('设置格式化')
-                this.editor.setValue(beautify(this.editor.getValue()));
+                this.editor.setValue(beautify(this.editor.getValue()),1);
                 //引用了js-beautify库
             },
             //编辑每个li的点击事件
@@ -277,6 +277,8 @@
                     case 3:
                         console.log(_this.editor.getCopyText())
                         _this.updateCopyText(_this.editor.getCopyText());//复制
+                        // _this.editor.onCopy();
+
                         break;
                     case '4':
                     case 4:
@@ -284,7 +286,9 @@
                         break;
                     case '5':
                     case 5:
-                        _this.editor.insert(_this.copyText);//粘贴
+                        _this.editor.commands.commands.paste.exec(_this.editor,_this.copyText)
+                        // _this.editor.insert(_this.copyText);//粘贴
+                        // _this.editor.onPaste(_this.copyText)
                         break;
                     case '6':
                     case 6:
@@ -350,7 +354,17 @@
 		            this.changeDeleteFile(this.activeFile)
 		            this.changeShowDeleteModal(true);
 	            }
-            }
+            },
+            //保存成功提示
+            success:function(cb){
+                this.boolSuccessVisible(true);
+                setTimeout(()=>{
+                    this.boolSuccessVisible(false);
+                },500);
+                if(cb && typeof(cb)=='function'){
+                    cb();
+                }
+            },
         },
         beforeDestroy () {
             this.hideFile();

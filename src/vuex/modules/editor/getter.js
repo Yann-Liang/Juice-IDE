@@ -34,5 +34,8 @@ export const editorGetter = {
 	},
     copyText(state){
         return state.copyText
+    },
+    successVisible(state){
+        return state.successVisible
     }
 };

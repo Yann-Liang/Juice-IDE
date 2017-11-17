@@ -33,6 +33,7 @@ export const editor = {
         	id:''
 	    },
         copyText:"",
+        successVisible:false,
     },
     actions: editorAction,
     getters: editorGetter,

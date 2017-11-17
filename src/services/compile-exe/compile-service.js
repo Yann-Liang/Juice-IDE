@@ -4,6 +4,7 @@
 import store from '@/vuex/store';
 import consoleService from '@/services/console/console-service';
 var fs = require('fs'), solc = require('solc/wrapper');
+import path from 'path';
 class compileServies {
     constructor() {
         this.contractName=null;
@@ -11,7 +12,7 @@ class compileServies {
     compiler(){
         var _this = this;
         var grammarError ,compileError=[];
-        store.dispatch('saveEditorFile',function(){
+        store.dispatch('saveEditorFile',()=>{
             //编译之前默认执行保存文件的操作
             var name = store.state.file.editFile.name,
                 path= store.state.file.editFile.value;
@@ -29,7 +30,7 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
-            free = spawn('src/services/compile-exe/solc',['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+            free = spawn(this.getSolcPath(),['--overwrite','-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
                 if(result.errors && result.errors.length>0){
@@ -187,6 +188,13 @@ class compileServies {
                 });
             }
         });
+    }
+
+    //获取solc路径
+    getSolcPath() {
+        const app = require('electron').remote.app;
+
+        return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : path.join(app.getPath('exe'), '..', '/solcs/solc');
     }
 }
 

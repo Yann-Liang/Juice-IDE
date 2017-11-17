@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-15 13:58:24
+ * @Last Modified time: 2017-11-17 15:24:16
  */
 //引入web3
 let Web3 = require('web3'),
@@ -12,6 +12,7 @@ import consoleService from '@/services/console/console-service';
 import APIServies from '@/services/API-servies';
 //import store from '@/vuex/store';
 import DeployLogService from '@/services/deploy/deploy-log-servises'
+import { debug } from 'util';
 
 const deployLogService = new DeployLogService();
 
@@ -358,7 +359,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '19d493bf995d27c43730ffffc3214ed54dd00c9f6ae04084382af7d299cd1fe6', //用户私钥
+            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007',//'8aa2e78b54fc3bf3c1ff2fd065830e876d76630f7a9c433909ca6d89881ffe18', //用户私钥
             userAddress: '', //用户钱包地址
         }
 
@@ -372,6 +373,7 @@ class DeployService {
         this.data = {};
 
         this.queryTime = '';
+
     }
 
 
@@ -383,7 +385,7 @@ class DeployService {
             this.initRegisterContract();
             return true;
         } catch (e) {
-            console.log(e);
+            console.warn(e);
             alert('sorry,找不到链！！！');
             return false;
         }
@@ -407,8 +409,9 @@ class DeployService {
         this._contracts["RegisterManager"] = registerInstance;
     };
 
-    //部署合约187ca65697e1765a062313219481bf5817901096fd20a2c4e1df634965d0979a
+    //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
+        debugger;
         this.deployStart(fileName, contractName);
         this.user.userAddress = userAddress;
         this.result = {
@@ -419,8 +422,11 @@ class DeployService {
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
-            try {
 
+            //16进制 需要加上0x
+            bin.substring(0, 2) == '0x' ? "" : bin = '0x' + bin;
+
+            try {
 
                 // let myContractReturned = calcContract.new({
                 //     data: bin,
@@ -428,26 +434,25 @@ class DeployService {
                 //     gasPrice: 21000000000,
                 //     gasLimit: 843314949521407,
                 // }, (err, myContract) => {
-                const txParams = {
-                    nonce: this.web3.nonce(),
-                    //gasPrice: 0x3b9aca00,//0x174876e800,
-                    //gasLimit: 843314949521407,//843314949521407,
-                    gasPrice: 0x98bca5a00,
-                    //gasLimit: 0xe8d4a50fff,
-                    gas: 0x9184e729fff,
-                    value: 0,
-                    data: bin,
-                }
-                    , serializedTxHex = this.sign(txParams);//签名后的数据
 
-                calcContract.deploy(serializedTxHex,txParams, (err, myContract) => {
+                const txParams = {
+                        nonce: this.web3.nonce(),
+                        gasPrice: 20000000000, //0x174876e800,
+                        gasLimit: 4300000, //843314949521407,
+                        //gasPrice: 0x98bca5a00,
+                        //gas: 0x9184e729fff,
+                        value: 0,
+                        data: bin,
+                    },
+                    serializedTxHex = this.sign(txParams); //签名后的数据
+
+                calcContract.deploy(serializedTxHex, (err, myContract) => {
                     console.log('err', err, myContract)
                     if (!err) {
                         if (!myContract.address) {
                             this.result.TxHash = myContract.transactionHash;
                             console.log("部署合约的交易哈希值: " + myContract.transactionHash);
                         } else {
-                            debugger;
                             console.log("合约的部署地址: " + myContract.address);
                             this.result.contractAddress = myContract.address;
                             this.data[myContract.address] = {
@@ -463,11 +468,12 @@ class DeployService {
                             resolve(myContract.address);
                         }
                     } else {
+                        resolve(err);
                         this.deployFailure(err);
                     }
                 });
             } catch (error) {
-                console.error(error);
+                console.warn(error);
                 this.deployFailure(error)
             }
 
@@ -513,7 +519,7 @@ class DeployService {
         deployLogService.push('[部署结果]', {
             logError: 'Deploy failure'
         }, {
-            info: err.message
+            logError: err.message
         });
         return new Promise((resolve, reject) => {
             resolve()
@@ -577,9 +583,11 @@ class DeployService {
                     result: result,
                 })
             } catch (e) {
+                console.warn(e);
                 this.runFailure(e);
                 cb(e);
             }
+            this.getContractLog(this.provider, contractAddress,this.getQueryTime());
         } else {
             let data = '';
             debugger;
@@ -601,27 +609,27 @@ class DeployService {
 
             console.log('data', data)
             const txParams = {
-                //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
-                //from: this.user.userAddress,
-                //防重 每次都生成一个新的nonce，用过之后就失效了
-                nonce: this.web3.nonce(),
-                gasPrice: 21000000000,
-                gasLimit: 843314949521407,
-                to: contract.address,
-                value: 0,
-                data: data,
-            },
-                serializedTxHex = this.sign(txParams);//签名后的数据
+                    //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
+                    //from: this.user.userAddress,
+                    //防重 每次都生成一个新的nonce，用过之后就失效了
+                    nonce: this.web3.nonce(),
+                    gasPrice: 21000000000,
+                    gasLimit: 843314949521407,
+                    to: contract.address,
+                    value: 0,
+                    data: data,
+                },
+                serializedTxHex = this.sign(txParams); //签名后的数据
 
             debugger;
 
-            let hash = this.web3.eth.sendRawTransaction(serializedTxHex);//交易的哈希
+            let hash = this.web3.eth.sendRawTransaction(serializedTxHex); //交易的哈希
             //let hash =this.web3.eth.sendTransaction(txParams)
             this.callbacks[hash] = {
                 cb: cb,
                 wrapCount: this.wrapCount,
             }
-            this.getContractLog(this.provider,this.getQueryTime());
+            this.getContractLog(this.provider, contractAddress,this.getQueryTime());
             this.getTransactionReceipt(hash);
         }
     }
@@ -631,11 +639,16 @@ class DeployService {
      *
      */
     queryContract(contractAddress, abi) {
+        //16进制 需要加上0x
+        contractAddress.substring(0, 2) == '0x' ? "" : contractAddress = '0x' + contractAddress;
+
         if (isString(abi)) {
             try {
                 abi = JSON.parse(abi)
             } catch (error) {
                 console.warn(error);
+                this.queryFailure(error);
+                return false;
             }
         }
 
@@ -652,10 +665,20 @@ class DeployService {
             };
             return contractInstance;
         } catch (error) {
-            console.warn(error)
+            console.warn(error);
+            this.queryFailure(error);
             return false;
         }
 
+    }
+
+    queryFailure(err) {
+        consoleService.output('[查询失败]', {
+            logError: 'query failure'
+        }, {
+            logError: err.message
+        });
+        return true;
     }
 
     runStart(contractAddress, contractFnName, constant, payable) {
@@ -672,7 +695,7 @@ class DeployService {
     }
 
     runFailure(err) {
-        consoleService.output('[运行结果]', {
+        consoleService.output('[运行失败]', {
             logError: 'Invoke failure'
         }, {
             logError: err.message
@@ -686,8 +709,8 @@ class DeployService {
             result = this.web3.eth.getTransactionReceipt(hash),
             data = {};
 
-        console.log('getTransactionReceipt.result=', result)
         if (result && result.transactionHash && hash == result.transactionHash) {
+            console.log('getTransactionReceipt.result=', result)
             clearTimeout(id);
             this.runFinish(result);
             this.callbacks[hash].cb(result);
@@ -709,7 +732,7 @@ class DeployService {
     }
 
     sign(txParams) {
-        let tx = new EthereumTx(txParams);;
+        let tx = new EthereumTx(txParams);
         console.log('txParams', txParams);
         //钱包签名
         let privateKey = Buffer.from(this.user.privateKey, 'hex');
@@ -722,19 +745,19 @@ class DeployService {
 
     //获取要查询的时间
     getQueryTime() {
-        const desendMinutes=(date,minutes)=>{
-            minutes=parseInt(minutes);
-            let interTimes=minutes*60*1000;
-            interTimes=parseInt(interTimes);
-            return new Date(Date.parse(date)-interTimes);
+        const desendMinutes = (date, minutes) => {
+            minutes = parseInt(minutes);
+            let interTimes = minutes * 60 * 1000;
+            interTimes = parseInt(interTimes);
+            return new Date(Date.parse(date) - interTimes);
         }
-        console.log(desendMinutes(new Date,5))
+        console.log(desendMinutes(new Date, 5))
         return this.queryTime ? this.queryTime : desendMinutes(new Date, 5);
     }
 
-    getContractLog(nodeId = '192.168.9.36',contractAddress='0xa7aecd267cdc0995cf7be374c26e394e385252a1', queryTime = '2017-10-25T03:20:09.516Z') {
-        APIServies.log.search({
-            "_source": ["address", "fields.ip", "message", "@timestamp"],
+    getContractLog(nodeId, contractAddress, queryTime) {
+        let params= {
+            "_source": [/* "address", "ip", "message","@timestamp" */],
             "query": {
                 "bool": {
                     "must": [{
@@ -744,41 +767,47 @@ class DeployService {
                         },
                         {
                             "term": {
-                                "fields.ip": nodeId
+                                "ip": nodeId.substring(nodeId.indexOf('//')+2,nodeId.lastIndexOf(':'))
                             }
                         }
                     ],
                     "must_not": [],
-                    "should": [],
-                    "filter": {
-                        "range": {
-                            "@timestamp": {
-                                "gt": queryTime
-                            }
-                        }
-                    }
+                    "should": []
                 }
             },
             "from": 0,
-            "size": 10000,
+            "size": queryTime?1000:1,
             "sort": [{
                 "@timestamp": {
                     "order": "desc"
                 }
             }],
             "aggs": {}
-        }).then((res) => {
+        }
+
+        if (queryTime) {
+            params.query.bool.filter= {
+                "range": {
+                    "@timestamp": {
+                        "gt": queryTime
+                    }
+                }
+            }
+        }
+        console.log(JSON.stringify(params))
+        APIServies.log.search(params).then((res) => {
             console.log('res', res)
             console.log(res.hits.hits);
             if (res && res.hits.hits.length > 0) {
                 let arr = res.hits.hits;
                 arr.map((item, index) => {
                     consoleService.output('[合约日志]', {
-                        ip: item._source.fields.ip,
-                        time:item._source['@timestamp'],
-                        address:item._source.address,
-                        message:item._source.message,
+                        ip: item._source.ip,
+                        //time: item._source['@timestamp'],
+                        address: item._source.address,
+                        message: item._source.message,
                     });
+                    this.queryTime = item._source['@timestamp'];
                 })
             }
         })
