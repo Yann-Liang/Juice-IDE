@@ -85,12 +85,17 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileStatus','consoleFlag','consoleDetail','commandList'])
+            ...mapGetters(['compileStatus','consoleFlag','consoleDetail','commandList','editor'])
         },
         //方法
         methods: {
             viewLog(){
+                // this.editor.resize(false);
                 consoleService.trigger(!this.consoleFlag);
+                // if(this.consoleFlag == true){
+
+                // }
+
             },
             viewRecord(){
                 var log = window.localStorage.getItem('deployLog');
@@ -196,7 +201,7 @@
         },
         //组件
         components: {
-            
+
         },
         //过滤器
         filters:{
