@@ -105,10 +105,11 @@
                 }
             },
             getUserInfo(callback){
-                this.user.address='0x00d3870deb0f243dc317cd685fcc9611e11b255c';
+                this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'//;'0x3864bc90a9b8ee5f6d414d6ef3e459f2a3513668'
                 try {
                     Juice.user.getUserInfo((res)=>{
                         if(!res.code){
+                            console.log('Juice.user.getUserInfo',res);
                             this.user=res.data;
                             callback&&callback();
                         }
