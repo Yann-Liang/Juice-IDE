@@ -6,7 +6,7 @@
                     <i class='el-icon-d-arrow-left darker'></i>
                 </div>
                 <ul class='files white' ref='files'>
-                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
+                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
                         <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'>X</span>
                         <span class="remove" v-if='dian'>...</span>
@@ -445,7 +445,21 @@
                 }else{
                     //不存在
                     this.askVisible = false;
-                    this.activeTab(index);
+                    if(id === 'setValue'){
+	                    this.select = index;
+	                    this.currentView = index ;
+	                    this.value = this.fileData[index].value;
+	                    this.name = this.fileData[index].name;
+	                    this.keyId = this.fileData[index].keyId;
+	                    console.log(this.keyId);
+	                    this.updateEditFile({
+		                    name:this.name,
+		                    value:this.value,
+		                    keyId:this.keyId
+	                    })
+                    }else{
+	                    this.activeTab(index);
+                    }
                 }
                 /*
                     如果是别的地方依旧高亮，直接删除别的tab标签的话，依旧还显示为别的地方的高亮，如果是当前地方高亮，删除当前，高亮显示为下一个 如果是最后一个地方高亮，删除最后一个tab标签，高亮显示为上一个
@@ -629,9 +643,8 @@
                 this.pushArray();
             },
             'removeData.id':function(){
-            	this.remove(this.removeData.index)
+            	this.remove(this.removeData.index,this.removeData.fileItem.keyId)
             }
-
         },
         //组件
         components: {

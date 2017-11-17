@@ -8,7 +8,6 @@ const [fs,path] = [require('fs-extra'),require('path')];
 const{dialog} = require('electron').remote;
 // const watch = require('watch');
 const chokidar = require('chokidar');
-console.log(chokidar);
 
 
 // id标识文件的类型 save标识是否保存
@@ -55,7 +54,7 @@ class file {
 				this.readFile(item.value,item.children,targetObj);
 			}
 		});
-		console.log(JSON.stringify(filesList));
+		filesList = this.filterFile(filesList);
 		return filesList;
 	}
 
@@ -112,7 +111,6 @@ class file {
 	copeFn(oldPath,newPath){
 		fs.copy(oldPath, newPath, err => {
 			if (err) return console.error(err)
-			console.log('另存为成功')
 		})
 	}
 	
@@ -209,24 +207,22 @@ class file {
 
 	//删除文件
 	removeFile(path,fn){
-		console.log(path);
 		fs.remove(path, function(err) {
 			if (err) return console.error(err)
 			fn && fn();
 		})
 	}
 
-	// 过滤未保存的文件
-	filterFile (data, id) {
+	// 过滤非sol文件
+	filterFile (data) {
 		const that = this;
-		console.log(data)
 		let newData = data.filter(x => {
-			console.log(x);
-			if(x.id === 1|| x.save === false){
+			let a = x.name.substring(x.name.length-4);
+			if(x.id === 1|| a.indexOf('.sol') !== -1){
 				return true
 			}
 		})
-		newData.forEach(x => x.children && (x.children = that.filterFile(x.children, id)))
+		newData.forEach(x => x.children && (x.children = that.filterFile(x.children)))
 		return newData
 	}
 
@@ -235,7 +231,6 @@ class file {
 		if(path){
 			this.writeFile(path,source,(err)=>{
 				fn && fn(err,'')
-				console.log('保存成功')
 			})
 		}else{
 			dialog.showSaveDialog({
@@ -245,7 +240,6 @@ class file {
 				if(filepath){
 					this.writeFile(filepath,source,(err)=>{
 						fn && fn(err,filepath)
-						console.log('保存成功')
 					})
 				}
 			})
@@ -262,7 +256,6 @@ class file {
 		})
 	}
 	saveAllNoFile(dialogFile){
-		console.log(dialogFile);
 		if(dialogFile.length>0){
 			dialog.showSaveDialog({
 				defaultPath:dialogFile[0].name
@@ -286,7 +279,9 @@ class file {
 
 	// 文件重命名
 	renameFile(oldpath,name,fn){
+		name = this.isDir(oldpath) ? name : this.uffixName(name);
 		const newFilePath = path.dirname(oldpath).replace(/\\/g,'/') + '/'+name;
+		console.log('文件重命名开始'+newFilePath)
 		fs.rename(oldpath,newFilePath, function(err) {
 			if (err) {
 				throw err;
@@ -305,7 +300,7 @@ class file {
 		}
 		dialog.showOpenDialog({
 			properties:properties,
-			filters:[{name: 'Custom File Type', extensions: ['js']},]
+			filters:[{name: 'Custom File Type', extensions: ['sol']},]
 		},(filename)=>{
 			const filepath = filename ? path.normalize(filename[0]).replace(/\\/g,'/') :'';
 			const item = this.GetByValue(data,filepath);

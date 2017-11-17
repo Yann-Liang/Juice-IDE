@@ -21,7 +21,6 @@ export const editorAction = {
 	saveEditorFile({dispatch,commit,state,rootState},cb){
 		if(state.fileData.length > 0){
 			file.saveFile(state.activeEditor.value,state.activeEditor.name,state.activeEditor.source,(err,filepath)=>{
-				console.log("filepath+keyId",filepath)
 				if(err){
 					console.log(err)
 				}else{
@@ -53,17 +52,12 @@ export const editorAction = {
 							keyId:keyId,
 							source: state.activeEditor.source
 						})
-						// console.log('宝宝宝宝宝宝啊')
-						
 					}else{
 						dispatch('updateTreeData',{keyId:state.activeEditor.keyId,save:true},{ root: true });
 					}
 					// 更新未保存vuex的状态
 					let edit = [];
-					console.log(state.editData.length)
 					state.editData.forEach((item,index)=>{
-						console.log(oldKeyId);
-						console.log(item.keyId)
 						if(item.keyId !==  oldKeyId){
 							edit.push(item);
 						}
@@ -135,10 +129,10 @@ export const editorAction = {
 		const data1 = state.fileData;
 		data1.forEach((item,index)=>{
 			if(fileItem.value && fileItem.value === item.value){
-				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
+				dispatch('updateRemoveData',{index:index,fileItem:item},{ root: true }); // 更新触发remove方法
 				return ;
 			}else if(fileItem.keyId === item.keyId){
-				dispatch('updateRemoveData',index,{ root: true }); // 更新触发remove方法
+				dispatch('updateRemoveData',{index:index,fileItem:item},{ root: true }); // 更新触发remove方法
 			}
 			
 		});
@@ -152,13 +146,14 @@ export const editorAction = {
 			}
 		})
 	},
-	updateRemoveData({commit,state},index){
+	updateRemoveData({commit,state},data){
 		let id = state.removeData.id + 1
-		const data = {
+		const result = {
 			id: id,
-			index:index
+			index:data.index,
+			fileItem:data.fileItem
 		}
-		commit('UPDATE_REMOVE_DATA',data)
+		commit('UPDATE_REMOVE_DATA',result)
 	},
 
 	//复制信息保存

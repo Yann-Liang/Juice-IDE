@@ -3,7 +3,6 @@
  */
 export const fileGetter = {
 	fileTreeData(state){
-		console.log(state.treeData)
 		return state.treeData
 	},
 	activeFile(state){
@@ -36,5 +35,17 @@ export const fileGetter = {
 	},
 	deleteFile(state){
 		return state.deleteFile;
+	},
+	showFileNameModal(state){
+		return state.showFileNameModal;
+	},
+	showDirNameModal(state){
+		return state.showDirNameModal;
+	},
+	hintInfo(state){
+		return state.hintInfo;
+	},
+	newOpenFile(state){
+		return state.newOpenFile;
 	}
 };
