@@ -1,15 +1,15 @@
 <template>
-    <div class="index no-chose" @mousedown="topFn">
+    <div class="index" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
         <div class="main">
-            <ul class="tabs bgblue white">
+            <ul class="tabs bgblue white no-chose">
                 <li @click="filesTab()"><i class="iconfont" title="文件">&#xe615;</i></li>
                 <li @click="compile()"><i class="iconfont" title="编译">&#xe613;</i></li>
                 <li @click="deployTab()"><i class="iconfont" title="部署">&#xe614;</i></li>
                 <li @click="queryTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
             </ul>
-            <div class="tab-box bggray">
+            <div class="tab-box bggray no-chose">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
 
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
@@ -301,16 +301,16 @@
             //设置节点地址
             setProvider(){
                 contractServies.setProvider('http://192.168.9.95:5788')//http://10.10.8.202:6789
-                try {
-                    Juice.app.getAppInfo((res)=>{
-                        if(!res.code){
-                            console.log('Juice.app.getAppInfo',res);
-                            contractServies.setProvider(res.data.chainUrl);
-                        }
-                    })
-                } catch (error) {
+                // try {
+                //     Juice.app.getAppInfo((res)=>{
+                //         if(!res.code){
+                //             console.log('Juice.app.getAppInfo',res);
+                //             contractServies.setProvider(res.data.chainUrl);
+                //         }
+                //     })
+                // } catch (error) {
 
-                }
+                // }
             }
         },
         //生命周期函数
