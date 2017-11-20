@@ -216,7 +216,6 @@
 				        })
 			        }else if(filename){
 				        const url = this.getUrl;
-				        console.log(file.basename(filename));
 				        url.push({value:filename,name:file.basename(filename)});
 				        this.updateUrl(url);
 			        }
@@ -255,7 +254,6 @@
 		        arr.forEach((item,index)=>{
 		        	if(item.value){
 				        file.removeFile(item.value,()=>{
-					        console.log('删除文件'+item.value+'成功');
 					        this.updateUrlFn(item)
 				        })
                     }else{
@@ -298,7 +296,6 @@
 								        value:res.value,
 								        keyId:res.keyId
 							        })
-							        console.log(this.editFile);
 						        }else if(res.code === 1){
 							        this.setHintInfo({
 								        show:true,

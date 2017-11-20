@@ -8,7 +8,6 @@ const [fs,path] = [require('fs-extra'),require('path')];
 const{dialog} = require('electron').remote;
 // const watch = require('watch');
 const chokidar = require('chokidar');
-console.log(chokidar)
 
 
 // id标识文件的类型 save标识是否保存
@@ -282,7 +281,6 @@ class file {
 	renameFile(oldpath,name,fn){
 		name = this.isDir(oldpath) ? name : this.uffixName(name);
 		const newFilePath = oldpath ? path.dirname(oldpath).replace(/\\/g,'/') + '/'+name :'';
-		console.log('文件重命名开始'+newFilePath)
 		if(newFilePath){
 			fs.rename(oldpath,newFilePath, function(err) {
 				if (err) {
@@ -397,7 +395,6 @@ class file {
 
 	// 监听文件变化
 	watchFile(pathArr,fn){
-		console.log(pathArr)
 		pathArr.forEach((item,index)=>{
 			if(item.value){
 				this.watcher = chokidar.watch(item.value, {
