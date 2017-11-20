@@ -172,7 +172,7 @@
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile'
-                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible']),
+                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible','updateRightMenuBlock']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
@@ -541,14 +541,6 @@
 		        })
 		        this.updateRightMenuBlock(false);
 	        },
-            open(fn) {
-                this.$prompt('请输入邮箱', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                    fn && fn(value)
-                })
-            },
             tipOpen() {
                 this.$alert('文件已存在，请更换文件名', '提示', {
                     confirmButtonText: '确定',
