@@ -31,7 +31,7 @@
                 </h4>
                 <div class="modal-content">
                     <div class="content-tip">
-                        <p class="">确定删除全部文件吗！</p>
+                        <p class="tip-text"><span class="warning-icon"></span>确定删除全部文件吗！</p>
                     </div>
                 </div>
                 <div class="modal-btn">
@@ -51,7 +51,7 @@
                 </h4>
                 <div class="modal-content">
                     <div class="content-tip">
-                        <p class="">确定删除{{deleteFile.value || deleteFile.name}}文件吗！</p>
+                        <p class="tip-text"><span class="warning-icon"></span>确定删除{{deleteFile.value || deleteFile.name}}文件吗！</p>
                     </div>
                 </div>
                 <div class="modal-btn">
@@ -116,7 +116,7 @@
                 </h4>
                 <div class="modal-content">
                     <div class="content-tip">
-                        <p class="">{{hintInfo.message}}</p>
+                        <p class="tip-text"><span class="warning-icon"></span>{{hintInfo.message}}</p>
                     </div>
                 </div>
                 <div class="modal-btn">
@@ -171,13 +171,20 @@
                 ,'updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeShowFileNameModal'
                 ,'changeDirNameModal','setHintInfo','updateNewOpenFile','updateData','updateActiveEditor','changeFileData','setActiveFile']),
             newFile(){
-            	if(this.activeFile.value){
+            	let blo = true;
+	            this.getUrl.forEach((item,index)=>{
+	            	if(item.keyId === this.activeFile.keyId && file.isFile(this.activeFile.value)){
+			            blo = false;
+                    }
+                });
+
+            	if(this.activeFile.value && blo){
             		this.title = 'SOL文件';
 		            this.ruleForm.newFileName = '';
 		            this.type = 'newFileName';
             		this.changeShowFileNameModal(true);
                 }else{
-		            file.newFile(this.activeFile.value,name,(res)=>{
+		            file.newFile('',name,(res)=>{
 			            if(this.activeFile.id === 1){
 				            this.updateNewOpenFile(this.activeFile);
 			            }
@@ -451,5 +458,17 @@
                 border-color:#bfbfbf;
             }
         }
+    }
+    .warning-icon{
+        display:inline-block;
+        width:30px;
+        height:30px;
+        vertical-align: top;
+        line-height:30px;
+        background:url(./images/warning.png) no-repeat center;
+        margin-right:10px;
+    }
+    .tip-text{
+        line-height:30px;
     }
 </style>
