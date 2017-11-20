@@ -1,15 +1,15 @@
 <template>
-    <div class="index no-chose" @mousedown="topFn">
+    <div class="index" @mousedown="topFn">
         <com-title></com-title>
         <com-header></com-header>
         <div class="main">
-            <ul class="tabs bgblue white">
+            <ul class="tabs bgblue white no-chose">
                 <li @click="filesTab()"><i class="iconfont" title="文件">&#xe615;</i></li>
                 <li @click="compile()"><i class="iconfont" title="编译">&#xe613;</i></li>
                 <li @click="deployTab()"><i class="iconfont" title="部署">&#xe614;</i></li>
                 <li @click="queryTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
             </ul>
-            <div class="tab-box bggray">
+            <div class="tab-box bggray no-chose">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
 
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
@@ -67,7 +67,9 @@
         //方法
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
-                ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile','boolSuccessVisible','boolSearchVisible','boolReplaceVisible']),
+                ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile'
+            ,'boolSuccessVisible','boolSearchVisible','boolReplaceVisible','changeShowFileNameModal','changeDirNameModal','setHintInfo','updateData']),
+
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
@@ -132,8 +134,7 @@
 		        // 注册快捷键
 		        // 新建
 		        hotkeys('ctrl+n', (event,handler)=>{
-			        alert('ctrl+n');
-			        this.newFile();
+                    this.newFile();
 		        });
 
 		        // 新建文件夹
@@ -168,7 +169,6 @@
 
 		        // 全部保存
 		        hotkeys('ctrl+alt+s', (event,handler)=>{
-                    // alert(123)
 			        this.saveAllFile(this.success);
 		        });
 
@@ -224,23 +224,12 @@
             },
 	        newFile(){
 		        if(this.activeFile.value){
-			        this.open((name)=>{
-				        file.newFile(this.activeFile.value,name,(res)=>{
-					        if(res.code === 0){
-						        this.queryFileListData();
-						        this.updateEditFile({
-							        name:file.uffixName(name),
-							        value:res.value,
-							        keyId:res.keyId
-						        })
-						        console.log(this.editFile);
-					        }else if(res.code === 1){
-						        this.tipOpen()
-					        }
-				        })
-			        });
+			        this.changeShowFileNameModal(true);
 		        }else{
 			        file.newFile(this.activeFile.value,name,(res)=>{
+				        if(this.activeFile.id === 1){
+					        this.updateNewOpenFile(this.activeFile);
+				        }
 				        if(res.code === 2){
 					        const url = this.getUrl;
 					        url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
@@ -257,38 +246,16 @@
 		        this.updateRightMenuBlock(false);
 	        },
 	        newDir(){
-		        this.open((name)=>{
-			        file.newMkdir(this.activeFile.value,name,(res)=>{
-				        if(res.code === 0){
-					        this.queryFileListData();
-				        }else if(res.code === 1){
-					        this.tipOpen()
-				        }else if(res.code === 2){
-
-				        }
-				        this.updateRightMenuBlock(false);
-			        })
-		        });
-	        },
-	        open(fn) {
-		        this.updateRightMenuBlock(false);
-		        this.$prompt('请输入邮箱', '提示', {
-			        confirmButtonText: '确定',
-			        cancelButtonText: '取消',
-		        }).then(({ value }) => {
-			        fn && fn(value)
-		        })
-	        },
-	        tipOpen(str) {
-	        	 str = str || '文件已存在，请更换文件名'
-		        this.$alert(str, '提示', {
-			        confirmButtonText: '确定',
-		        });
+		        this.changeDirNameModal(true);
 	        },
 	        exportFile(type){
 		        file.exportFile(type,this.fileTreeData,(filename)=>{
 			        if(filename && file.isObject(filename)){
-                        this.tipOpen('文件已存在在项目中');
+				        this.setHintInfo({
+					        show:true,
+					        title:'',
+					        message:type == 'file' ? '文件已存在在项目中' : '文件夹已存在项目中'
+				        })
 			        }else if(filename){
 				        const url = this.getUrl;
 				        console.log(file.basename(filename));
@@ -332,6 +299,7 @@
         mounted() {
             this.initUrlFn();
 	        this.hotkeysFn();
+	        this.updateData([]);
         },
         //监视
         watch: {},

@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-17 15:24:16
+ * @Last Modified time: 2017-11-17 18:21:37
  */
 //引入web3
 let Web3 = require('web3'),
@@ -12,7 +12,9 @@ import consoleService from '@/services/console/console-service';
 import APIServies from '@/services/API-servies';
 //import store from '@/vuex/store';
 import DeployLogService from '@/services/deploy/deploy-log-servises'
-import { debug } from 'util';
+import {
+    debug
+} from 'util';
 
 const deployLogService = new DeployLogService();
 
@@ -359,7 +361,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007',//'8aa2e78b54fc3bf3c1ff2fd065830e876d76630f7a9c433909ca6d89881ffe18', //用户私钥
+            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007', //'8aa2e78b54fc3bf3c1ff2fd065830e876d76630f7a9c433909ca6d89881ffe18', //用户私钥
             userAddress: '', //用户钱包地址
         }
 
@@ -436,42 +438,43 @@ class DeployService {
                 // }, (err, myContract) => {
 
                 const txParams = {
-                        nonce: this.web3.nonce(),
-                        gasPrice: 20000000000, //0x174876e800,
-                        gasLimit: 4300000, //843314949521407,
-                        //gasPrice: 0x98bca5a00,
-                        //gas: 0x9184e729fff,
-                        value: 0,
-                        data: bin,
-                    },
-                    serializedTxHex = this.sign(txParams); //签名后的数据
+                    nonce: this.web3.nonce(),
+                    gasPrice: 20000000000,
+                    gasLimit: 4300000,
+                    value: 0,
+                    data: bin,
+                };
 
-                calcContract.deploy(serializedTxHex, (err, myContract) => {
-                    console.log('err', err, myContract)
-                    if (!err) {
-                        if (!myContract.address) {
-                            this.result.TxHash = myContract.transactionHash;
-                            console.log("部署合约的交易哈希值: " + myContract.transactionHash);
+                this.sign(txParams).then((serializedTxHex) => {
+                    calcContract.deploy(serializedTxHex, (err, myContract) => {
+                        console.log('err', err, myContract)
+                        if (!err) {
+                            if (!myContract.address) {
+                                this.result.TxHash = myContract.transactionHash;
+                                console.log("部署合约的交易哈希值: " + myContract.transactionHash);
+                            } else {
+                                console.log("合约的部署地址: " + myContract.address);
+                                this.result.contractAddress = myContract.address;
+                                this.data[myContract.address] = {
+                                    contractAddress: this.result.contractAddress,
+                                    from: this.result.From,
+                                    fileName: fileName,
+                                    contractName: contractName,
+                                    contract: myContract
+                                };
+                                //store.dispatch('addDeployedData',this.data[myContract.address]);
+
+                                this.deployFinish();
+                                resolve(myContract.address);
+                            }
                         } else {
-                            console.log("合约的部署地址: " + myContract.address);
-                            this.result.contractAddress = myContract.address;
-                            this.data[myContract.address] = {
-                                contractAddress: this.result.contractAddress,
-                                from: this.result.From,
-                                fileName: fileName,
-                                contractName: contractName,
-                                contract: myContract
-                            };
-                            //store.dispatch('addDeployedData',this.data[myContract.address]);
-
-                            this.deployFinish();
-                            resolve(myContract.address);
+                            resolve(err);
+                            this.deployFailure(err);
                         }
-                    } else {
-                        resolve(err);
-                        this.deployFailure(err);
-                    }
+                    });
                 });
+
+
             } catch (error) {
                 console.warn(error);
                 this.deployFailure(error)
@@ -587,7 +590,7 @@ class DeployService {
                 this.runFailure(e);
                 cb(e);
             }
-            this.getContractLog(this.provider, contractAddress,this.getQueryTime());
+            this.getContractLog(this.provider, contractAddress, this.getQueryTime());
         } else {
             let data = '';
             debugger;
@@ -609,28 +612,28 @@ class DeployService {
 
             console.log('data', data)
             const txParams = {
-                    //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
-                    //from: this.user.userAddress,
-                    //防重 每次都生成一个新的nonce，用过之后就失效了
-                    nonce: this.web3.nonce(),
-                    gasPrice: 21000000000,
-                    gasLimit: 843314949521407,
-                    to: contract.address,
-                    value: 0,
-                    data: data,
-                },
-                serializedTxHex = this.sign(txParams); //签名后的数据
+                //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
+                //from: this.user.userAddress,
+                //防重 每次都生成一个新的nonce，用过之后就失效了
+                nonce: this.web3.nonce(),
+                gasPrice: 21000000000,
+                gasLimit: 843314949521407,
+                to: contract.address,
+                value: 0,
+                data: data,
+            }; //签名后的数据
 
-            debugger;
+            this.sign(txParams).then((serializedTxHex) => {
+                let hash = this.web3.eth.sendRawTransaction(serializedTxHex); //交易的哈希
+                //let hash =this.web3.eth.sendTransaction(txParams)
+                this.callbacks[hash] = {
+                    cb: cb,
+                    wrapCount: this.wrapCount,
+                }
+                this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+                this.getTransactionReceipt(hash);
+            });
 
-            let hash = this.web3.eth.sendRawTransaction(serializedTxHex); //交易的哈希
-            //let hash =this.web3.eth.sendTransaction(txParams)
-            this.callbacks[hash] = {
-                cb: cb,
-                wrapCount: this.wrapCount,
-            }
-            this.getContractLog(this.provider, contractAddress,this.getQueryTime());
-            this.getTransactionReceipt(hash);
         }
     }
 
@@ -732,15 +735,29 @@ class DeployService {
     }
 
     sign(txParams) {
-        let tx = new EthereumTx(txParams);
-        console.log('txParams', txParams);
-        //钱包签名
-        let privateKey = Buffer.from(this.user.privateKey, 'hex');
-        tx.sign(privateKey);
-        const serializedTx = tx.serialize(),
-            serializedTxHex = "0x" + serializedTx.toString('hex');
+        //调试用
+        return new Promise((resolve, reject) => {
+            let tx = new EthereumTx(txParams);
+            console.log('txParams', txParams);
+            //钱包签名
+            let privateKey = Buffer.from(this.user.privateKey, 'hex');
+            tx.sign(privateKey);
+            const serializedTx = tx.serialize(),
+                serializedTxHex = "0x" + serializedTx.toString('hex');
+            resolve(serializedTxHex);
+        })
 
-        return serializedTxHex;
+        // return new Promise((resolve, reject) => {
+        //     Juice.wallat.sign(txParams, (res) => {
+        //         if (res.code == 0) {
+        //             resolve(res.data);
+        //         } else {
+        //             consoleService.output('[签名失败]', {
+        //                 logError: res.msg
+        //             });
+        //         }
+        //     })
+        // })
     }
 
     //获取要查询的时间
@@ -756,8 +773,8 @@ class DeployService {
     }
 
     getContractLog(nodeId, contractAddress, queryTime) {
-        let params= {
-            "_source": [/* "address", "ip", "message","@timestamp" */],
+        let params = {
+            "_source": [ /* "address", "ip", "message","@timestamp" */ ],
             "query": {
                 "bool": {
                     "must": [{
@@ -767,7 +784,7 @@ class DeployService {
                         },
                         {
                             "term": {
-                                "ip": nodeId.substring(nodeId.indexOf('//')+2,nodeId.lastIndexOf(':'))
+                                "ip": nodeId.substring(nodeId.indexOf('//') + 2, nodeId.lastIndexOf(':'))
                             }
                         }
                     ],
@@ -776,7 +793,7 @@ class DeployService {
                 }
             },
             "from": 0,
-            "size": queryTime?1000:1,
+            "size": queryTime ? 1000 : 1,
             "sort": [{
                 "@timestamp": {
                     "order": "desc"
@@ -786,7 +803,7 @@ class DeployService {
         }
 
         if (queryTime) {
-            params.query.bool.filter= {
+            params.query.bool.filter = {
                 "range": {
                     "@timestamp": {
                         "gt": queryTime
