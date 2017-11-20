@@ -1,5 +1,5 @@
 <template>
-    <div class="header bgwhite info">
+    <div class="header bgwhite info no-chose">
         <div>
             <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
