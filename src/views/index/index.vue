@@ -139,31 +139,26 @@
 
 		        // 新建文件夹
 		        hotkeys('ctrl+w', (event,handler)=>{
-			        alert('ctrl+w');
 			        this.newDir();
 		        });
 
 		        // 导入本地文件
 		        hotkeys('ctrl+shift+o', (event,handler)=>{
 			        this.exportFile('file')
-			        alert('ctrl+shift+o');
 		        });
 
 		        // 导入本地文件夹
 		        hotkeys('ctrl+o', (event,handler)=>{
-			        alert('ctrl+o');
 			        this.exportFile('dir')
 		        });
 
 		        // 保存
 		        hotkeys('ctrl+s', (event,handler)=>{
-			        console.log('ctrl+s')
 			        this.saveEditorFile(this.success)
 		        });
 
 		        // 另存为
 		        hotkeys('ctrl+shift+s', (event,handler)=>{
-                    // alert(111111)
 			        this.saveOtherPath(1)
 		        });
 
@@ -182,18 +177,15 @@
 
 		        // 删除所有文件
 		        hotkeys('ctrl+shift+delete', (event,handler)=>{
-			        alert('ctrl+shift+delete');
 			        this.changeShowTipModal(true)
 		        });
 
                 //查找
                 hotkeys('ctrl+f', (event,handler)=>{
-                    alert('ctrl+f');
                     this.boolSearchVisible(true);
                 });
                 //替换
                 hotkeys('ctrl+h', (event,handler)=>{
-                    alert('ctrl+h');
                     this.boolReplaceVisible(true);
                 });
 
@@ -247,7 +239,6 @@
 				        })
 			        }else if(filename){
 				        const url = this.getUrl;
-				        console.log(file.basename(filename));
 				        url.push({value:filename,name:file.basename(filename)});
 				        this.updateUrl(url);
 			        }
@@ -271,7 +262,6 @@
                 try {
                     Juice.app.getAppInfo((res)=>{
                         if(!res.code){
-                            console.log('Juice.app.getAppInfo',res);
                             contractServies.setProvider(res.data.chainUrl);
                         }
                     })

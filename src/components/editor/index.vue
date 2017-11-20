@@ -106,8 +106,11 @@
                 </div>
             </div>
         </div>
-        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
-        <div class="tips default" v-if='tipsVisible'>
+        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive
+                  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction'
+                  @replaceFunction='replaceFunction' v-show="fileData.length > 0">
+        </v-editor>
+        <div class="tips default"  v-show="fileData.length == 0">
             <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
 
         </div>
@@ -477,15 +480,16 @@
                     if(id === 'setValue'){
 	                    this.select = index;
 	                    this.currentView = index ;
-	                    this.value = this.fileData[index].value;
-	                    this.name = this.fileData[index].name;
-	                    this.keyId = this.fileData[index].keyId;
-	                    console.log(this.keyId);
-	                    this.updateEditFile({
-		                    name:this.name,
-		                    value:this.value,
-		                    keyId:this.keyId
-	                    })
+	                    this.value = this.fileData[index] ? this.fileData[index].value : this.value;
+	                    this.name = this.fileData[index] ? this.fileData[index].name  : this.name;
+	                    this.keyId = this.fileData[index] ? this.fileData[index].keyId  : this.keyId;
+	                    if(this.fileData.length){
+		                    this.updateEditFile({
+			                    name:this.name,
+			                    value:this.value,
+			                    keyId:this.keyId
+		                    })
+                        }
                     }else{
 	                    this.activeTab(index);
                     }
@@ -672,7 +676,9 @@
         //监视
         watch: {
             editFile:function(){
-                this.pushArray();
+            	if(!this.editFile.unWatch){
+		            this.pushArray();
+                }
             },
             'removeData.id':function(){
             	this.remove(this.removeData.index,this.removeData.fileItem.keyId)

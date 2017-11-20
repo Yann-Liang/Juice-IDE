@@ -31,35 +31,35 @@ export const fileAction = {
 		let dirPathArr = state.url.filter((item)=>{
 			return item.value;
 		});
-		// file.watchFile(dirPathArr,(data)=>{
-		// 	if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
-		// 		dispatch('queryFileListData',null,{ root: true });
-		// 	}else if(data.type === 'unlink'){
-		// 		dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
-		// 		dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
-		// 		dispatch('queryFileListData',null,{ root: true });
-		// 	}else if(data.type === 'change'){
-		// 		rootState.editor.fileData.forEach((item,index,fileData)=>{
-		// 			if(item.value === data.path){
-		// 				if(rootState.editor.activeEditor.value === data.path){
-		// 					//  设置值
-		// 					const source = file.readFileSync(data.path);
-		// 					rootState.editor.editor.setValue(source.toString());
-		// 				}else{
-		// 					// 更新source
-		// 					const arr = rootState.editor.editData;
-		// 					arr.forEach((itm,ind,result)=>{
-		// 						if(itm.value === data.path){
-		// 							const source = file.readFileSync(data.path);
-		// 							result[ind].source = source;
-		// 							dispatch('updateData',result,{ root: true });
-		// 						}
-		// 					})
-		// 				}
-		// 			}
-		// 		})
-		// 	}
-		// });
+		file.watchFile(dirPathArr,(data)=>{
+			if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
+				dispatch('queryFileListData',null,{ root: true });
+			}else if(data.type === 'unlink'){
+				dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
+				dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
+				dispatch('queryFileListData',null,{ root: true });
+			}else if(data.type === 'change'){
+				rootState.editor.fileData.forEach((item,index,fileData)=>{
+					if(item.value === data.path){
+						if(rootState.editor.activeEditor.value === data.path){
+							//  设置值
+							const source = file.readFileSync(data.path);
+							rootState.editor.editor.setValue(source.toString());
+						}else{
+							// 更新source
+							const arr = rootState.editor.editData;
+							arr.forEach((itm,ind,result)=>{
+								if(itm.value === data.path){
+									const source = file.readFileSync(data.path);
+									result[ind].source = source;
+									dispatch('updateData',result,{ root: true });
+								}
+							})
+						}
+					}
+				})
+			}
+		});
 		dispatch('queryFileListData',null,{ root: true });
 	},
 	updateEditFile({ commit, state },fileObj){
@@ -115,7 +115,7 @@ export const fileAction = {
 									const url = rootState.file.url;
 									url.forEach((item,index)=>{
 										if(item.name === currentFile.name && item.value === currentFile.value){
-											item.value = keyId;
+											item.value = filepath;
 											item.name = file.basename(filepath)
 											return false;
 										}
@@ -151,35 +151,76 @@ export const fileAction = {
 	},
 	renameFile({ commit, state,rootState,dispatch},name){
 		const filesList = state.position.item;
+		file.watcher.close();
 		file.renameFile(filesList.value,name,(newFilePath)=>{
 			// 重命名成功更新状态
-			const keyId = file.keyIdFn(newFilePath);
-			name = file.uffixName(name);
+			const keyId = newFilePath ? file.keyIdFn(newFilePath) : filesList.keyId;
+			name = file.isDir(newFilePath) ? name :file.uffixName(name);
 			// 更新updateFileData编辑去tabs
-			dispatch('updateFileData',{param:{keyId:keyId,value:newFilePath,name:name}},{ root: true });
-
-			// 更新当前编辑的状态
-			if(keyId == rootState.editor.activeEditor.keyId){
-				dispatch('updateActiveEditor',{
-					value: newFilePath,
-					name: name,
-					keyId:keyId,
-					source: rootState.editor.activeEditor.source
-				},{ root: true });
-				// 更新当前激活的文件状态
-				dispatch('updateEditFile',{keyId:keyId,value:newFilePath,name:name},{ root: true });
+			if(file.isFile(newFilePath) || newFilePath === ''){ // 如果是文件
+				dispatch('updateFileData',{param:{keyId:keyId,value:newFilePath,name:name}},{ root: true });
+				
+				// 更新当前编辑的状态
+				if(keyId == rootState.editor.activeEditor.keyId){
+					dispatch('updateActiveEditor',{
+						value: newFilePath,
+						name: name,
+						keyId:keyId,
+						source: rootState.editor.activeEditor.source
+					},{ root: true });
+					// 更新当前激活的文件状态
+					dispatch('updateEditFile',{keyId:keyId,value:newFilePath,name:name},{ root: true });
+				}
+				
+				// 更新未保存vuex的状态
+				let edit = rootState.editor.editData;
+				rootState.editor.editData.forEach((item,index)=>{
+					if(item.keyId ===  keyId){
+						edit[index].name = name;
+						edit[index].value = newFilePath;
+						dispatch('updateData',edit,{ root: true });
+						return false;
+					}
+				})
+			}else if(file.isDir(newFilePath)){ //如果是文件夹
+				let activeIndex = 0;
+				let fileDataArr = rootState.editor.fileData.filter((item,index) => {
+					if(item.value.indexOf(filesList.value) === -1){
+						return true;
+					}
+				});
+				fileDataArr.forEach((item,index)=>{
+					if(item.value === rootState.editor.activeEditor.value){
+						activeIndex = index;
+					}
+				})
+				
+				
+				console.log(222222222)
+				console.log(fileDataArr)
+				
+				
+				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
+				dispatch('updateRemoveData',{index:activeIndex,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
+				
+				let editData = rootState.editor.editData.filter((item,index) => {
+					if(item.value.indexOf(filesList.value) === -1){
+						return true;
+					}
+				});
+				
+				dispatch('updateData',editData,{root:true}) // 更新fileData;
 			}
-
-			// 更新未保存vuex的状态
-			let edit = rootState.editor.editData;
-			rootState.editor.editData.forEach((item,index)=>{
-				if(item.keyId ===  keyId){
-					edit[index].name = name;
-					edit[index].value = newFilePath;
-					dispatch('updateData',edit,{ root: true });
+			// 更新url
+			const url = rootState.file.url;
+			url.forEach((item,index)=>{
+				if(item.name === filesList.name && item.value === filesList.value){
+					item.value = newFilePath;
+					item.name = name;
 					return false;
 				}
 			})
+			dispatch('updateUrl',url,{ root: true });
 		})
 	},
 	// 另存为
@@ -286,15 +327,13 @@ export const fileAction = {
 					dispatch('updateDeleteStatus',state.activeFile,{root:true})
 				})
 			}else if(file.isDir(state.activeFile.value)){ //如果是文件夹
-				let activeIndex = '';
+				let activeIndex = 0;
 				let fileDataArr = rootState.editor.fileData.filter((item,index) => {
 					if(item.value.indexOf(state.activeFile.value) === -1){
 						return true;
 					}
 				});
-				rootState.editor.fileData.forEach((item,index)=>{
-					console.log(item.value)
-					console.log(rootState.editor.activeEditor.value)
+				fileDataArr.forEach((item,index)=>{
 					if(item.value === rootState.editor.activeEditor.value){
 						activeIndex = index;
 					}
@@ -302,9 +341,7 @@ export const fileAction = {
 				
 				
 				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
-				if(activeIndex !== ''){
-					dispatch('updateRemoveData',{index:0,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
-				}
+				dispatch('updateRemoveData',{index:0,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
 
 				let editData = rootState.editor.editData.filter((item,index) => {
 					if(item.value.indexOf(state.activeFile.value) === -1){
@@ -314,6 +351,7 @@ export const fileAction = {
 
 				dispatch('updateData',editData,{root:true}) // 更新fileData;
 				file.removeFile(state.activeFile.value,()=>{})
+				updateUrlFn()
 			}
 		}else{
 			updateUrlFn()
