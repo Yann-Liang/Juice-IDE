@@ -301,16 +301,16 @@
             //设置节点地址
             setProvider(){
                 contractServies.setProvider('http://192.168.9.95:5788')//http://10.10.8.202:6789
-                // try {
-                //     Juice.app.getAppInfo((res)=>{
-                //         if(!res.code){
-                //             console.log('Juice.app.getAppInfo',res);
-                //             contractServies.setProvider(res.data.chainUrl);
-                //         }
-                //     })
-                // } catch (error) {
+                try {
+                    Juice.app.getAppInfo((res)=>{
+                        if(!res.code){
+                            console.log('Juice.app.getAppInfo',res);
+                            contractServies.setProvider(res.data.chainUrl);
+                        }
+                    })
+                } catch (error) {
 
-                // }
+                }
             }
         },
         //生命周期函数
