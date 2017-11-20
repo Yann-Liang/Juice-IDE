@@ -31,40 +31,39 @@ export const fileAction = {
 		let dirPathArr = state.url.filter((item)=>{
 			return item.value;
 		});
-		file.watchFile(dirPathArr,(data)=>{
-			if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
-				dispatch('queryFileListData',null,{ root: true });
-			}else if(data.type === 'unlink'){
-				dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
-				dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
-				dispatch('queryFileListData',null,{ root: true });
-			}else if(data.type === 'change'){
-				rootState.editor.fileData.forEach((item,index,fileData)=>{
-					if(item.value === data.path){
-						if(rootState.editor.activeEditor.value === data.path){
-							//  设置值
-							const source = file.readFileSync(data.path);
-							rootState.editor.editor.setValue(source.toString());
-						}else{
-							// 更新source
-							const arr = rootState.editor.editData;
-							arr.forEach((itm,ind,result)=>{
-								if(itm.value === data.path){
-									const source = file.readFileSync(data.path);
-									result[ind].source = source;
-									dispatch('updateData',result,{ root: true });
-								}
-							})
-						}
-					}
-				})
-			}
-		});
+		// file.watchFile(dirPathArr,(data)=>{
+		// 	if(data.type === 'add' || data.type === 'unlinkDir' || data.type === 'addDir'){
+		// 		dispatch('queryFileListData',null,{ root: true });
+		// 	}else if(data.type === 'unlink'){
+		// 		dispatch('doneUrlFn',{value:data.path},{ root: true });  // 更新根目录路径列表
+		// 		dispatch('updateDeleteStatus',{keyId:file.keyIdFn(),value:data.path},{ root: true }); // 更新删除状态
+		// 		dispatch('queryFileListData',null,{ root: true });
+		// 	}else if(data.type === 'change'){
+		// 		rootState.editor.fileData.forEach((item,index,fileData)=>{
+		// 			if(item.value === data.path){
+		// 				if(rootState.editor.activeEditor.value === data.path){
+		// 					//  设置值
+		// 					const source = file.readFileSync(data.path);
+		// 					rootState.editor.editor.setValue(source.toString());
+		// 				}else{
+		// 					// 更新source
+		// 					const arr = rootState.editor.editData;
+		// 					arr.forEach((itm,ind,result)=>{
+		// 						if(itm.value === data.path){
+		// 							const source = file.readFileSync(data.path);
+		// 							result[ind].source = source;
+		// 							dispatch('updateData',result,{ root: true });
+		// 						}
+		// 					})
+		// 				}
+		// 			}
+		// 		})
+		// 	}
+		// });
 		dispatch('queryFileListData',null,{ root: true });
 	},
 	updateEditFile({ commit, state },fileObj){
 		commit('UPDATE_EDIT_FILE', fileObj);
-		// console.log('state.editFile',state.editFile)
 	},
 	updatePosition({ commit, state },position){
 		commit('UPDATE_POSITION', position);
@@ -79,8 +78,6 @@ export const fileAction = {
 	saveAllFile({ commit, state,rootState,dispatch},cb){
 		// 获取编辑未保存的文件数据
 		const data = rootState.editor.editData;
-		console.log('下面是编辑未保存的数据：')
-		console.log(data);
 		if(data.length>0){
 			let fileData =data.filter((item)=>{
 				return item.value;
@@ -189,17 +186,10 @@ export const fileAction = {
 	saveOtherPath({ commit, state,rootState,dispatch},type){
 		if(type == 1){
 			const activeFile = rootState.editor.activeEditor;
-			file.saveFile("",activeFile.name,activeFile.source,()=>{})
+			file.saveFile('',activeFile.name,activeFile.source,()=>{})
 		}else if(type == 2){
 			let activeFile = state.activeFile;
 			if(activeFile.value){
-				// file.fsReadFile(activeFile.value,(err,data)=>{
-				// 	if(!err){
-				// 		file.saveFile('',activeFile.name,data,()=>{})
-				// 	}else{
-				//
-				// 	}
-				// });
 				file.saveFile('',activeFile.name,null,(err,filename)=>{
 					if(err){
 						if (err) return console.error(err)
@@ -236,7 +226,6 @@ export const fileAction = {
 								}
 							})
 							dispatch('updateUrl',url,{ root: true });
-							console.log(rootState.file.url);
 
 							if(oldKeyId == rootState.editor.activeEditor.keyId){
 								commit('UPDATE_ACTION_EDITOR',{  // 更新当前编辑的状态
@@ -270,7 +259,6 @@ export const fileAction = {
 		arr.forEach((item,index)=>{
 			if(item.value){
 				file.removeFile(item.value,()=>{
-					console.log('删除文件'+item.value+'成功');
 				})
 			}
 		})
@@ -281,25 +269,55 @@ export const fileAction = {
 		let id = state.fileCurrentId + 1;
 		commit('UPDATE_CURRENT_ID', id);
 	},
-
-	removeFileFn({ commit, state ,dispatch}){
+	
+	removeFileFn({ commit, state ,dispatch ,rootState}){
 		function updateUrlFn(){
 			state.url.forEach((item,index,data)=>{
 				if(state.activeFile.value == item.value && state.activeFile.name == item.name){
 					data.splice(index,1);
-					dispatch('updateUrl',data,{root:true})
+					dispatch('updateUrl',data,{root:true});
 				}
 			})
 		}
 		if(state.activeFile.value){
-			file.removeFile(state.activeFile.value,()=>{
-				updateUrlFn()
-				console.log(state.url);
-				console.log('删除文件成功');
-				dispatch('updateDeleteStatus',state.activeFile,{root:true})
-			})
+			if(file.isFile(state.activeFile.value)){ // 如果是文件
+				file.removeFile(state.activeFile.value,()=>{
+					updateUrlFn()
+					dispatch('updateDeleteStatus',state.activeFile,{root:true})
+				})
+			}else if(file.isDir(state.activeFile.value)){ //如果是文件夹
+				let activeIndex = '';
+				let fileDataArr = rootState.editor.fileData.filter((item,index) => {
+					if(item.value.indexOf(state.activeFile.value) === -1){
+						return true;
+					}
+				});
+				rootState.editor.fileData.forEach((item,index)=>{
+					console.log(item.value)
+					console.log(rootState.editor.activeEditor.value)
+					if(item.value === rootState.editor.activeEditor.value){
+						activeIndex = index;
+					}
+				})
+				
+				
+				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
+				if(activeIndex !== ''){
+					dispatch('updateRemoveData',{index:0,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
+				}
+
+				let editData = rootState.editor.editData.filter((item,index) => {
+					if(item.value.indexOf(state.activeFile.value) === -1){
+						return true;
+					}
+				});
+
+				dispatch('updateData',editData,{root:true}) // 更新fileData;
+				file.removeFile(state.activeFile.value,()=>{})
+			}
 		}else{
 			updateUrlFn()
+			dispatch('updateDeleteStatus',state.activeFile,{root:true});
 		}
 		dispatch('setActiveFile','',{root:true})
 		dispatch('updateRightMenuBlock',false,{root:true})
@@ -312,5 +330,22 @@ export const fileAction = {
 	},
 	changeDeleteFile({ commit, state },deleteFile){
 		commit('CHANGE_DELETE_FILE',deleteFile);
+	},
+	changeShowFileNameModal({ commit, state },fileName){
+		commit('CHANGE_FILE_NAME',fileName);
+	},
+	changeDirNameModal({ commit, state },showDirNameModal){
+		commit('CHANGE_DIR_NAME',showDirNameModal);
+	},
+	setHintInfo({ commit, state },hintInfo){
+		commit('SET_HINT_INFO',hintInfo);
+	},
+	updateNewOpenFile({ commit, state },fileItem){
+		let id = state.newOpenFile.id + 1;
+		const data = {
+			id: id,
+			newFile:fileItem
+		}
+		commit('UPDATE_NEW_OPEN_FILE',data)
 	}
 }

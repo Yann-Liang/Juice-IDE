@@ -141,20 +141,20 @@
         },
         //计算
         computed: {
-            ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile','currentName'])
+	        ...mapGetters(['fileTreeData','editor','copyText','activeFile','getUrl','editFile','currentName'])
         },
         methods: {
-	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock','saveOtherPath','saveAllFile','removeAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible','updateCurrentId','removeFileFn','changeShowDeleteModal','changeDeleteFile',]),
-
+	        ...mapActions(['saveEditorFile','boolSearchVisible','boolReplaceVisible','updateCopyText','updateRightMenuBlock'
+                ,'saveOtherPath','saveAllFile','removeAllFile','changeShowTipModal','queryFileListData','updateEditFile','updateUrl','boolSuccessVisible',
+            'changeShowFileNameModal','changeDirNameModal','setHintInfo','changeShowDeleteModal','changeDeleteFile','updateNewOpenFile'
+            ,'updateCurrentId']),
             setHeaderTab:function(e){
                 if(e.target.innerText=='文件'){
-                    console.log('文件')
                     // this.fileVisible=true;
                     this.editVisible=false;
                     this.fileVisible ? this.hideFile() : this.showFile();
                     // this.visible ? this.hide() : this.show()
                 }else if(e.target.innerText=='编辑'){
-                    console.log('编辑')
                     // this.editVisible=true;
                     this.editVisible ? this.hideEdit() : this.showEdit()
                     this.fileVisible=false;
@@ -174,8 +174,6 @@
                 document.removeEventListener('click', this.hidePanelFile, false)
             },
             hidePanelFile (e) {
-                console.log(this.$refs.filedata)
-                console.log(this.$refs.filedata.contains(e.target));
                 if (!this.$refs.filedata.contains(e.target)) {
                     this.hideFile()
                 }
@@ -189,8 +187,6 @@
                 document.removeEventListener('click', this.hidePanelEdit, false)
             },
             hidePanelEdit (e) {
-                console.log(this.$refs.editdata)
-                console.log(this.$refs.editdata.contains(e.target));
                 if (!this.$refs.editdata.contains(e.target)) {
                     this.hideEdit();
                 }
@@ -208,11 +204,6 @@
                 var _this = this;
                 this.fileVisible = false
                 console.log(e.target.getAttribute("data-id"));
-                // switch(e.target.innerText){
-                //     case '保存':
-                //         this.saveEditorFile();
-                //         break;
-                // }
                 switch(e.target.getAttribute("data-id")){
                     case '1':
                     case 1:
@@ -249,10 +240,8 @@
                         break;
                     case '8':
                     case 8:
-                        if(_this.activeFile){
-                            _this.changeDeleteFile(_this.activeFile)
-                            _this.changeShowDeleteModal(true);
-                        };//删除
+	                    _this.deleteFn()
+                        ;//删除
                         break;
                     case '9':
                     case 9:
@@ -318,6 +307,54 @@
             help(){
                 shell.openExternal('http://www.juzhen.io/index.php');
             },
+	        newFile(){
+		        if(this.activeFile.value){
+			        this.changeShowFileNameModal(true);
+		        }else{
+			        file.newFile(this.activeFile.value,name,(res)=>{
+				        if(this.activeFile.id === 1){
+					        this.updateNewOpenFile(this.activeFile);
+				        }
+				        if(res.code === 2){
+					        const url = this.getUrl;
+					        url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
+					        this.updateUrl(url);
+					        this.updateEditFile({
+						        name:file.uffixName(this.currentName),
+						        value:res.value,
+						        keyId:res.keyId
+					        })
+					        this.updateCurrentId() // 更新id
+				        }
+			        })
+		        }
+		        this.updateRightMenuBlock(false);
+	        },
+	        newDir(){
+		        this.changeDirNameModal(true);
+	        },
+	        exportFile(type){
+		        file.exportFile(type,this.fileTreeData,(filename)=>{
+			        if(filename && file.isObject(filename)){
+				        this.setHintInfo({
+					        show:true,
+					        title:'',
+					        message:type == 'file' ? '文件已存在在项目中' : '文件夹已存在项目中'
+				        })
+			        }else if(filename){
+				        const url = this.getUrl;
+				        console.log(file.basename(filename));
+				        url.push({value:filename,name:file.basename(filename)});
+				        this.updateUrl(url);
+			        }
+		        });
+	        },
+            deleteFn(){
+	            if(this.activeFile){
+		            this.changeDeleteFile(this.activeFile)
+		            this.changeShowDeleteModal(true);
+	            }
+            },
             //保存成功提示
             success:function(cb){
                 this.boolSuccessVisible(true);
@@ -327,84 +364,6 @@
                 if(cb && typeof(cb)=='function'){
                     cb();
                 }
-            },
-            topFn(){
-                this.updateRightMenuBlock(false);
-            },
-            newFile(){
-                if(this.activeFile.value){
-                    this.open((name)=>{
-                        file.newFile(this.activeFile.value,name,(res)=>{
-                            if(res.code === 0){
-                                this.queryFileListData();
-                                this.updateEditFile({
-                                    name:file.uffixName(name),
-                                    value:res.value,
-                                    keyId:res.keyId
-                                })
-                                console.log(this.editFile);
-                            }else if(res.code === 1){
-                                this.tipOpen()
-                            }
-                        })
-                    });
-                }else{
-                    file.newFile(this.activeFile.value,name,(res)=>{
-                        if(res.code === 2){
-                            const url = this.getUrl;
-                            url.push({value:'',name:file.uffixName(this.currentName),keyId:res.keyId});
-                            this.updateUrl(url);
-                            this.updateEditFile({
-                                name:file.uffixName(this.currentName),
-                                value:res.value,
-                                keyId:res.keyId
-                            })
-                            this.updateCurrentId() // 更新id
-                        }
-                    })
-                }
-                this.updateRightMenuBlock(false);
-            },
-            newDir(){
-                this.open((name)=>{
-                    file.newMkdir(this.activeFile.value,name,(res)=>{
-                        if(res.code === 0){
-                            this.queryFileListData();
-                        }else if(res.code === 1){
-                            this.tipOpen()
-                        }else if(res.code === 2){
-
-                        }
-                        this.updateRightMenuBlock(false);
-                    })
-                });
-            },
-            open(fn) {
-                this.updateRightMenuBlock(false);
-                this.$prompt('请输入邮箱', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                    fn && fn(value)
-                })
-            },
-            tipOpen(str) {
-                 str = str || '文件已存在，请更换文件名'
-                this.$alert(str, '提示', {
-                    confirmButtonText: '确定',
-                });
-            },
-            exportFile(type){
-                file.exportFile(type,this.fileTreeData,(filename)=>{
-                    if(filename && file.isObject(filename)){
-                        this.tipOpen('文件已存在在项目中');
-                    }else if(filename){
-                        const url = this.getUrl;
-                        console.log(file.basename(filename));
-                        url.push({value:filename,name:file.basename(filename)});
-                        this.updateUrl(url);
-                    }
-                });
             },
         },
         beforeDestroy () {

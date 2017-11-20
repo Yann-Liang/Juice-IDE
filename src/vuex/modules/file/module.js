@@ -20,7 +20,17 @@ export const file = {
 	    currentName:'',
 	    showTipModal: false,
 	    showDeleteModal: false,
-	    deleteFile:''
+	    deleteFile:'',
+	    showFileNameModal:'',
+	    showDirNameModal:'',
+	    hintInfo:{
+	    	show: false,
+		    title:'',
+		    message:''
+	    },
+	    newOpenFile:{
+	    	id: 0
+	    }
     },
     actions: fileAction,
     getters: fileGetter,

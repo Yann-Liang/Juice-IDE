@@ -13,7 +13,7 @@
                 <img src="./images/dir.png" v-if="isFolder">
                 <img src="./images/file-default.png" v-if="!isFolder">
                 {{filesList.name}}
-                <span class="no-save danger" v-if="!filesList.save">未保存</span>
+                <span class="no-save" v-if="!filesList.save">· 未保存</span>
                 <div class="wrap-delete">
                     <i class="el-icon-delete dir-icon default" v-if="!filesList.children" @click.stop="removeFile(filesList)"></i>
                 </div>
@@ -52,7 +52,7 @@
         },
 		//计算
 		computed: {
-            ...mapGetters(['activeFile','getUrl','editFile']),
+            ...mapGetters(['activeFile','getUrl','editFile','newOpenFile']),
 			isFolder: function () {
 				return this.filesList.children
 			},
@@ -102,18 +102,9 @@
 	            })
             },
             removeFile(filesList){
+	            this.setActiveFile(filesList);
             	this.changeDeleteFile(filesList);
             	this.changeShowDeleteModal(true)
-//				if(filesList.value){
-//					file.removeFile(filesList.value,()=>{
-//						this.updateUrlFn(filesList);
-//						this.queryFileListData();
-//						console.log('删除文件成功');
-//                        this.updateDeleteStatus(filesList)
-//					})
-//                }else{
-//					this.updateUrlFn(filesList);
-//                }
             },
 			rightMenu(filesList,e){
             	if(e.button === 2){
@@ -123,17 +114,24 @@
                         y:e.clientY,
                         item:filesList
                     };
-                    this.updatePosition(position)
+                    this.updatePosition(position);
 		            this.updateRightMenuBlock(true)
                 }
-            }
+            },
+
 		},
 		//生命周期函数
 		created(){
 
 		},
 		//监视
-		watch: {},
+		watch: {
+            'newOpenFile.id':function(){
+            	if(this.newOpenFile.newFile.keyId === this.filesList.keyId){
+            		this.open = true;
+                }
+            }
+        },
 		//组件
 		components: {}
 	}
@@ -191,7 +189,8 @@
             display:block;
         }
         .no-save{
-            margin-left:20px;
+            margin-left:30px;
+            color:rgba(255, 102, 0, 0.717647)
         }
         .tip{
             font-size:8px;

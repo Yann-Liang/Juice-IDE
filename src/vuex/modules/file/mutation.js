@@ -31,5 +31,17 @@ export const fileMutation = {
 	},
 	['CHANGE_DELETE_FILE'](state,deleteFile){
 		state.deleteFile = deleteFile;
+	},
+	['CHANGE_FILE_NAME'](state,fileName){
+		state.showFileNameModal = fileName;
+	},
+	['CHANGE_DIR_NAME'](state,dirName){
+		state.showDirNameModal = dirName;
+	},
+	['SET_HINT_INFO'](state,info){
+		state.hintInfo = info;
+	},
+	['UPDATE_NEW_OPEN_FILE'](state,data){
+		state.newOpenFile = data;
 	}
 };
