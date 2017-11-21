@@ -264,10 +264,17 @@
                 this.updateRightMenuBlock(false);
             },
 	        newFile(){
-		        if(this.activeFile.value){
+		        let blo = true;
+		        this.fileTreeData.forEach((item,index)=>{
+			        if(item.keyId === this.activeFile.keyId && file.isFile(this.activeFile.value)){
+				        blo = false;
+			        }
+		        });
+
+		        if(this.activeFile.value && blo){
 			        this.changeShowFileNameModal(true);
 		        }else{
-			        file.newFile(this.activeFile.value,name,(res)=>{
+			        file.newFile('',name,(res)=>{
 				        if(this.activeFile.id === 1){
 					        this.updateNewOpenFile(this.activeFile);
 				        }

@@ -204,10 +204,16 @@
 		        this.updateRightMenuBlock(false);
             },
 	        newFile(){
-		        if(this.activeFile.value){
+		        let blo = true;
+		        this.fileTreeData.forEach((item,index)=>{
+			        if(item.keyId === this.activeFile.keyId && file.isFile(this.activeFile.value)){
+				        blo = false;
+			        }
+		        });
+		        if(this.activeFile.value && blo){
 			        this.changeShowFileNameModal(true);
 		        }else{
-			        file.newFile(this.activeFile.value,name,(res)=>{
+			        file.newFile('',name,(res)=>{
 				        if(this.activeFile.id === 1){
 					        this.updateNewOpenFile(this.activeFile);
 				        }
@@ -268,15 +274,34 @@
                 } catch (error) {
 
                 }
+            },
+            setIntSol(){
+            	const url = this.getUrl;
+            	if(url && url.length === 0){
+            		const data = [
+                        {
+                        	name: 'example1.sol',
+                            value:'',
+                            keyId:file.keyIdFn('')+'example1.sol'
+                        },
+			            {
+				            name: 'example2.sol',
+				            value:'',
+				            keyId:file.keyIdFn('')+'example2.sol'
+			            }
+                    ]
+		            this.updateUrl(data);
+                }
             }
         },
         //生命周期函数
         created() {
             this.setProvider();
+	        this.initUrlFn();
+	        this.setIntSol();
         },
         beforeMount() {},
         mounted() {
-            this.initUrlFn();
 	        this.hotkeysFn();
 	        this.updateData([]);
         },
