@@ -262,7 +262,7 @@
                 try {
                     Juice.app.getAppInfo((res)=>{
                         if(!res.code){
-                            contractServies.setProvider(res.data.chainUrl);
+                            contractServies.setProvider(res.data.contractUrl);
                         }
                     })
                 } catch (error) {
