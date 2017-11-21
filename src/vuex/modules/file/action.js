@@ -195,11 +195,6 @@ export const fileAction = {
 					}
 				})
 				
-				
-				console.log(222222222)
-				console.log(fileDataArr)
-				
-				
 				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
 				dispatch('updateRemoveData',{index:activeIndex,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
 				
