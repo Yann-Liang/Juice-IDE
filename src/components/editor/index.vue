@@ -169,7 +169,7 @@
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile'
-                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible']),
+                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible','updateRightMenuBlock']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
