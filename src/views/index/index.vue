@@ -4,10 +4,10 @@
         <com-header></com-header>
         <div class="main">
             <ul class="tabs bgblue white no-chose">
-                <li @click="filesTab()"><i class="iconfont" title="文件">&#xe615;</i></li>
-                <li @click="compile()"><i class="iconfont" title="编译">&#xe613;</i></li>
-                <li @click="deployTab()"><i class="iconfont" title="部署">&#xe614;</i></li>
-                <li @click="queryTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
+                <li @click="filesTab()"><i class="iconfont" title="合约文件管理器">&#xe615;</i></li>
+                <li @click="compile()"><i class="iconfont" title="编译合约">&#xe613;</i></li>
+                <li @click="deployTab()"><i class="iconfont" title="部署并运行合约">&#xe614;</i></li>
+                <li @click="queryTab()"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray no-chose">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
