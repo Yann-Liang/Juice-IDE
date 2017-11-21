@@ -13,7 +13,7 @@ const chokidar = require('chokidar');
 // id标识文件的类型 save标识是否保存
 class file {
 	constructor() {
-	
+		const watcher = ''
 	}
 	//遍历文件夹，获取所有文件夹里面的文件信息
 	/*
@@ -280,14 +280,18 @@ class file {
 	// 文件重命名
 	renameFile(oldpath,name,fn){
 		name = this.isDir(oldpath) ? name : this.uffixName(name);
-		const newFilePath = path.dirname(oldpath).replace(/\\/g,'/') + '/'+name;
-		console.log('文件重命名开始'+newFilePath)
-		fs.rename(oldpath,newFilePath, function(err) {
-			if (err) {
-				throw err;
-			}
+		const newFilePath = oldpath ? path.dirname(oldpath).replace(/\\/g,'/') + '/'+name :'';
+		if(newFilePath){
+			fs.rename(oldpath,newFilePath, function(err) {
+				if (err) {
+					throw err;
+				}
+				fn && fn(newFilePath);
+			})
+		}else{
 			fn && fn(newFilePath);
-		})
+		}
+		
 	}
 
 	// 导入文件
@@ -339,7 +343,7 @@ class file {
 	}
 	
 	// 根据value来获取树结构的值
-	GetByValue = function(Data,value){
+	GetByValue(Data,value){
 		var Deep,T,F;
 		for (F = Data.length;F;)
 		{
@@ -393,11 +397,11 @@ class file {
 	watchFile(pathArr,fn){
 		pathArr.forEach((item,index)=>{
 			if(item.value){
-				const watcher = chokidar.watch(item.value, {
+				this.watcher = chokidar.watch(item.value, {
 					ignored: /(^|[\/\\])\../,
 					persistent: true
 				});
-				watcher
+				this.watcher
 					.on('add', path => {
 						fn && fn({
 							type:'add',

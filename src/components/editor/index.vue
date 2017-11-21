@@ -2,7 +2,7 @@
     <div class="">
         <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
+                <div class='scroll-bar left-bar bggray' ref='leftbar' @click='scrollLeft' >
                     <i class='el-icon-d-arrow-left darker'></i>
                 </div>
                 <ul class='files white' ref='files'>
@@ -13,7 +13,7 @@
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
+                <div class='scroll-bar right-bar bggray' @click='scrollRight' ref='rightbar'>
                     <i class='el-icon-d-arrow-right darker'></i>
                 </div>
             </div>
@@ -106,8 +106,11 @@
                 </div>
             </div>
         </div>
-        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction' @replaceFunction='replaceFunction'></v-editor>
-        <div class="tips default" v-if='tipsVisible'>
+        <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive
+                  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction'
+                  @replaceFunction='replaceFunction' v-show="fileData.length > 0">
+        </v-editor>
+        <div class="tips default"  v-show="fileData.length == 0">
             <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
 
         </div>
@@ -169,20 +172,17 @@
         //方法
         methods: {
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateData','updateTreeData','saveEditorFile'
-                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible']),
+                ,'changeFileData','boolSearchVisible','boolReplaceVisible','saveAllFile','updateCurrentId','boolSuccessVisible','updateRightMenuBlock']),
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
-                console.log('放大')
                 this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                console.log('缩小')
                 this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             findFunction:function(bool){
-                console.log(bool)
                 this.boolSearchVisible(bool);
                 // this.searchVisible = bool;
             },
@@ -199,10 +199,7 @@
             },
             //全局搜索
             onSearch:function(){
-                // console.log('diandiandian',this.inputValue)
                 //获取到当前选中的元素
-                // console.log('1111111111111111111111')
-                // console.log('getcopytext',this.editor.getCopyText());
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
             },
@@ -257,15 +254,12 @@
             },
             //保存当前文件
             save:function(){
-                console.log('保存当前文件')
-                console.log(this.name)
                 this.saveEditorFile(()=>{
                     this.success();
                 });
             },
             //代码格式化
             format:function(){
-                console.log('代码格式化');
                 this.$refs.childMethod.format();
             },
             //向右滑动
@@ -275,7 +269,6 @@
                 var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
                 var hiddenRight = hiddenLength + currentLeft;
-                console.log(hiddenLength,currentLeft,hiddenRight);
                 if(hiddenRight > 0){
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
@@ -289,7 +282,6 @@
                 var leftArrow = this.$refs.leftbar;
                 var rightArrow = this.$refs.rightbar;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
-                console.log(currentLeft)
                 if(currentLeft < 0){
                     if(currentLeft < -this.vistual){
                        this.$refs.files.style.left = `${currentLeft + this.vistual}px`
@@ -305,7 +297,6 @@
                 this.value = item.value;
                 this.name = item.name;
                 this.keyId = item.keyId;
-	            console.log('切换tab现在的keyId:'+this.keyId+this.name);
                 this.updateEditFile({
 	                name:this.name,
 	                value:this.value,
@@ -315,8 +306,6 @@
             },
             //效果切换
             activeTab:function(index){
-                console.log('index',index)
-                console.log('this.select',this.select);
                 if(this.fileData.length == 1){
                     //提示用户打开文件
                     this.editorVisible = false;
@@ -327,7 +316,6 @@
                     this.editorVisible = true;
                     this.tipsVisible = false;
                     if(this.select == index){
-                        console.log('高亮=删除')
                         let result = this.fileData;
                         result.splice(index,1);
                         this.changeFileData(result);
@@ -348,7 +336,6 @@
 
                         }
                     }else if(this.select > index){
-                        console.log('高亮>删除相同')
                         let result = this.fileData;
                         result.splice(index,1);
                         this.changeFileData(result);
@@ -358,7 +345,6 @@
                         this.name = this.fileData[this.select].name;
                         this.keyId = this.fileData[this.select].keyId;
                     }else if(this.select < index){
-                        console.log('高亮<删除相同')
                         let result = this.fileData;
                         result.splice(index,1);
                         this.changeFileData(result);
@@ -380,10 +366,8 @@
             yes:function(e){
                 var index = e.target.getAttribute("data-index");
                 var arr = e.target.getAttribute("data-arr");
-                console.log("当前关闭窗口的位置以及信息",index+arr);
                 arr = JSON.parse(arr);
                 if(this.select == index){
-                    console.log('当前关闭和当前高亮显示一样')
                     /*
                         当前高亮和要关闭的当前窗口相等
                         保存当前文件，并进行更改状态，tab切换，关闭弹窗操作操作
@@ -403,8 +387,6 @@
                         2》要关闭的当前窗口小于当前高亮显示的
                         之后保存要关闭的那个窗口文件，并进行左边状态更改，tab切换，fileData状态更改，关闭弹窗操作
                     */
-                    console.log('当前关闭和当前高亮显示不同',arr[0])
-                    console.log(arr[0].value,arr[0].name,arr[0].source)
                     file.saveFile(arr[0].value,arr[0].name,arr[0].source,()=>{
                         //关闭弹窗
                         this.askVisible = false;
@@ -432,7 +414,6 @@
             no:function(e){
                 var index = e.target.getAttribute("data-index");
                 var arr = e.target.getAttribute("data-arr");
-                console.log("当前关闭窗口的位置以及信息",index+arr);
                 arr = JSON.parse(arr);
                 //更改左边文件栏状态
                 this.updateTreeData({keyId:arr[0].keyId,save:true,value:arr[0].value});
@@ -457,7 +438,6 @@
             },
             //关闭当前窗口
             remove:function(index,id){
-                console.log('index',index);
                 /*
                     关闭当前窗口，判断当前高亮this.select与要关闭的index是否相等
                     然后判断要关闭的这个窗口是否是未保存状态
@@ -477,15 +457,16 @@
                     if(id === 'setValue'){
 	                    this.select = index;
 	                    this.currentView = index ;
-	                    this.value = this.fileData[index].value;
-	                    this.name = this.fileData[index].name;
-	                    this.keyId = this.fileData[index].keyId;
-	                    console.log(this.keyId);
-	                    this.updateEditFile({
-		                    name:this.name,
-		                    value:this.value,
-		                    keyId:this.keyId
-	                    })
+	                    this.value = this.fileData[index] ? this.fileData[index].value : this.value;
+	                    this.name = this.fileData[index] ? this.fileData[index].name  : this.name;
+	                    this.keyId = this.fileData[index] ? this.fileData[index].keyId  : this.keyId;
+	                    if(this.fileData.length){
+		                    this.updateEditFile({
+			                    name:this.name,
+			                    value:this.value,
+			                    keyId:this.keyId
+		                    })
+                        }
                     }else{
 	                    this.activeTab(index);
                     }
@@ -560,14 +541,6 @@
 		        })
 		        this.updateRightMenuBlock(false);
 	        },
-            open(fn) {
-                this.$prompt('请输入邮箱', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                }).then(({ value }) => {
-                    fn && fn(value)
-                })
-            },
             tipOpen() {
                 this.$alert('文件已存在，请更换文件名', '提示', {
                     confirmButtonText: '确定',
@@ -606,7 +579,6 @@
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
                     if(item.keyId == this.editFile.keyId){
-                        console.log('不push进数组')
                         // console.log()
                         //为true 高亮显示当前，并且不push
                         this.select = index;
@@ -619,7 +591,6 @@
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
-                    console.log('push进数组');
 	                let data = this.fileData;
 	                data.push(this.editFile);
 	                this.changeFileData(data);
@@ -652,11 +623,9 @@
                     _this.offReplace();
                 }
                 if (e.ctrlKey && e.keyCode == 187){ //按 ctrl++
-                    console.log('方法')
                     _this.increase();
                 }
                 if (e.ctrlKey && e.keyCode == 189){ //按 ctrl--
-                    console.log("fafff")
                     _this.decrease();
                 }
 
@@ -667,12 +636,13 @@
         },
         mounted() {
 
-            // console.log(this.saveCode)
         },
         //监视
         watch: {
             editFile:function(){
-                this.pushArray();
+            	if(!this.editFile.unWatch){
+		            this.pushArray();
+                }
             },
             'removeData.id':function(){
             	this.remove(this.removeData.index,this.removeData.fileItem.keyId)
