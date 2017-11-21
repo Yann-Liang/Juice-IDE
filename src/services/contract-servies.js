@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-17 18:21:37
+ * @Last Modified time: 2017-11-20 14:07:21
  */
 //引入web3
 let Web3 = require('web3'),
@@ -361,8 +361,8 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007', //'8aa2e78b54fc3bf3c1ff2fd065830e876d76630f7a9c433909ca6d89881ffe18', //用户私钥
-            userAddress: '', //用户钱包地址
+            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007',//用户私钥
+            address: '', //用户钱包地址
         }
 
         //部署结果
@@ -413,14 +413,14 @@ class DeployService {
 
     //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
-        debugger;
         this.deployStart(fileName, contractName);
-        this.user.userAddress = userAddress;
+        this.user.address = userAddress;
         this.result = {
             contractAddress: '',
             TxHash: '',
             From: userAddress,
         };
+        debugger;
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
@@ -571,7 +571,7 @@ class DeployService {
             try {
                 //加上from
                 argumentList.push({
-                    from: this.user.userAddress
+                    from: this.user.address
                 });
                 let result = contract[contractFnName].apply(null, argumentList);
                 debugger;
@@ -613,7 +613,7 @@ class DeployService {
             console.log('data', data)
             const txParams = {
                 //from就是钱包地址，但是用私钥签名后，钱包地址可以通过签名得到公钥再通过公钥得到钱包地址 不用传
-                //from: this.user.userAddress,
+                //from: this.user.address,
                 //防重 每次都生成一个新的nonce，用过之后就失效了
                 nonce: this.web3.nonce(),
                 gasPrice: 21000000000,
@@ -686,7 +686,7 @@ class DeployService {
 
     runStart(contractAddress, contractFnName, constant, payable) {
         consoleService.output('[开始运行]', `Function [${contractFnName}] invoking...`, 'Invoke args:', {
-            From: this.user.userAddress,
+            From: this.user.address,
             to: contractAddress,
             constant: constant,
             payable: payable,
@@ -736,28 +736,28 @@ class DeployService {
 
     sign(txParams) {
         //调试用
-        return new Promise((resolve, reject) => {
-            let tx = new EthereumTx(txParams);
-            console.log('txParams', txParams);
-            //钱包签名
-            let privateKey = Buffer.from(this.user.privateKey, 'hex');
-            tx.sign(privateKey);
-            const serializedTx = tx.serialize(),
-                serializedTxHex = "0x" + serializedTx.toString('hex');
-            resolve(serializedTxHex);
-        })
-
         // return new Promise((resolve, reject) => {
-        //     Juice.wallat.sign(txParams, (res) => {
-        //         if (res.code == 0) {
-        //             resolve(res.data);
-        //         } else {
-        //             consoleService.output('[签名失败]', {
-        //                 logError: res.msg
-        //             });
-        //         }
-        //     })
+        //     let tx = new EthereumTx(txParams);
+        //     console.log('txParams', txParams);
+        //     //钱包签名
+        //     let privateKey = Buffer.from(this.user.privateKey, 'hex');
+        //     tx.sign(privateKey);
+        //     const serializedTx = tx.serialize(),
+        //         serializedTxHex = "0x" + serializedTx.toString('hex');
+        //     resolve(serializedTxHex);
         // })
+
+        return new Promise((resolve, reject) => {
+            Juice.wallet.sign(txParams, (res) => {
+                if (res.code == 0) {
+                    resolve(res.data);
+                } else {
+                    consoleService.output('[签名失败]', {
+                        logError: res.msg
+                    });
+                }
+            })
+        })
     }
 
     //获取要查询的时间

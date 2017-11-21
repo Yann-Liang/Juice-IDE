@@ -77,7 +77,7 @@
             deploy(){
                 let item=this.form.contractItem,
                 deploy=()=>{
-                    contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.userAddress).then((address)=>{
+                    contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.address).then((address)=>{
                         if(address){
                             this.form.address=address;
                             this.flag=true;
@@ -105,7 +105,7 @@
                 }
             },
             getUserInfo(callback){
-                this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'//;'0x3864bc90a9b8ee5f6d414d6ef3e459f2a3513668'
+                //this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'
                 try {
                     Juice.user.getUserInfo((res)=>{
                         if(!res.code){
