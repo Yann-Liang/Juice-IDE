@@ -30,7 +30,7 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
-            free = spawn(this.getSolcPath(),['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+            free = spawn(this.getSolcPath(),['-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
                 if(result.errors && result.errors.length>0){
@@ -49,6 +49,7 @@ class compileServies {
             });
             // 注册子进程关闭事件
             free.on('exit', function (code, signal) {
+                console.info('exit',code,signal)
                 if(code==0){
                     console.info('_this.contractName',_this.contractName);
                     if(_this.contractName && _this.contractName.length>0){
@@ -193,7 +194,6 @@ class compileServies {
     //获取solc路径
     getSolcPath() {
         const app = require('electron').remote.app;
-
         return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : path.join(app.getPath('exe'), '..', '/solcs/solc');
     }
 }
