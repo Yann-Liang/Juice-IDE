@@ -172,7 +172,7 @@
                 ,'changeDirNameModal','setHintInfo','updateNewOpenFile','updateData','updateActiveEditor','changeFileData','setActiveFile']),
             newFile(){
             	let blo = true;
-	            this.getUrl.forEach((item,index)=>{
+	            this.fileTreeData.forEach((item,index)=>{
 	            	if(item.keyId === this.activeFile.keyId && file.isFile(this.activeFile.value)){
 			            blo = false;
                     }
@@ -361,6 +361,7 @@
         },
         //生命周期函数
         created() {
+        	console.log(this.getUrl)
 	        this.queryFileListData();
         },
         beforeMount() {
