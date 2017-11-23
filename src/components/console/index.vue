@@ -244,7 +244,8 @@
     }
     .log-output{
         box-sizing:border-box;
-        width:100%;
+        /*width:100%;*/
+        width:calc(~"100% - 3px");
         height:200px;
         overflow-x: hidden;
         overflow-y: auto;
@@ -252,8 +253,8 @@
         line-height:24px;
     }
     .log-output::-webkit-scrollbar {
-        width:5px;
-        height:5px;
+        width:10px;
+        height:10px;
     }
     .log-output::-webkit-scrollbar-track-piece {
         background:#fff;
@@ -261,7 +262,8 @@
     .log-output::-webkit-scrollbar-thumb{
         background:#e5e5e5;
         height:50px;
-        border-radius:8px;
+        border-radius:10px;
+        z-index:999999;
     }
     .log-item{
         margin-bottom:15px;
