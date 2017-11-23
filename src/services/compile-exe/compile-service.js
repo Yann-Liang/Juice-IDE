@@ -131,6 +131,7 @@ class compileServies {
         } catch (exception) {
             result = { error: 'Uncaught JavaScript exception:\n' + exception }
         }
+        console.info('result======',result);
         if(result.errors && result.errors.length>0){
             let errors = result.errors,errorsKeyArr={},errorsArr=[],
                 _input = source.sources[store.state.editor.activeEditor.name].match(/import\s+[\"|\'][\w|.|\\|\/]+[\"|\']/gi);
