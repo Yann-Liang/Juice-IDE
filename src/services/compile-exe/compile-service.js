@@ -30,6 +30,7 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
+            console.info(this.getSolcPath());
             free = spawn(this.getSolcPath(),['-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
@@ -41,7 +42,6 @@ class compileServies {
             },path);
             // 捕获标准输出并将其打印到控制台
             free.stdout.on('data', function (data) {
-
             });
             // 捕获标准错误输出并将其打印到控制台
             free.stderr.on('data', function (data) {
@@ -79,6 +79,7 @@ class compileServies {
                                 });
                                 consoleService.output({logSuccess:'Compiler Success'});
                                 consoleService.output(falseData);
+                                console.info(store.state.compile);
                                 _this.clearOutput();
                             }
                         },100)
