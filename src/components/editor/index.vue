@@ -30,9 +30,10 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
+                    <span class='search-err' v-if='searchErr'>无结果</span>
                     <!--<span @click='onSearchUp'>↑</span>-->
                     <!--<span @click='onSearchDown'>↓</span>-->
                     <!--这里的上下切换，换成了input的键盘事件-->
@@ -135,6 +136,7 @@
         //实例的数据对象
         data() {
             return {
+                searchErr:false,
                 dataarr:[],
                 dataindex:"",
                 cha:true,
@@ -176,11 +178,25 @@
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
+                console.log('放大')
+                if(this.editor.getFontSize() == 24){
+                    return false;
+                }else{
+                    this.$refs.childMethod.editorFontSize(1);
+                }
+
+                // this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+                console.log('缩小')
+                if(this.editor.getFontSize() == 14){
+                    return false;
+                }else{
+                    this.$refs.childMethod.editorFontSize(-1)
+                }
+
+                // this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             findFunction:function(bool){
                 this.boolSearchVisible(bool);
@@ -199,9 +215,35 @@
             },
             //全局搜索
             onSearch:function(){
+                // console.log('diandiandian',this.inputValue)
                 //获取到当前选中的元素
+                // console.log('1111111111111111111111')
+                // console.log('getcopytext',this.editor.getCopyText());
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
+                console.log(this.editor.find(this.inputValue,{
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    // start:{row:1,column:1}
+                }) == undefined)
+                if(this.editor.find(this.inputValue,{
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    // start:{row:1,column:1}
+                }) == undefined){
+                    //搜索无结果
+                    this.searchErr = true;
+                }else{
+                    this.searchErr = false
+                }
             },
             //向上搜索
             onSearchUp:function(){
@@ -218,6 +260,7 @@
                 // this.searchVisible = false;
                 this.inputValue = "";
                 this.searchValue = "";
+                this.searchErr = false
             },
             fromSearch:function(){
                 this.$refs.childMethod.onSearch(this.fromValue);
@@ -772,12 +815,13 @@
     z-index: 100000;
     margin-left: -240px;
     padding: 0 10px;
-    width: 440px;
+    width: 480px;
     height: 60px;
     line-height: 60px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
     background-color:#fff;
+    padding-right:0;
     input{
         padding-left:10px;
         width:300px;
@@ -801,6 +845,12 @@
     .close-search{
         float:right;
         cursor: pointer;
+        margin-right:11px;
+    }
+    .search-err{
+        color:red;
+        display: inline-block;
+        width:42px;
     }
 }
 .replace-model{
