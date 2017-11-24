@@ -7,6 +7,8 @@ const{dialog} = require('electron').remote;
 export const fileAction = {
 	queryFileListData({ commit, state,rootState, dispatch}){
 		let data = file.getFileList(state.url);
+		console.log(state.url);
+		console.log(data);
 		rootState.editor.editData.forEach((item,index)=>{
 			data = file.updateFile(data,{keyId:item.keyId,save:false})
 		});

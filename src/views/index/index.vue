@@ -4,10 +4,10 @@
         <com-header></com-header>
         <div class="main">
             <ul class="tabs bgblue white no-chose">
-                <li @click="filesTab()"><i class="iconfont" title="文件">&#xe615;</i></li>
-                <li @click="compile()"><i class="iconfont" title="编译">&#xe613;</i></li>
-                <li @click="deployTab()"><i class="iconfont" title="部署">&#xe614;</i></li>
-                <li @click="queryTab()"><i class="iconfont" title="查找">&#xe616;</i></li>
+                <li @click="filesTab()"><i class="iconfont" title="合约文件管理器">&#xe615;</i></li>
+                <li @click="compile()"><i class="iconfont" title="编译合约">&#xe613;</i></li>
+                <li @click="deployTab()"><i class="iconfont" title="部署并运行合约">&#xe614;</i></li>
+                <li @click="queryTab()"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray no-chose">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
@@ -215,10 +215,16 @@
 		        this.updateRightMenuBlock(false);
             },
 	        newFile(){
-		        if(this.activeFile.value){
+		        let blo = true;
+		        this.fileTreeData.forEach((item,index)=>{
+			        if(item.keyId === this.activeFile.keyId && file.isFile(this.activeFile.value)){
+				        blo = false;
+			        }
+		        });
+		        if(this.activeFile.value && blo){
 			        this.changeShowFileNameModal(true);
 		        }else{
-			        file.newFile(this.activeFile.value,name,(res)=>{
+			        file.newFile('',name,(res)=>{
 				        if(this.activeFile.id === 1){
 					        this.updateNewOpenFile(this.activeFile);
 				        }
@@ -273,21 +279,40 @@
                 try {
                     Juice.app.getAppInfo((res)=>{
                         if(!res.code){
-                            contractServies.setProvider(res.data.chainUrl);
+                            contractServies.setProvider(res.data.contractUrl);
                         }
                     })
                 } catch (error) {
 
+                }
+            },
+            setIntSol(){
+            	const url = this.getUrl;
+            	if(url && url.length === 0){
+            		const data = [
+                        {
+                        	name: 'example1.sol',
+                            value:'',
+                            keyId:file.keyIdFn('')+'example1.sol'
+                        },
+			            {
+				            name: 'example2.sol',
+				            value:'',
+				            keyId:file.keyIdFn('')+'example2.sol'
+			            }
+                    ]
+		            this.updateUrl(data);
                 }
             }
         },
         //生命周期函数
         created() {
             this.setProvider();
+	        this.initUrlFn();
+	        this.setIntSol();
         },
         beforeMount() {},
         mounted() {
-            this.initUrlFn();
 	        this.hotkeysFn();
 	        this.updateData([]);
         },

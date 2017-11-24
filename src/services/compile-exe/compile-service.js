@@ -30,7 +30,8 @@ class compileServies {
             };
             var fileId = path;
             var spawn = require('child_process').spawn,free;
-            free = spawn(this.getSolcPath(),['--overwrite','-o','output','--optimize','--bin','--abi',path]);
+            console.info(this.getSolcPath());
+            free = spawn(this.getSolcPath(),['-o','output','--optimize','--bin','--abi',path]);
             //保存语法错误
             _this.grammarCheck(function(result, missingInputs, source){
                 if(result.errors && result.errors.length>0){
@@ -41,7 +42,6 @@ class compileServies {
             },path);
             // 捕获标准输出并将其打印到控制台
             free.stdout.on('data', function (data) {
-
             });
             // 捕获标准错误输出并将其打印到控制台
             free.stderr.on('data', function (data) {
@@ -49,6 +49,7 @@ class compileServies {
             });
             // 注册子进程关闭事件
             free.on('exit', function (code, signal) {
+                console.info('exit',code,signal)
                 if(code==0){
                     console.info('_this.contractName',_this.contractName);
                     if(_this.contractName && _this.contractName.length>0){
@@ -78,6 +79,7 @@ class compileServies {
                                 });
                                 consoleService.output({logSuccess:'Compiler Success'});
                                 consoleService.output(falseData);
+                                console.info(store.state.compile);
                                 _this.clearOutput();
                             }
                         },100)
@@ -129,6 +131,7 @@ class compileServies {
         } catch (exception) {
             result = { error: 'Uncaught JavaScript exception:\n' + exception }
         }
+        console.info('result======',result);
         if(result.errors && result.errors.length>0){
             let errors = result.errors,errorsKeyArr={},errorsArr=[],
                 _input = source.sources[store.state.editor.activeEditor.name].match(/import\s+[\"|\'][\w|.|\\|\/]+[\"|\']/gi);
@@ -193,7 +196,6 @@ class compileServies {
     //获取solc路径
     getSolcPath() {
         const app = require('electron').remote.app;
-
         return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : path.join(app.getPath('exe'), '..', '/solcs/solc');
     }
 }
