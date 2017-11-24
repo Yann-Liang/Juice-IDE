@@ -2,7 +2,7 @@
     <div class="">
         <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar' ref='leftbar' @click='scrollLeft' >
+                <div class='scroll-bar left-bar bggray' ref='leftbar' @click='scrollLeft' >
                     <i class='el-icon-d-arrow-left darker'></i>
                 </div>
                 <ul class='files white' ref='files'>
@@ -13,7 +13,7 @@
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <div class='scroll-bar right-bar' @click='scrollRight' ref='rightbar'>
+                <div class='scroll-bar right-bar bggray' @click='scrollRight' ref='rightbar'>
                     <i class='el-icon-d-arrow-right darker'></i>
                 </div>
             </div>
@@ -695,6 +695,7 @@
             z-index:999;
             font-size:16px;
             cursor: pointer;
+            // background:#fff;
         }
         .left-bar{
             left:0;
