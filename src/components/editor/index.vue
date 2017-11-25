@@ -735,7 +735,7 @@
             position: absolute;
             width:20px;
             top:0;
-            z-index:999;
+            z-index:2;//梁燕翔 挡住弹窗 改小
             font-size:16px;
             cursor: pointer;
             // background:#fff;
