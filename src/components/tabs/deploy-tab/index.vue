@@ -15,7 +15,7 @@
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
         <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
-        <validation @emitDeploy='publicDeploy'></validation>
+        <validation :valid-flag="validFlag" @emitDeploy='publicDeploy' @close="closeValidation"></validation>
     </div>
 </template>
 
@@ -44,7 +44,8 @@
                 deployedData:contractServies.data,
                 user:{
                     address:''
-                }
+                },
+                validFlag:false,
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -76,32 +77,10 @@
         //方法
         methods: {
             deploy(){
-                 var userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
-                console.log(userInfo.userName);
-                if(userInfo.userName){
-                    //存在,需要检测是否有身份证书
-                    this.updateUserInfo(userInfo);
-                    let account;
-                    if(userInfo.account){
-                        account = userInfo.account;
-                    }else{
-                        account = userInfo.userName;
-                    }
-                    console.log(keyManager.checkAvailable(userInfo.userName,account))
-                    if(keyManager.checkAvailable(userInfo.userName,account) == true){
-                        //存在，则需要进行账户验证
-                        console.log(keyManager.checkAvailable(userInfo.userName,account))
-                        this.boolValidVisible(true);
-                    }else{
-                        //未检测到身份证书，需要导入身份证书
-                        this.boolCertVisible(true);
-                    }
-
-                }else{
-                    this.boolLoginVisible(true);
-                }
+                this.validFlag=true;
             },
             publicDeploy(){
+                this.validFlag=false;
                 let item=this.form.contractItem,
                 deploy=()=>{
                     contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.address).then((address)=>{
@@ -141,6 +120,9 @@
                 } catch (error) {
 
                 }
+            },
+            closeValidation(){
+                this.validFlag=false;
             }
         },
         //生命周期函数

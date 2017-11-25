@@ -1,38 +1,36 @@
 <template>
-    <div>
-        <div class="modal" v-if="validFlag">
-            <div class="modal-main  info-model">
-                <el-row class="modal-title model-right">
-                    <span>JUICE区块链账户验证</span>
-                    <span class="modal-close" @click='closeVaild'></span>
-                </el-row>
-                <div class="modal-content model-password">
-                    <el-form :model='login2' ref='form3' :rules='rules' label-width='70px'>
-                        <el-form-item label="账户名" >
-                            <el-input v-model="userObj.userName" class="input-box" :disabled="true"></el-input>
-                        </el-form-item>
-                        <el-form-item label="密码" prop="accountPwd">
-                            <el-input type="password" v-model="login2.accountPwd" class="input-box" placeholder='请输入区块链账户身份证书密码'></el-input>
-                            <div class="el-form-item__error" v-if="passwordERR">密码输入错误</div>
-                        </el-form-item>
-                        <el-form-item label="验证码" prop="code">
-                            <el-input v-model="login2.code" class="input-box" id="code" @blur='checkLpicma' placeholder='请输入验证码'></el-input>
-                            <div class="code-img">
-                                <img :src='imgURL'>
-                                <input type="text" v-model='checkCode' :style='{color:activeColor}'>
-                            </div>
-                            <span unselectable="on" @click="codeURL">
-                            换一张
-                            </span>
-                            <div class="el-form-item__error" v-if="codeERR">验证码不正确</div>
-                        </el-form-item>
-                    </el-form>
-                </div>
-                <div class="modal-btn">
-                    <el-button class='bgcanbtn white btn-info' @click='closeVaild'>取消</el-button>
-                    <el-button class="bgblue white btn-info" type="p
-                    rimary" @click='sureValid' :disabled='disabled'>确定</el-button>
-                </div>
+    <div class="modal" v-if="validFlag">
+        <div class="modal-main  info-model">
+            <el-row class="modal-title model-right">
+                <span>JUICE区块链账户验证</span>
+                <span class="modal-close" @click='closeVaild'></span>
+            </el-row>
+            <div class="modal-content model-password">
+                <el-form :model='login2' ref='form3' :rules='rules' label-width='70px'>
+                    <el-form-item label="账户名" >
+                        <el-input v-model="login2.userName" class="input-box" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="accountPwd">
+                        <el-input type="password" v-model="login2.accountPwd" class="input-box" placeholder='请输入区块链账户身份证书密码'></el-input>
+                        <div class="el-form-item__error" v-if="passwordERR">密码输入错误</div>
+                    </el-form-item>
+                    <el-form-item label="验证码" prop="code">
+                        <el-input v-model="login2.code" class="input-box" id="code" @blur='checkLpicma' placeholder='请输入验证码'></el-input>
+                        <div class="code-img">
+                            <img :src='imgURL'>
+                            <input type="text" v-model='checkCode' :style='{color:activeColor}'>
+                        </div>
+                        <span unselectable="on" @click="codeURL">
+                        换一张
+                        </span>
+                        <div class="el-form-item__error" v-if="codeERR">验证码不正确</div>
+                    </el-form-item>
+                </el-form>
+            </div>
+            <div class="modal-btn">
+                <el-button class='bgcanbtn white btn-info' @click='closeVaild'>取消</el-button>
+                <el-button class="bgblue white btn-info" type="p
+                rimary" @click='sureValid' :disabled='disabled'>确定</el-button>
             </div>
         </div>
     </div>
@@ -52,6 +50,7 @@ export default{
                 login2:{
                     accountPwd:"",
                     code:"",
+                    userName:'',
                 },
                 imgURL:'',
                 codeERR: false,
@@ -69,7 +68,11 @@ export default{
             boolValidVisible:{
 				type: Boolean,
       			default: false,
-			},
+            },
+            validFlag:{
+				type: Boolean,
+      			default: false,
+            },
         },
         //计算
         computed: {
@@ -112,45 +115,25 @@ export default{
                 }
             },
             closeVaild(){
-
+                this.$emit('close');
             },
             sureValid(){
-                //判断account是否有值
-                let account;
-                if(this.userObj.account){
-                    account = this.userObj.account;
-                }else{
-                    account = this.userObj.userName;
-                }
-                var validInfo = {
-                    userName:this.userObj.userName,
-                    account:account,
-                    password:this.login2.accountPwd,
-                }
                 this.$refs.form3.validate((valid)=>{
                     if(valid){
                         if(this.login2.code.toUpperCase() != this.checkCode){
                             this.codeERR = true;
                         }else{
                             this.codeERR = false;
-                            console.log("进行账户验证,获取私钥");
-                            //var privateKey =keyManager.recover(validInfo.userName,validInfo.account,validInfo.password);
-                            //var address = keyManager.getAddress(validInfo.userName,validInfo.account);
-                            console.log('获取得到的私钥',privateKey);
-                            console.log('获取得到的地址',address);
-                            if(privateKey){
-                                //存在
-                                this.passwordERR = false;
-                                //设置私钥
-                                contractServies.setPrivateKey(privateKey);
-                                //设置地址
-                                contractServies.setUserAddress(address);
-                                this.$emit('emitDeploy');
-                            }else{
-                                //不存在
-                                this.passwordERR = true;
-                            }
+                            // try {
+                            //     Juice.user.getUserInfo((res)=>{
+                            //         if(!res.code){
+                            //             this.login2.userName=res.data.uuid;
+                            //         }
+                            //     })
+                            // } catch (error) {
 
+                            // }
+                            this.$emit('emitDeploy');
                         }
 
                     }
@@ -160,6 +143,15 @@ export default{
         },
         //生命周期函数
         created() {
+            try {
+                Juice.user.getUserInfo((res)=>{
+                    if(!res.code){
+                        this.login2.userName=res.data.uuid;
+                    }
+                })
+            } catch (error) {
+
+            }
             this.codeURL();
         },
         beforeMount() {
