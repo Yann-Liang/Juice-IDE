@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-21 19:43:48
+ * @Last Modified time: 2017-11-24 10:27:07
  */
 //引入web3
 let Web3 = require('web3'),
