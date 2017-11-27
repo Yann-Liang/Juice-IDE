@@ -259,16 +259,9 @@
                 // console.log('getcopytext',this.editor.getCopyText());
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
-                console.log(this.editor.find(this.inputValue,{
-                    backwards: false,
-                    wrap: true,
-                    caseSensitive: true,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                    // start:{row:1,column:1}
-                }) == undefined)
-                if(this.editor.find(this.inputValue,{
+                if(this.inputValue == ""){
+                    this.searchErr = false;
+                }else if(this.editor.find(this.inputValue,{
                     backwards: false,
                     wrap: true,
                     caseSensitive: true,
@@ -277,11 +270,11 @@
                     range:"",
                     // start:{row:1,column:1}
                 }) == undefined){
-                    //搜索无结果
                     this.searchErr = true;
                 }else{
-                    this.searchErr = false
+                    this.searchErr = false;
                 }
+
             },
             //向上搜索
             onSearchUp:function(){
