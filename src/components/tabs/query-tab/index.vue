@@ -34,7 +34,8 @@
                     abi:'',
                 },
 				flag:false,
-				abi:[]
+                abi:[],
+                validFlag:false,
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -51,6 +52,7 @@
                 this.validFlag=true;
             },
             queryContract(){
+                this.validFlag=false;
 				console.log('queryContract',this.form);
 				let contract=contractServies.queryContract(this.form.address,this.form.abi);
 				if(contract){
@@ -58,6 +60,9 @@
 					this.abi=contract.abi;
 				}
             },
+             closeValidation(){
+                this.validFlag=false;
+            }
         },
         //生命周期函数
         created() {
@@ -75,7 +80,8 @@
         },
         //组件
         components: {
-			run
+            run,
+            validation,
         },
         //过滤器
         filters: {

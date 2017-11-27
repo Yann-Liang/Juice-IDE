@@ -130,8 +130,8 @@ export default{
                                     password:this.login2.accountPwd,
                                     type:contractServies.user.type,
                                 },(res)=>{
+                                    this.codeURL();//更新验证码
                                     if(!res.code){
-                                        this.codeURL();//更新验证码
                                         this.$emit('emitDeploy');
                                     }else{
                                         //不存在
@@ -141,7 +141,7 @@ export default{
                             } catch (error) {
                                 alert(error)
                             }
-                            //this.$emit('emitDeploy');
+                            this.$emit('emitDeploy');
                         }
 
                     }
