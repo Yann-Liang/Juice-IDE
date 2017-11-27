@@ -80,9 +80,9 @@
                         </div>
                     </div>
                     <div class="modal-btn">
-                        <el-button type="primary" @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</el-button>
-                        <el-button type="primary" @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</el-button>
-                        <el-button class="cancel" :data-index='dataindex' @click='calcel'>取消</el-button>
+                        <span  class='btn-info'  @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
+                        <span  class='btn-info' type="primary" @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
+                        <span class="btn-info cancel" :data-index='dataindex' @click='calcel'>取消</span>
                      <!--    <el-button class="cancel" @click="calcel">取消</el-button>
                         <el-button type="primary" @click="sureDeleteAllFile()">确定</el-button> -->
                     </div>
@@ -440,7 +440,7 @@
             yes:function(e){
                 var index = e.target.getAttribute("data-index");
                 var arr = e.target.getAttribute("data-arr");
-                arr = JSON.parse(arr);
+                // arr = JSON.parse(arr);
                 if(this.select == index){
                     /*
                         当前高亮和要关闭的当前窗口相等
@@ -526,7 +526,7 @@
                     this.askVisible = true;
                     this.dataindex = index;
                     this.fileName = arr[0].name;
-                    this.dataarr = JSON.stringify(arr);
+                    this.dataarr = arr;
                     //
                 }else{
                     //不存在
@@ -1048,6 +1048,15 @@
             border-color:#bfbfbf;
         }
     }
+}
+.btn-info{
+    background-color: #0b8aee;
+    color: #fff;
+    padding: 11px 31px;
+    margin: 0 35px;
+    /* border: 1px solid #0b8aee; */
+    border-radius: 3px;
+    cursor: pointer;
 }
 
 .javascript-editor{
