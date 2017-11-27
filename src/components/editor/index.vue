@@ -1052,7 +1052,7 @@
 .btn-info{
     background-color: #0b8aee;
     color: #fff;
-    padding: 11px 31px;
+    padding: 9px 31px;
     margin: 0 35px;
     /* border: 1px solid #0b8aee; */
     border-radius: 3px;
