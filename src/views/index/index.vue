@@ -43,7 +43,7 @@
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
     import file from '@/services/API-file'
-
+    const beautify = require('js-beautify').js_beautify
     export default {
         //组件名
         name: "index",
@@ -188,8 +188,19 @@
                 hotkeys('ctrl+h', (event,handler)=>{
                     this.boolReplaceVisible(true);
                 });
+                //格式化
+                hotkeys('ctrl+l', (event,handler)=>{
+                    alert('ctrl+l');
+                    this.format();//格式化
+                });
 
 	        },
+            //代码格式化
+            format:function(){
+                console.log('设置格式化')
+                this.editor.setValue(beautify(this.editor.getValue()),1);
+                //引用了js-beautify库
+            },
             //保存成功提示
             success:function(cb){
                 this.boolSuccessVisible(true);

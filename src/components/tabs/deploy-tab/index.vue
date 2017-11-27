@@ -7,7 +7,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item label="">
-                <el-select v-model="form.contractItem" placeholder="选择合约文件">
+                <el-select v-model="form.contractItem" placeholder="选择合约">
                     <el-option v-for="(item,index) in compileData" :key="index" :label="item.contractName" :value="item"></el-option>
                 </el-select>
             </el-form-item>
@@ -15,7 +15,7 @@
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
         <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
-
+        <validation :valid-flag="validFlag" @emitDeploy='publicDeploy' @close="closeValidation"></validation>
     </div>
 </template>
 
@@ -25,6 +25,7 @@
     import contractServies from '@/services/contract-servies';
     import APIServies from '@/services/API-servies';
     import run from "@/components/run/";
+    import validation from "@/components/validation/";
 
     export default {
         //组件名
@@ -43,7 +44,8 @@
                 deployedData:contractServies.data,
                 user:{
                     address:''
-                }
+                },
+                validFlag:false,
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -60,7 +62,7 @@
                 return this.form.select?this.compileResult[this.form.select].data :[];
 
             },
-            runDisabled:function() {
+            runDisabled() {
                 let bool=false;
                 // for(let i=0;i<this.form2.selectFnIndex.inputs.length;i++){
                 //      console.log(this.selectFnIndex.inputs[i].arg)
@@ -75,6 +77,10 @@
         //方法
         methods: {
             deploy(){
+                this.validFlag=true;
+            },
+            publicDeploy(){
+                this.validFlag=false;
                 let item=this.form.contractItem,
                 deploy=()=>{
                     contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.address).then((address)=>{
@@ -87,9 +93,6 @@
                     })
                 }
                 this.user.address?deploy():this.getUserInfo(deploy);
-            },
-            getContractLog(){
-                contractServies.getContractLog()
             },
             //没有选择合约文件 选择编辑区当前编辑的文件
             autoSelet(){
@@ -117,6 +120,9 @@
                 } catch (error) {
 
                 }
+            },
+            closeValidation(){
+                this.validFlag=false;
             }
         },
         //生命周期函数
@@ -136,7 +142,8 @@
         },
         //组件
         components: {
-            run
+            run,
+            validation,
         },
         //过滤器
         filters:{
@@ -156,6 +163,8 @@
         .el-form-item{
             margin-bottom:10px;
         }
+
+
     }
     .tab-btn{
         margin:20px 0 30px;

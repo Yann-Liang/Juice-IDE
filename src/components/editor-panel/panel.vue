@@ -42,19 +42,15 @@
             ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
 	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile']),
-            //放大
-            increase:function(){
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
-            },
-            //缩小
-            decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+            //放大缩小字体
+            editorFontSize:function(incr){
+                this.editor.setFontSize(this.editor.getFontSize() + incr)
             },
             //全局搜索
             onSearch:function(name){
                 this.editor.find(name,{
                     backwards: false,
-                    wrap: false,
+                    wrap: true,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
@@ -83,7 +79,7 @@
             replaceAll:function(oldValue,newValue){
                 this.editor.find(oldValue,{
                     backwards: false,
-                    wrap: false,
+                    wrap: true,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
@@ -349,7 +345,7 @@
                 enableLiveAutocompletion: true
             });
             //字体大小
-            this.editor.setFontSize(12);
+            this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
             this.setValue();
