@@ -76,9 +76,9 @@
                 this.queryTabFlag = false;
             },
             compile() {
-                this.filesTabFlag = false;
-                this.deployTabFlag = false;
-                this.queryTabFlag = false;
+                // this.filesTabFlag = false;
+                // this.deployTabFlag = false;
+                // this.queryTabFlag = false;
                 compileService.compiler();
             },
             deployTab() {

@@ -141,7 +141,7 @@ export default{
                             } catch (error) {
                                 alert(error)
                             }
-                            this.$emit('emitDeploy');
+                            //this.$emit('emitDeploy');
                         }
 
                     }
