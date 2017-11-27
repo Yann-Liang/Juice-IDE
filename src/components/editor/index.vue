@@ -68,7 +68,27 @@
 
                 </div>
             </div>
-            <div class="popup" v-if='askVisible'>
+            <div class="tip-modal modal" v-if="askVisible">
+                <div class="modal-main">
+                    <h4 class="modal-title">
+                        提示
+                        <span class="modal-close" @click="calcel"></span>
+                    </h4>
+                    <div class="modal-content">
+                        <div class="content-tip">
+                            <p class="">{{fileName}}文件已经被更改过，确定关闭？</p>
+                        </div>
+                    </div>
+                    <div class="modal-btn">
+                        <el-button type="primary" @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</el-button>
+                        <el-button type="primary" @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</el-button>
+                        <el-button class="cancel" :data-index='dataindex' @click='calcel'>取消</el-button>
+                     <!--    <el-button class="cancel" @click="calcel">取消</el-button>
+                        <el-button type="primary" @click="sureDeleteAllFile()">确定</el-button> -->
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="popup" v-if='askVisible'>
                 <div class="mask">
                    <div class="ask-model">
                         <div class="ask-content">
@@ -84,20 +104,37 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="popup"  v-if='asksVisible'>
+            </div> -->
+            <!-- <div class="popup"  v-if='asksVisible'>
                 <div class="mask">
                     <div class="ask-model">
                         <div class="ask-content">
                             <ul>
                                 <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
-                                <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
+                                <li>有尚未保存的文件，确定要关闭所有窗口吗！</li>
                                 <li>
                                     <span class='btn-info' @click='yess($event)'>是</span>
                                     <span class='btn-info' @click='nos($event)'>否</span>
                                 </li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="tip-modal modal" v-if="asksVisible">
+                <div class="modal-main">
+                    <h4 class="modal-title">
+                        提示
+                        <span class="modal-close" @click="calcels"></span>
+                    </h4>
+                    <div class="modal-content">
+                        <div class="content-tip">
+                            <p class="">有尚未保存的文件，确定关闭所有窗口吗！</p>
+                        </div>
+                    </div>
+                    <div class="modal-btn">
+                        <el-button class="cancel" @click='nos($event)'>取消</el-button>
+                        <el-button type="primary" @click='yess($event)'>确定</el-button>
                     </div>
                 </div>
             </div>
@@ -136,6 +173,7 @@
         //实例的数据对象
         data() {
             return {
+                fileName:"",
                 searchErr:false,
                 dataarr:[],
                 dataindex:"",
@@ -491,9 +529,12 @@
                 });
                 if(arr.length != 0){
                     //存在，
+                    console.log(arr)
                     this.askVisible = true;
                     this.dataindex = index;
+                    this.fileName = arr[0].name;
                     this.dataarr = JSON.stringify(arr);
+                    //
                 }else{
                     //不存在
                     this.askVisible = false;
@@ -1003,7 +1044,18 @@
     }
 
 }
-
+.tip-modal{
+    .modal-main{
+        width:511px;
+    }
+    .cancel{
+        background:#bfbfbf;
+        color:#fff;
+        &.el-button:hover{
+            border-color:#bfbfbf;
+        }
+    }
+}
 
 .javascript-editor{
     width:100%;
