@@ -440,7 +440,7 @@
             yes:function(e){
                 var index = e.target.getAttribute("data-index");
                 var arr = e.target.getAttribute("data-arr");
-                // arr = JSON.parse(arr);
+                arr = JSON.parse(arr);
                 if(this.select == index){
                     /*
                         当前高亮和要关闭的当前窗口相等
@@ -526,7 +526,7 @@
                     this.askVisible = true;
                     this.dataindex = index;
                     this.fileName = arr[0].name;
-                    this.dataarr = arr;
+                    this.dataarr = JSON.stringify(arr);
                     //
                 }else{
                     //不存在
