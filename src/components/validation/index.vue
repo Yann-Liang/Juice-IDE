@@ -50,7 +50,7 @@ export default{
                 login2:{
                     accountPwd:"",
                     code:"",
-                    userName:'',
+                    userName:contractServies.user.username,
                 },
                 imgURL:'',
                 codeERR: false,
@@ -124,15 +124,23 @@ export default{
                             this.codeERR = true;
                         }else{
                             this.codeERR = false;
-                            // try {
-                            //     Juice.user.getUserInfo((res)=>{
-                            //         if(!res.code){
-                            //             this.login2.userName=res.data.uuid;
-                            //         }
-                            //     })
-                            // } catch (error) {
-
-                            // }
+                            try {
+                                Juice.wallet.login({
+                                    username:contractServies.user.username,
+                                    password:this.login2.accountPwd,
+                                    type:contractServies.user.type,
+                                },(res)=>{
+                                    this.codeURL();//更新验证码
+                                    if(!res.code){
+                                        this.$emit('emitDeploy');
+                                    }else{
+                                        //不存在
+                                        this.passwordERR = true;
+                                    }
+                                })
+                            } catch (error) {
+                                alert(error)
+                            }
                             this.$emit('emitDeploy');
                         }
 

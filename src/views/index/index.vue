@@ -286,6 +286,22 @@
 
                 }
             },
+            getUserInfo(callback){
+                //this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'
+                try {
+                    Juice.user.getUserInfo((res)=>{
+                        if(!res.code){
+                            console.log('Juice.user.getUserInfo',res);
+                            contractServies.user.username=res.data.uuid;
+                            contractServies.user.address=res.data.address;
+                            contractServies.user.type=res.data.type;
+                            callback&&callback();
+                        }
+                    })
+                } catch (error) {
+                    console.warn('Juice.user.getUserInfo:',error)
+                }
+            },
             setIntSol(){
             	const url = this.getUrl;
             	if(url && url.length === 0){
@@ -308,6 +324,7 @@
         //生命周期函数
         created() {
             this.setProvider();
+            this.getUserInfo();
 	        this.initUrlFn();
 	        this.setIntSol();
         },
