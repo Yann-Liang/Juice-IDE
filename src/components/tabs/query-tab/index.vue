@@ -10,10 +10,10 @@
                     :rows="8"
                     placeholder="输入合约ABI" v-model="form.abi"></el-input>
             </el-form-item>
-            <el-button class="tab-btn btn-info" @click="queryContract">查询合约</el-button>
+            <el-button class="tab-btn btn-info" @click="query">查询合约</el-button>
         </el-form>
     	<run v-if="flag" :abi="abi" :address="form.address"></run>
-
+        <validation :valid-flag="validFlag" @emitDeploy='queryContract' @close="closeValidation"></validation>
     </div>
 </template>
 
@@ -21,6 +21,7 @@
     //import  from ''
 	import contractServies from '@/services/contract-servies';
 	import run from "@/components/run/";
+    import validation from "@/components/validation/";
 
     export default {
         //组件名
@@ -46,6 +47,9 @@
         },
         //方法
         methods: {
+            query(){
+                this.validFlag=true;
+            },
             queryContract(){
 				console.log('queryContract',this.form);
 				let contract=contractServies.queryContract(this.form.address,this.form.abi);
@@ -53,9 +57,6 @@
 					this.flag=true;
 					this.abi=contract.abi;
 				}
-            },
-            run(){
-                console.log(11)
             },
         },
         //生命周期函数
