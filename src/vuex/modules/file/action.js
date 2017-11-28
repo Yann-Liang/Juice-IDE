@@ -320,7 +320,7 @@ export const fileAction = {
 		if(state.activeFile.value){
 			if(file.isFile(state.activeFile.value)){ // 如果是文件
 				file.removeFile(state.activeFile.value,()=>{
-					updateUrlFn()
+					updateUrlFn();
 					dispatch('updateDeleteStatus',state.activeFile,{root:true})
 				})
 			}else if(file.isDir(state.activeFile.value)){ //如果是文件夹

@@ -275,6 +275,7 @@
 	        sureDeleteFile(){
 		        this.removeFileFn();
 		        this.changeShowDeleteModal(false);
+		        this.updateRightMenuBlock(false);
             },
 	        cancelFileNameFn(formName){
 		        this.ruleForm.newFileName = '';
