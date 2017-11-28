@@ -2,7 +2,7 @@
     <div class="">
         <div class="file-tab bggray">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar bggray' ref='leftbar' @click='scrollLeft' >
+                <div class='scroll-bar left-bar bggray' :class='showOrHideOne' ref='leftbar' @click='scrollLeft' >
                     <i class='el-icon-d-arrow-left darker'></i>
                 </div>
                 <ul class='files white' ref='files'>
@@ -13,7 +13,7 @@
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <div class='scroll-bar right-bar bggray' @click='scrollRight' ref='rightbar'>
+                <div class='scroll-bar right-bar bggray'  :class='showOrHideTwo' @click='scrollRight' ref='rightbar'>
                     <i class='el-icon-d-arrow-right darker'></i>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                     </h4>
                     <div class="modal-content">
                         <div class="content-tip">
-                            <p class="">{{fileName}}文件已经被更改过，确定关闭？</p>
+                            <p class="warning">{{fileName}}文件已经被更改过了，要保存更改吗？</p>
                         </div>
                     </div>
                     <div class="modal-btn">
@@ -173,6 +173,9 @@
         //实例的数据对象
         data() {
             return {
+                // hiddenLength:"",
+                showOrHideOne:"hide",
+                showOrHideTwo:"hide",
                 fileName:"",
                 searchErr:false,
                 dataarr:[],
@@ -207,7 +210,10 @@
         //计算
         computed: {
             ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor'
-                ,'searchVisible','replaceVisible','removeData','currentName','successVisible'])
+                ,'searchVisible','replaceVisible','removeData','currentName','successVisible']),
+            // hiddenLength:function(){
+            //     return console.log(this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth);
+            // }
         },
         //方法
         methods: {
@@ -336,31 +342,38 @@
             format:function(){
                 this.$refs.childMethod.format();
             },
-            //向右滑动
+            //点击向右滑动
             scrollRight:function(e){
+                console.log('执行向右滑动')
                 var rightArrow = this.$refs.rightbar;
                 var leftArrow = this.$refs.leftbar;
                 var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
-                var currentLeft = this.$refs.files.offsetLeft || 20;
+                var currentLeft = this.$refs.files.offsetLeft || 0;
                 var hiddenRight = hiddenLength + currentLeft;
+                console.log('hiddenRight>>>>>>>>>>>>>>>',hiddenLength,currentLeft,hiddenRight)
                 if(hiddenRight > 0){
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
+                        this.showOrHideTwo = 'hide';
+                        // this.showOrHideOne = 'hide';
                     }
                 }
             },
-            //向左滑动
+            //点击向左滑动
             scrollLeft:function(){
                 var leftArrow = this.$refs.leftbar;
                 var rightArrow = this.$refs.rightbar;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
+                console.log('currentLeft>>>>>>>>>',currentLeft)
                 if(currentLeft < 0){
                     if(currentLeft < -this.vistual){
                        this.$refs.files.style.left = `${currentLeft + this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`
+                        this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
+                        // this.showOrHideTwo = 'hide';
+                        this.showOrHideOne = 'hide';
                     }
                 }
             },
@@ -656,7 +669,7 @@
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
                     if(item.keyId == this.editFile.keyId){
-                        // console.log()
+                        console.log('不push进数组')
                         //为true 高亮显示当前，并且不push
                         this.select = index;
                         this.currentView = index;
@@ -664,10 +677,17 @@
                         this.name = this.editFile.name;
                         this.keyId = this.editFile.keyId;
                         blo = true;
+                        /*
+                            push进数组之后，确定
+                        */
+                        this.$nextTick(()=>{
+                            this.showTabScroll();
+                        })
                     }
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
+                    console.log('push进数组')
 	                let data = this.fileData;
 	                data.push(this.editFile);
 	                this.changeFileData(data);
@@ -676,8 +696,75 @@
                     this.value = this.fileData[this.fileData.length - 1].value;
                     this.name = this.fileData[this.fileData.length - 1].name;
 	                this.keyId = this.fileData[this.fileData.length - 1].keyId;
+
+                    this.$nextTick(()=>{
+                        this.initArrow();
+                    })
+                }
+            },
+            //初始化左移右移箭头
+            initArrow:function(){
+                if(this.fileData.length == 0){
+                    //什么也不做
+                }else{
+                    var leftArrow = this.$refs.leftbar;
+                    var rightArrow = this.$refs.rightbar;
+                    var filetabWidth = this.$refs.files.offsetWidth;
+                    var tabWidth = this.$refs.tabs.offsetWidth;
+                    var hiddenLength = filetabWidth - tabWidth;
+                    // console.log('this.$refs.files>>>>>>>>>>',this.$refs.files)
+                    // console.log('filetabWidth>>>>>>>>>>>>>',filetabWidth);
+                    // console.log('tabWidth>>>>>>>>>>>>>>>>',tabWidth);
+                    // console.log('hiddenLength>>>>>>>>>>>>>>>>>>',hiddenLength)
+                    var currentLeft = this.$refs.files.offsetLeft || 0;
+                    var hiddenRight = hiddenLength + currentLeft;
+                    if(hiddenLength > 0){
+                        //已超过，此时需要显示出来箭头
+                        this.showOrHideTwo = 'show';
+                        this.showOrHideOne = 'show';
+                        if(hiddenRight > 0){
+                            if(hiddenRight > this.vistual){
+                               this.$refs.files.style.left = `${currentLeft - this.vistual}px`
+                            }else{
+                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                            }
+                        }
+
+                    }else{
+                        this.showOrHideTwo = 'hide';
+                        this.showOrHideOne = 'hide';
+                        this.$refs.files.style.left = '0';
+                    }
+                    // console.log()
+                }
+
+            },
+            /*
+            不push进数组的时候，点击左边的tab，找到右边相对应的位置，在右边菜单栏已有小图标显示的情况下
+            */
+            showTabScroll:function(){
+                if(this.fileData.length == 0){
+                    //什么也不做
+                }else{
+                    var filetabWidth = this.$refs.files.offsetWidth;
+                    var tabWidth = this.$refs.tabs.offsetWidth;
+                    var hiddenLength = filetabWidth - tabWidth;
+                    var currentLeft = this.$refs.files.offsetLeft || 20;
+                    if(hiddenLength > 0){
+                        //证明已超过，此时
+
+                        console.log('currentLeft>>>>>>>>>',currentLeft)
+                        if(currentLeft < 0){
+                            if(currentLeft < -this.vistual){
+                               this.$refs.files.style.left = `${currentLeft + this.vistual}px`
+                            }else{
+                                this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`
+                            }
+                        }
+                    }
                 }
             }
+
         },
         //生命周期函数
         created() {
@@ -723,6 +810,13 @@
             },
             'removeData.id':function(){
             	this.remove(this.removeData.index,this.removeData.fileItem.keyId)
+            },
+            'fileData.length':function(){
+                this.$nextTick(()=>{
+                    console.log('this.fileData.length',this.fileData.length)
+                    this.initArrow();
+                })
+
             }
         },
         //组件
@@ -786,7 +880,7 @@
             flex-direction:row;
             justify-content:flex-start;
             position: absolute;
-            left:20px;
+            left:0px;
             overflow:hidden;
             cursor:default;
             li{
@@ -817,7 +911,7 @@
                 }
             }
             .new-file{
-                margin-left:10px;
+                margin-left:18px;
                 padding:0;
                 background-color:transparent;
             }
@@ -829,6 +923,12 @@
         }
 
     }
+}
+.show{
+    opacity: 1;
+}
+.hide{
+    opacity: 0;
 }
 .tools{
     width:227px;
@@ -1053,10 +1153,18 @@
     background-color: #0b8aee;
     color: #fff;
     padding: 9px 31px;
-    margin: 0 35px;
+    margin: 0 10px;
     /* border: 1px solid #0b8aee; */
     border-radius: 3px;
     cursor: pointer;
+}
+.cancel{
+    background: #bfbfbf;
+    color: #fff;
+    border: 1px solid #bfbfbf;
+}
+.warning{
+
 }
 
 .javascript-editor{
