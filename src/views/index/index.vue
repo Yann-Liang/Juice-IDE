@@ -3,11 +3,11 @@
         <com-title></com-title>
         <com-header></com-header>
         <div class="main">
-            <ul class="tabs bgblue white no-chose">
-                <li @click="filesTab()"><i class="iconfont" title="合约文件管理器">&#xe615;</i></li>
-                <li @click="compile()"><i class="iconfont" title="编译合约">&#xe613;</i></li>
-                <li @click="deployTab()"><i class="iconfont" title="部署并运行合约">&#xe614;</i></li>
-                <li @click="queryTab()"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
+            <ul class="tabs bgblue menu-def no-chose">
+                <li @click="filesTab()" :class="{active:activeMenu==1}"><i class="iconfont" title="合约文件管理器">&#xe615;</i></li>
+                <li @click="compile()" :class="{active:activeMenu==2}"><i class="iconfont" title="编译合约">&#xe613;</i></li>
+                <li @click="deployTab()" :class="{active:activeMenu==3}"><i class="iconfont" title="部署并运行合约">&#xe614;</i></li>
+                <li @click="queryTab()" :class="{active:activeMenu==4}"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray no-chose">
                 <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
@@ -16,7 +16,7 @@
                 <keep-alive>
                     <query-tab class="tab" v-if="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
                 </keep-alive>
-                <i class="border bgblue" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <i class="border fixed" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
@@ -43,7 +43,7 @@
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
     import file from '@/services/API-file'
-
+    const beautify = require('js-beautify').js_beautify
     export default {
         //组件名
         name: "index",
@@ -56,6 +56,7 @@
                 ghostbarFlag:false,
                 ghostbarLeft:100,
                 tabWidth:223,
+                activeMenu:'1' //当前操作菜单项
             };
         },
         //数组或对象，用于接收来自父组件的数据
@@ -74,22 +75,26 @@
                 this.filesTabFlag = !this.filesTabFlag;
                 this.deployTabFlag = false;
                 this.queryTabFlag = false;
+                this.activeMenu = '1';
             },
             compile() {
-                this.filesTabFlag = false;
-                this.deployTabFlag = false;
-                this.queryTabFlag = false;
+                // this.filesTabFlag = false;
+                // this.deployTabFlag = false;
+                // this.queryTabFlag = false;
                 compileService.compiler();
+                this.activeMenu = '2';
             },
             deployTab() {
                 this.deployTabFlag = !this.deployTabFlag;
                 this.filesTabFlag = false;
                 this.queryTabFlag = false;
+                this.activeMenu = '3';
             },
             queryTab() {
                 this.queryTabFlag = !this.queryTabFlag;
                 this.deployTabFlag = false;
                 this.filesTabFlag = false;
+                this.activeMenu = '4';
             },
             hiddenTabs(){
                 this.queryTabFlag = false;
@@ -188,8 +193,19 @@
                 hotkeys('ctrl+h', (event,handler)=>{
                     this.boolReplaceVisible(true);
                 });
+                //格式化
+                hotkeys('ctrl+l', (event,handler)=>{
+                    alert('ctrl+l');
+                    this.format();//格式化
+                });
 
 	        },
+            //代码格式化
+            format:function(){
+                console.log('设置格式化')
+                this.editor.setValue(beautify(this.editor.getValue()),1);
+                //引用了js-beautify库
+            },
             //保存成功提示
             success:function(cb){
                 this.boolSuccessVisible(true);
@@ -275,6 +291,22 @@
 
                 }
             },
+            getUserInfo(callback){
+                //this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'
+                try {
+                    Juice.user.getUserInfo((res)=>{
+                        if(!res.code){
+                            console.log('Juice.user.getUserInfo',res);
+                            contractServies.user.username=res.data.uuid;
+                            contractServies.user.address=res.data.address;
+                            contractServies.user.type=res.data.type;
+                            callback&&callback();
+                        }
+                    })
+                } catch (error) {
+                    console.warn('Juice.user.getUserInfo:',error)
+                }
+            },
             setIntSol(){
             	const url = this.getUrl;
             	if(url && url.length === 0){
@@ -297,6 +329,7 @@
         //生命周期函数
         created() {
             this.setProvider();
+            this.getUserInfo();
 	        this.initUrlFn();
 	        this.setIntSol();
         },
@@ -389,6 +422,17 @@
         bottom            : 0;
     }
     .iconfont{
-        font-size:26px;
+        font-size:24px;
+    }
+    .menu-def{
+        color:rgba(255,255,255,0.7);
+    }
+    .active{
+        color:rgba(255,255,255,1)
+    }
+    .fixed{
+        width:5px;
+        height:1000%;
+        background-color: transparent;
     }
 </style>

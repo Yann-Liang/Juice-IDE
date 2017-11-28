@@ -4,7 +4,7 @@
             <h4 class="bggray">
                 <span class="default no-chose">控制台</span>
                 <span class="search">
-                    <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.up="near(-1)" @keyup.down="near(1)">
+                    <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.right="near(1)" @keyup.left="near(-1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <!--<span class="direction" @click="near(-1)">↑</span>-->
                     <!--<span class="direction" @click="near(1)">↓</span>-->
                      <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
@@ -121,7 +121,7 @@
                 if(key && key.length>0){
                     var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
                     //高亮显示
-                    document.getElementById('log-id').innerHTML=data.replace(reg,'<span style="background-color:#2b5170;border:solid 1px #0066cc;color:#fff" class="high-lighter">' +key+ '</span>' );
+                    document.getElementById('log-id').innerHTML=data.replace(reg,'<span style="border:solid 1px #0066cc;" class="high-lighter">' +key+ '</span>' );
                     //滚动条定位
                     this.regList = document.getElementsByClassName('high-lighter');
                     var container = this.$el.querySelector("#log-id");
@@ -129,6 +129,7 @@
                         container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
                         this.current = 0;
                         this.regList[0].style.backgroundColor="#0066cc";
+                        this.regList[0].style.color="#fff";
                         this.hasMatch = true;
                     }else{ //无匹配值
                         this.hasMatch = false;
@@ -190,12 +191,14 @@
             },
             current:function(val,old){
                 var container = this.$el.querySelector("#log-id");
-                this.regList[old].style.backgroundColor="#2b5170";
+                this.regList[old].style.backgroundColor="#fff";
                 this.regList[old].style.borderColor="#0066cc";
+                this.regList[old].style.color="#333";
                 if(container){
                     container.scrollTop = this.regList[this.current].offsetTop-container.offsetTop;
                     this.regList[val].style.backgroundColor="#0066cc";
                     this.regList[val].style.borderColor="#0b8aee";
+                    this.regList[val].style.color="#fff";
                 }
             }
         },
@@ -220,8 +223,9 @@
         align-items:flex-end;
         h4{
             padding:0 14px 0 10px;
-            height:50px;
-            line-height:50px;
+            height:32px;
+            line-height:32px;
+            border-top:solid 1px #e4e4e4;
             .search{
                 float:right;
             }
@@ -230,11 +234,13 @@
                 cursor:pointer;
             }
             input{
+                position: relative;
+                top: -2px;
                 padding-left:10px;
                 width:200px;
-                height:32px;
-                line-height:32px;
-                border:solid 1px #bfbfbf;
+                height: 22px;
+                line-height: 22px;
+                border:solid 1px #e7e7e7;
                 &:focus{
                     outline:none;
                     border:solid 1px @blue;
@@ -244,12 +250,13 @@
     }
     .log-output{
         box-sizing:border-box;
-        width:100%;
+        width:calc(~"100% - 3px");
         height:200px;
         overflow-x: hidden;
         overflow-y: auto;
         padding:10px 15px;
         line-height:24px;
+        font-size:12px;
     }
     .log-output::-webkit-scrollbar {
         width:5px;
@@ -261,7 +268,8 @@
     .log-output::-webkit-scrollbar-thumb{
         background:#e5e5e5;
         height:50px;
-        border-radius:8px;
+        border-radius:5px;
+        z-index:999999;
     }
     .log-item{
         margin-bottom:15px;
@@ -272,6 +280,10 @@
     .log-detail{
         p,li,span{
             word-break:break-all;
+        }
+        p{
+            margin-bottom:10px;
+            line-height:16px;
         }
     }
     .log-title{
@@ -286,7 +298,8 @@
     }
     .command-line{
         padding-left:25px;
-        line-height:34px;
+        line-height:28px;
+        font-size:12px;
         border:solid 1px transparent;
         background: url('./images/command.png') no-repeat 10px center;
         &:focus{

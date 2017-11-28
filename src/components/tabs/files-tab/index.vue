@@ -1,13 +1,15 @@
 <template>
     <div class="file no-chose">
-        <ul class="tab-list">
-            <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
-            <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
-            <li title="导入文件夹" @click="exportFile('dir')"><i class="iconfont info">&#xe626;</i></li>
-            <li title="新建文件夹" @click="newDir()"><i class="iconfont info">&#xe627;</i></li>
-            <li title="保存所有文件" @click="saveAllFile()"><i class="iconfont info">&#xe629;</i></li>
-            <li title="删除所有文件" @click="removeAllFile()"><i class="iconfont info">&#xe623;</i></li>
-        </ul>
+        <div class="tab-container">
+            <ul class="tab-list">
+                <li title="新建文件" @click="newFile()"><i class="iconfont info">&#xe620;</i></li>
+                <li title="导入文件" @click="exportFile('file')"><i class="iconfont info">&#xe625;</i></li>
+                <li title="导入文件夹" @click="exportFile('dir')"><i class="iconfont info">&#xe626;</i></li>
+                <li title="新建文件夹" @click="newDir()"><i class="iconfont info">&#xe627;</i></li>
+                <li title="保存所有文件" @click="saveAllFile()"><i class="iconfont info">&#xe634;</i></li>
+                <li title="删除所有文件" @click="removeAllFile()"><i class="iconfont info">&#xe623;</i></li>
+            </ul>
+        </div>
         <ul class="file-content">
             <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item" ref="treeItem"></item>
             <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
@@ -402,18 +404,20 @@
     .file-content{
         flex-grow: 1;
     }
-    .tab-list{
-        height:40px;
-        min-height:40px;
-        padding:0 15px;
-        display: flex;
-        align-content: space-between;
+    .tab-container{
         border-bottom:solid 1px #e5e5e5;
     }
+    .tab-list{
+        width:205px;
+        height:32px;
+        min-height:32px;
+        padding:0 15px;
+    }
     .tab-list li{
-        flex-grow: 1;
-        height:40px;
-        line-height:40px;
+        margin-right:13px;
+        display:inline-block;
+        height:32px;
+        line-height:32px;
         cursor:pointer;
     }
     .file-content{

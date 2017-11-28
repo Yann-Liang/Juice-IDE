@@ -1,25 +1,25 @@
 <template>
     <div class="">
-        <div class="file-tab bggray">
+        <div class="file-tab bggrayer">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar bggray' ref='leftbar' @click='scrollLeft' >
-                    <i class='el-icon-d-arrow-left darker'></i>
+                <div class='scroll-bar left-bar bggrayer' ref='leftbar' @click='scrollLeft' >
+                    <i class="iconfont small">&#xe62f;</i>
                 </div>
-                <ul class='files white' ref='files'>
+                <ul class='files' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'>X</span>
+                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <div class='scroll-bar right-bar bggray' @click='scrollRight' ref='rightbar'>
-                    <i class='el-icon-d-arrow-right darker'></i>
+                <div class='scroll-bar right-bar bggrayer' @click='scrollRight' ref='rightbar'>
+                    <i class="iconfont small">&#xe630;</i>
                 </div>
             </div>
             <div class="tools">
                 <div class="tool">
-                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe62a;</i></span>
+                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe633;</i></span>
                     <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
                     <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
                     <span @click.prevent='increase' title="字体放大"><i class="iconfont info">&#xe61d;</i></span>
@@ -30,12 +30,12 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearchDown" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
-                    <!--<span @click='onSearchUp'>↑</span>-->
-                    <!--<span @click='onSearchDown'>↓</span>-->
-                    <!--这里的上下切换，换成了input的键盘事件-->
+                    <span class='search-err' v-if='searchErr'>无结果</span>
+                    <span @click='onSearchUp'><i class="iconfont info">&#xe638;</i></span>
+                    <span @click='onSearchDown'><i class="iconfont info">&#xe637;</i></span>
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
             </div>
@@ -67,7 +67,27 @@
 
                 </div>
             </div>
-            <div class="popup" v-if='askVisible'>
+            <div class="tip-modal modal" v-if="askVisible">
+                <div class="modal-main">
+                    <h4 class="modal-title">
+                        提示
+                        <span class="modal-close" @click="calcel"></span>
+                    </h4>
+                    <div class="modal-content">
+                        <div class="content-tip">
+                            <p class="">{{fileName}}文件已经被更改过，确定关闭？</p>
+                        </div>
+                    </div>
+                    <div class="modal-btn">
+                        <span  class='btn-info'  @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
+                        <span  class='btn-info' type="primary" @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
+                        <span class="btn-info cancel" :data-index='dataindex' @click='calcel'>取消</span>
+                     <!--    <el-button class="cancel" @click="calcel">取消</el-button>
+                        <el-button type="primary" @click="sureDeleteAllFile()">确定</el-button> -->
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="popup" v-if='askVisible'>
                 <div class="mask">
                    <div class="ask-model">
                         <div class="ask-content">
@@ -83,20 +103,37 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="popup"  v-if='asksVisible'>
+            </div> -->
+            <!-- <div class="popup"  v-if='asksVisible'>
                 <div class="mask">
                     <div class="ask-model">
                         <div class="ask-content">
                             <ul>
                                 <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
-                                <li>有尚未保存的文件，确定要关闭所有窗口吗？</li>
+                                <li>有尚未保存的文件，确定要关闭所有窗口吗！</li>
                                 <li>
                                     <span class='btn-info' @click='yess($event)'>是</span>
                                     <span class='btn-info' @click='nos($event)'>否</span>
                                 </li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="tip-modal modal" v-if="asksVisible">
+                <div class="modal-main">
+                    <h4 class="modal-title">
+                        提示
+                        <span class="modal-close" @click="calcels"></span>
+                    </h4>
+                    <div class="modal-content">
+                        <div class="content-tip">
+                            <p class="">有尚未保存的文件，确定关闭所有窗口吗！</p>
+                        </div>
+                    </div>
+                    <div class="modal-btn">
+                        <el-button class="cancel" @click='nos($event)'>取消</el-button>
+                        <el-button type="primary" @click='yess($event)'>确定</el-button>
                     </div>
                 </div>
             </div>
@@ -135,6 +172,8 @@
         //实例的数据对象
         data() {
             return {
+                fileName:"",
+                searchErr:false,
                 dataarr:[],
                 dataindex:"",
                 cha:true,
@@ -176,11 +215,25 @@
             //放大
             increase:function(){
                 // this.$refs.childMethod.increase();
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
+                console.log('放大')
+                if(this.editor.getFontSize() == 24){
+                    return false;
+                }else{
+                    this.$refs.childMethod.editorFontSize(1);
+                }
+
+                // this.editor.setFontSize(this.editor.getFontSize() + 1)
             },
             //缩小
             decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+                console.log('缩小')
+                if(this.editor.getFontSize() == 14){
+                    return false;
+                }else{
+                    this.$refs.childMethod.editorFontSize(-1)
+                }
+
+                // this.editor.setFontSize(this.editor.getFontSize() - 1)
             },
             findFunction:function(bool){
                 this.boolSearchVisible(bool);
@@ -199,9 +252,28 @@
             },
             //全局搜索
             onSearch:function(){
+                // console.log('diandiandian',this.inputValue)
                 //获取到当前选中的元素
+                // console.log('1111111111111111111111')
+                // console.log('getcopytext',this.editor.getCopyText());
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
+                if(this.inputValue == ""){
+                    this.searchErr = false;
+                }else if(this.editor.find(this.inputValue,{
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    // start:{row:1,column:1}
+                }) == undefined){
+                    this.searchErr = true;
+                }else{
+                    this.searchErr = false;
+                }
+
             },
             //向上搜索
             onSearchUp:function(){
@@ -218,6 +290,7 @@
                 // this.searchVisible = false;
                 this.inputValue = "";
                 this.searchValue = "";
+                this.searchErr = false
             },
             fromSearch:function(){
                 this.$refs.childMethod.onSearch(this.fromValue);
@@ -448,9 +521,12 @@
                 });
                 if(arr.length != 0){
                     //存在，
+                    console.log(arr)
                     this.askVisible = true;
                     this.dataindex = index;
+                    this.fileName = arr[0].name;
                     this.dataarr = JSON.stringify(arr);
+                    //
                 }else{
                     //不存在
                     this.askVisible = false;
@@ -680,21 +756,23 @@
 .file-tab{
     display:flex;
     align-content: space-between;
-    height:40px;
-    line-height:40px;
+    height:32px;
+    line-height:32px;
     position: relative;
+    padding-left:10px;
     .tabs{
         flex-grow: 1;
         position: relative;
         padding-right:20px;
-        overflow-x:hidden;
+        overflow:hidden;
         .scroll-bar{
             position: absolute;
             width:20px;
             top:0;
-            z-index:999;
+            z-index:2;//梁燕翔 挡住弹窗 改小
             font-size:16px;
             cursor: pointer;
+            // background:#fff;
         }
         .left-bar{
             left:0;
@@ -713,12 +791,13 @@
             cursor:default;
             li{
                 padding:0 5px 0 10px;
-                border-right:1px solid #fff;
                 display: flex;
                 flex-wrap:nowrap;
                 flex-direction:row;
                 justify-content:flex-end;
-                background-color:#c0c0c0;
+                font-size:12px;
+                color:#888;
+                background-color:#eee;
                 span{
                     display: inline-block;
                     white-space: nowrap;
@@ -737,6 +816,17 @@
                         }
                     }
                 }
+                .remove{
+                    padding:0;
+                    margin-top:14px;
+                    display:inline-block;
+                    width:8px;
+                    height:8px;
+                    background: url(images/close-blue.png) no-repeat center center;
+                    &:hover{
+                         background: url(images/close-darker.png) no-repeat center center;
+                     }
+                }
             }
             .new-file{
                 margin-left:10px;
@@ -744,7 +834,8 @@
                 background-color:transparent;
             }
             .li-active{
-                background-color: #999;
+                color:@fontBase;
+                background-color: #fff;
                 font-weight: bold;
                 border-bottom: 0 none;
             }
@@ -753,12 +844,12 @@
     }
 }
 .tools{
-    width:227px;
+    width:175px;
     position: relative;
     .tool{
         text-align: right;
         span{
-            margin-right:14px;
+            margin-right:8px;
             display: inline-block;
             cursor: pointer;
         }
@@ -771,17 +862,23 @@
     z-index: 100000;
     margin-left: -240px;
     padding: 0 10px;
-    width: 440px;
-    height: 60px;
-    line-height: 60px;
+    width: 480px;
+    height: 50px;
+    line-height: 50px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
     background-color:#fff;
+    padding-right:0;
+    .iconfont{
+        font-size:14px;
+        margin:0 5px;
+        cursor:pointer;
+    }
     input{
         padding-left:10px;
-        width:300px;
-        height:38px;
-        line-height:38px;
+        width:266px;
+        height:32px;
+        line-height:32px;
         border:solid 1px #bfbfbf;
         &:focus{
             outline:none;
@@ -789,17 +886,24 @@
          }
     }
     .btn{
-        margin:0 10px;
         display: inline-block;
+        padding:0;
         width:60px;
-        height:38px;
-        line-height:38px;
+        height:32px;
+        line-height:32px;
+        margin:0 10px;
         text-align: center;
         border-radius:3px;
     }
     .close-search{
         float:right;
         cursor: pointer;
+        margin-right:11px;
+    }
+    .search-err{
+        color:red;
+        display: inline-block;
+        width:42px;
     }
 }
 .replace-model{
@@ -952,7 +1056,27 @@
     }
 
 }
-
+.tip-modal{
+    .modal-main{
+        width:511px;
+    }
+    .cancel{
+        background:#bfbfbf;
+        color:#fff;
+        &.el-button:hover{
+            border-color:#bfbfbf;
+        }
+    }
+}
+.btn-info{
+    background-color: #0b8aee;
+    color: #fff;
+    padding: 9px 31px;
+    margin: 0 35px;
+    /* border: 1px solid #0b8aee; */
+    border-radius: 3px;
+    cursor: pointer;
+}
 
 .javascript-editor{
     width:100%;
@@ -974,7 +1098,9 @@
         font-style: normal;
         // border:1px solid red;
     }
-
-    // background-color:#000;
 }
+    .small{
+        font-size:12px;
+        color:#666;
+    }
 </style>

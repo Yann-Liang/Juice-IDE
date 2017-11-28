@@ -11,7 +11,7 @@
     //brace
     import * as ace from 'brace';
     import 'brace/mode/javascript';
-    import 'brace/theme/eclipse';
+    import 'brace/theme/tomorrow';
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
@@ -42,19 +42,15 @@
             ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
 	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile']),
-            //放大
-            increase:function(){
-                this.editor.setFontSize(this.editor.getFontSize() + 1)
-            },
-            //缩小
-            decrease:function(){
-                this.editor.setFontSize(this.editor.getFontSize() - 1)
+            //放大缩小字体
+            editorFontSize:function(incr){
+                this.editor.setFontSize(this.editor.getFontSize() + incr)
             },
             //全局搜索
             onSearch:function(name){
                 this.editor.find(name,{
                     backwards: false,
-                    wrap: false,
+                    wrap: true,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
@@ -83,7 +79,7 @@
             replaceAll:function(oldValue,newValue){
                 this.editor.find(oldValue,{
                     backwards: false,
-                    wrap: false,
+                    wrap: true,
                     caseSensitive: true,
                     wholeWord: false,
                     regExp: false,
@@ -332,6 +328,7 @@
         },
         mounted() {
             this.editor = ace.edit('javascript-editor');
+            this.editor.setStyle('font');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
             // console.log(this.editor,this.editor.on,this.editor.off)
@@ -341,15 +338,17 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/eclipse');
+            this.editor.setTheme('ace/theme/tomorrow');
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
                 // enableSnippets: true,
                 enableLiveAutocompletion: true
             });
+            //设置打印边距可见度
+            this.editor.setShowPrintMargin(false);
             //字体大小
-            this.editor.setFontSize(12);
+            this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
             this.setValue();
@@ -523,7 +522,8 @@
     width:100%;
     flex-grow:1;
 }
-
-
+.font{
+    /*font-family:"Ubuntu Mono","PingFang SC";*/
+}
 
 </style>

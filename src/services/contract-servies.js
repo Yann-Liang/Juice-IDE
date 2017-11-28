@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-21 15:51:02
+ * @Last Modified time: 2017-11-27 11:37:36
  */
 //引入web3
 let Web3 = require('web3'),
@@ -363,6 +363,8 @@ class DeployService {
         this.user = {
             privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007',//用户私钥
             address: '', //用户钱包地址
+            username: '',//用户名
+            type:'',
         }
 
         //部署结果
@@ -419,12 +421,13 @@ class DeployService {
             contractAddress: '',
             TxHash: '',
             From: userAddress,
+            abi:''
         };
         debugger;
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
-
+            this.result.abi = abi;
             //16进制 需要加上0x
             bin.substring(0, 2) == '0x' ? "" : bin = '0x' + bin;
 
@@ -468,7 +471,7 @@ class DeployService {
                                 resolve(myContract.address);
                             }
                         } else {
-                            resolve(err);
+                            resolve();
                             this.deployFailure(err);
                         }
                     });
