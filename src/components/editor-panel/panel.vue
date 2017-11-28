@@ -11,7 +11,7 @@
     //brace
     import * as ace from 'brace';
     import 'brace/mode/javascript';
-    import 'brace/theme/eclipse';
+    import 'brace/theme/tomorrow';
     import 'brace/ext/language_tools'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
@@ -337,13 +337,15 @@
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
-            this.editor.setTheme('ace/theme/eclipse');
+            this.editor.setTheme('ace/theme/tomorrow');
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
                 // enableSnippets: true,
                 enableLiveAutocompletion: true
             });
+            //设置打印边距可见度
+            this.editor.setShowPrintMargin(false);
             //字体大小
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
