@@ -1,9 +1,9 @@
 <template>
-    <header class="title-header bgblue white">
+    <header class="title-header">
         <i class="header-icon"></i>
         <ul class="header-right fr" id="toolbar">
             <li class="min" @click="min"></li>
-            <li class="max" @click="max"></li>
+            <li :class="isMaximized?'middle':'max'"  @click="max"></li>
             <li class="close" @click="close"></li>
         </ul>
         <p>JUICE IDE</p>
@@ -120,17 +120,19 @@
     }
 
     .title-header {
-        height: 50px;
-        line-height: 50px;
+        height: 25px;
+        line-height: 25px;
+		font-size:12px;
         -webkit-app-region: drag;
+		/*border-bottom:solid 1px #e4e4e4;*/
     }
 
     .header-icon {
         float: left;
-        margin: 9px;
-        width: 32px;
-        height: 32px;
-        background: url(./images/icon.png);
+        margin: 3px 9px;
+        width: 20px;
+        height: 20px;
+        background: url(./images/logo.png);
         background-size: 100% 100%;
     }
 
@@ -141,23 +143,27 @@
     .header-right>li {
         cursor: pointer;
         display: inline-block;
-        margin: 14px 15px 0px;
-        width: 16px;
-        height: 16px;
+        margin: 7px 15px 0px;
+        width: 12px;
+        height: 12px;
         background-repeat: no-repeat;
         background-size: 90%;
     }
 
     .min{
-        background: url(./images/shrink.png) 0 8px;
+        background: url(./images/shrink-blue.png) 0 0;
     }
 
     .max{
-        background: url(./images/magnify.png) 0 0;
+        background: url(./images/magnify-blue.png) 0 0;
     }
-
+	.header-right>.middle{
+		width:14px;
+		height:14px;
+		background: url(./images/middle.png) no-repeat 0 0;
+	}
     .close{
-        background: url(./images/close.png);
+        background: url(./images/close-blue.png);
     }
 
     .info-model{

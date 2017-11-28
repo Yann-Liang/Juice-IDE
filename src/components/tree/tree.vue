@@ -13,7 +13,7 @@
                 <img src="./images/dir.png" v-if="isFolder">
                 <img src="./images/file-default.png" v-if="!isFolder">
                 {{filesList.name}}
-                <span class="no-save" v-if="!filesList.save">· 未保存</span>
+                <span class="no-save" v-if="!filesList.save"></span>
                 <div class="wrap-delete">
                     <i class="el-icon-delete dir-icon default" v-if="!filesList.children" @click.stop="removeFile(filesList)"></i>
                 </div>
@@ -166,6 +166,7 @@
             padding-left:20px;
             img{
                 display:inline-block;
+                margin-right:4px;
             }
         }
         .root-file:hover{
@@ -190,7 +191,11 @@
         }
         .no-save{
             margin-left:30px;
-            color:rgba(255, 102, 0, 0.717647)
+            display: inline-block;
+            width:6px;
+            height:6px;
+            border-radius:6px;
+            background-color: rgba(255, 102, 0, 0.717647);
         }
         .tip{
             font-size:8px;
