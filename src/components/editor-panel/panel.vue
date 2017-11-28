@@ -328,6 +328,7 @@
         },
         mounted() {
             this.editor = ace.edit('javascript-editor');
+            this.editor.setStyle('font');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
             // console.log(this.editor,this.editor.on,this.editor.off)
@@ -523,9 +524,11 @@
     flex-grow:1;
 }
 .font{
+
     font-family:"PingFang SC","微软雅黑";
 }
 
+}
 
 
 </style>
