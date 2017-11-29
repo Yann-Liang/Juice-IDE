@@ -111,7 +111,7 @@ class compileServies {
     //语法检查
     grammarCheck(cb){
         var _this = this;
-        var sourceText = store.state.editor.activeEditor.source;
+        var sourceText =  store.state.editor.activeEditor.source;
         sourceText = sourceText.replace(/import\s+[\"|\'][\w|.|\\|\/]+[\"|\']\;*/ig,'');
         var source = {
             sources:{
@@ -136,7 +136,7 @@ class compileServies {
             let errors = result.errors,errorsKeyArr={},errorsArr=[],
                 _input = source.sources[store.state.editor.activeEditor.name].match(/import\s+[\"|\'][\w|.|\\|\/]+[\"|\']/gi);
             errors.forEach(function(error){
-                var errorId = error.match(/\w+\.sol\:[0-9]+/i);
+                var errorId = error.match(/\.sol\:[0-9]+/i);
                 if(!_input || !_this.isContain(_input,error)){
                     if(!!errorId){
                         if(!errorsKeyArr[errorId[0]]){
