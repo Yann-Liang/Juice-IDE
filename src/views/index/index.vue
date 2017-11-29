@@ -16,7 +16,7 @@
                 <keep-alive>
                     <query-tab class="tab" v-if="queryTabFlag" :style="{width:tabWidth+'px'}"></query-tab>
                 </keep-alive>
-                <i class="border fixed" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
+                <i class="border" v-if="queryTabFlag ||filesTabFlag||deployTabFlag" @mousedown="mousedown($event)"></i>
             </div>
             <div class="main-right">
                 <editor class="editor"></editor>
@@ -395,7 +395,7 @@
         width: 1px;
         height: 100%;
         cursor: col-resize;
-        //border-right: 1px solid ;
+        background-color: transparent;
     }
 
     .main-right {
@@ -418,7 +418,7 @@
         position          : absolute;
         cursor            : col-resize;
         z-index           : 9999;
-        top               : 100px;
+        top               : 50px;
         bottom            : 0;
     }
     .iconfont{
@@ -430,9 +430,5 @@
     .active{
         color:rgba(255,255,255,1)
     }
-    .fixed{
-        width:5px;
-        height:1000%;
-        background-color: transparent;
-    }
+
 </style>

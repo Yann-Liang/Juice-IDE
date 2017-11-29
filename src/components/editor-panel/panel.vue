@@ -528,7 +528,5 @@
     font-family:"PingFang SC","微软雅黑";
 }
 
-}
-
 
 </style>
