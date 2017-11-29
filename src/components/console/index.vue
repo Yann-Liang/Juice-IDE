@@ -293,9 +293,6 @@
             }
         }
     }
-    /*
-     * by 梁燕翔
-     */
     .log-border{
         position: absolute;
         width: 100%;
@@ -304,7 +301,7 @@
         background-color: transparent;
     }
     .log-output{
-        flex: 1;//梁燕翔
+        flex: 1;
         box-sizing:border-box;
         width:100%;
         overflow-x: hidden;
@@ -331,9 +328,6 @@
     .log-item-title{
         margin-bottom:10px;
     }
-    /*
-     * by 梁燕翔
-      */
     .log-area{
         flex: 1;
         display: flex;
@@ -370,10 +364,6 @@
             border:solid 1px @blue;
          }
     }
-
-    /*
-     * by 梁燕翔
-     */
     .log-ghostbar{
         height:3px ;
         opacity           : 0.5;
