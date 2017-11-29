@@ -9,7 +9,7 @@ export const config = {
     state: {
         language:'zh_cn',
         theme: 'default',
-        consoleHeight:51,
+        consoleHeight:34,
     },
     actions: configAction,
     getters: configGetter,

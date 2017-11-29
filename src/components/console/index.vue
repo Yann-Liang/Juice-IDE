@@ -93,13 +93,14 @@
         },
         //方法
         methods: {
+            ...mapActions(['updateConsoleHeight']),
             viewLog(){
                 // this.editor.resize(false);
                 consoleService.trigger(!this.consoleFlag);
                 // if(this.consoleFlag == true){
 
                 // }
-
+                this.updateConsoleHeight(this.consoleFlag?287:34);
             },
             viewRecord(){
                 var log = window.localStorage.getItem('deployLog');
