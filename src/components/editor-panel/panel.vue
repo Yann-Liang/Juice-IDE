@@ -54,12 +54,11 @@
                     caseSensitive: false,
                     wholeWord: false,
                     regExp: false,
-                    range:"",
+                    // range:"",
                     // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
-                this.onSearchUp();
-                this.onSearchDown();
+                this.editor.findPrevious();
             },
             //向上搜索
             onSearchUp:function(){
@@ -87,8 +86,7 @@
                     // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
-                this.onSearchUp();
-                this.onSearchDown();
+                this.editor.findPrevious();
                 this.editor.replaceAll(newValue);
             },
             //代码格式化
