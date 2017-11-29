@@ -5,6 +5,7 @@ import compile from './modules/compile/module.js'
 import file from './modules/file/module.js'
 import deploy from './modules/deploy/module.js'
 import editor from './modules/editor/module.js'
+import config from './modules/config/module.js'
 
 Vue.use(Vuex)
 
@@ -25,7 +26,8 @@ export default new Vuex.Store({
 	    compile,
 		file,
 		deploy,
-        editor
+		editor,
+		config,
 	},
 	state
 })

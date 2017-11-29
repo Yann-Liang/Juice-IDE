@@ -24,7 +24,7 @@
             </div>
 
         </div>
-        <div class="ghostbar bgblue" :style="{left:ghostbarLeft}" v-if="ghostbarFlag"></div>
+        <div class="ghostbar bgblue" :style="{left:ghostbarLeft+'px'}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
@@ -112,7 +112,7 @@
                 },getPosition =(event)=>  {
                     return event.pageX;
                 },moveGhostbar  =(event)=>  {
-                    this.ghostbarLeft = getPosition(event) + 'px'
+                    this.ghostbarLeft = getPosition(event)
                 },removeGhostbar =(event)=>  {
                     this.ghostbarFlag=false;
                     document.removeEventListener('mousemove', moveGhostbar)
@@ -411,6 +411,13 @@
         display:flex;
         flex-direction: column;
     }
+
+    .console{
+        display: flex;
+        flex-direction: column;
+        height: 287px;
+    }
+
 
     .ghostbar{
         width             : 3px;
