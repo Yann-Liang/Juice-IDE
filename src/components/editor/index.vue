@@ -331,6 +331,7 @@
             //点击向右滑动
             scrollRight:function(e){
                 console.log('执行向右滑动')
+                this.showOrHideOne = true;
                 var rightArrow = this.$refs.rightbar;
                 var leftArrow = this.$refs.leftbar;
                 var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
@@ -342,6 +343,7 @@
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
                         this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
+                        this.showOrHideTwo = false;
                         // this.showOrHideTwo = 'hide';
                         // this.showOrHideOne = 'hide';
                     }
@@ -349,6 +351,7 @@
             },
             //点击向左滑动
             scrollLeft:function(){
+                this.showOrHideTwo = true;
                 var leftArrow = this.$refs.leftbar;
                 var rightArrow = this.$refs.rightbar;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
@@ -357,7 +360,8 @@
                     if(currentLeft < -this.vistual){
                        this.$refs.files.style.left = `${currentLeft + this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`;
+                        this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
+                        this.showOrHideOne = false;
                         // this.showOrHideTwo = 'hide';
                         // this.showOrHideOne = 'hide';
                     }
@@ -722,7 +726,7 @@
                             if(hiddenRight > this.vistual){
                                this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                             }else{
-                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
                             }
                         }
 
