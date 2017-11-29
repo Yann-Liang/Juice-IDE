@@ -3,7 +3,7 @@
         <div class="file-tab bggrayer">
             <div class="tabs" ref='tabs'>
 
-                <div class='scroll-bar left-bar bggrayer'  :class='showOrHideOne' ref='leftbar' @click='scrollLeft' >
+                <div class='scroll-bar left-bar bggrayer'  v-if='showOrHideOne' ref='leftbar' @click='scrollLeft' >
                     <i class="iconfont small">&#xe62f;</i>
 
                 </div>
@@ -16,7 +16,7 @@
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
 
-                <div class='scroll-bar right-bar bggrayer'  :class='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
+                <div class='scroll-bar right-bar bggrayer'  v-if='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
                     <i class="iconfont small">&#xe630;</i>
 
                 </div>
@@ -34,7 +34,7 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}"  v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
                     <span class='search-err' v-if='searchErr'>无结果</span>
@@ -43,32 +43,23 @@
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
             </div>
-            <div class="replace-model" v-if='replaceVisible'>
+            <div class="replace-model shadow" v-if='replaceVisible'>
+                <div class="replace-content replace-one">
+                    <span>
+                        <input class="dark" type="text"  :style="{backgroundColor:repMatch?'#fff':'#d43718'}" v-model='fromValue'  placeholder="查找内容"  @keyup.up="onReplaceUp" @keyup.left="onReplaceUp" @keyup.down="onReplaceDown" @keyup.right="onReplaceDown"  @input='fromSearch' autofocus="autofocus" v-focus>
+                    </span>
+                    <span class="btn btn-info" @click='fromSearch'>查找</span>
+                    <!-- <span class='search-err' v-if='searchErr'>无结果</span> -->
+                    <span @click='onReplaceUp'><i class="iconfont info">&#xe638;</i></span>
+                    <span @click='onReplaceDown'><i class="iconfont info">&#xe637;</i></span>
+                    <span @click="offReplace" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
+                </div>
                 <div class="replace-content">
-                    <ul class="left">
-                        <li>
-                            <label for="">form:</label>
-                            <input type="text" name="" v-model='fromValue' @input='fromSearch'  autofocus="autofocus" v-focus/>
-                        </li>
-                        <li>
-                            <label for="">to:</label>
-                           <input type="text" name="" v-model="toValue"/>
-                        </li>
-                    </ul>
-                    <ul class="center">
-                        <li>
-                            <span @click='replaceSign' class='btn-info'>Replace</span>
-                        </li>
-                        <li>
-                            <span @click='replaceAll' class='btn-info'>ReplaceAll</span>
-                        </li>
-                    </ul>
-                    <ul class="right">
-                        <li @click='offReplace' class="close-search">
-                            <i class="iconfont dark">&#xe61f;</i>
-                        </li>
-                    </ul>
-
+                    <span>
+                        <input class="dark" type="text" v-model='toValue'  placeholder="替换为">
+                    </span>
+                    <span class="btn btn-info" @click='replaceSign'>替换</span>
+                    <span class="btn btn-info" @click='replaceAll'>全部替换</span>
                 </div>
             </div>
             <div class="tip-modal modal" v-if="askVisible">
@@ -91,39 +82,7 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="popup" v-if='askVisible'>
-                <div class="mask">
-                   <div class="ask-model">
-                        <div class="ask-content">
-                            <ul>
-                                <li><i class="iconfont dark" @click='calcel'>&#xe61f;</i></li>
-                                <li>此文件已经被更改过，确定关闭？</li>
-                                <li>
-                                    <span class='btn-info' @click='yes($event)' :data-index='dataindex' :data-arr='dataarr'>是</span>
-                                    <span class='btn-info' @click='no($event)' :data-index='dataindex' :data-arr='dataarr'>否</span>
-                                    <span class='btn-info' @click='calcel' :data-index='dataindex'>取消</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-            <!-- <div class="popup"  v-if='asksVisible'>
-                <div class="mask">
-                    <div class="ask-model">
-                        <div class="ask-content">
-                            <ul>
-                                <li><i class="iconfont dark" @click='calcels'>&#xe61f;</i></li>
-                                <li>有尚未保存的文件，确定要关闭所有窗口吗！</li>
-                                <li>
-                                    <span class='btn-info' @click='yess($event)'>是</span>
-                                    <span class='btn-info' @click='nos($event)'>否</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+
             <div class="tip-modal modal" v-if="asksVisible">
                 <div class="modal-main">
                     <h4 class="modal-title">
@@ -176,9 +135,11 @@
         //实例的数据对象
         data() {
             return {
+                repMatch:true,
+                hasMatch:true,
                 // hiddenLength:"",
-                showOrHideOne:"hide",
-                showOrHideTwo:"hide",
+                showOrHideOne:false,
+                showOrHideTwo:false,
                 fileName:"",
                 searchErr:false,
                 dataarr:[],
@@ -269,7 +230,7 @@
                 this.searchValue = this.inputValue;
                 this.$refs.childMethod.onSearch(this.inputValue);
                 if(this.inputValue == ""){
-                    this.searchErr = false;
+                    this.hasMatch = true;
                 }else if(this.editor.find(this.inputValue,{
                     backwards: false,
                     wrap: true,
@@ -279,9 +240,9 @@
                     range:"",
                     // start:{row:1,column:1}
                 }) == undefined){
-                    this.searchErr = true;
+                    this.hasMatch = false;
                 }else{
-                    this.searchErr = false;
+                    this.hasMatch = true;
                 }
 
             },
@@ -291,6 +252,7 @@
             },
             //向下搜索
             onSearchDown:function(){
+
                 this.$refs.childMethod.onSearchDown();
             },
             //关闭弹窗
@@ -304,6 +266,27 @@
             },
             fromSearch:function(){
                 this.$refs.childMethod.onSearch(this.fromValue);
+                if(this.fromValue == ""){
+                    this.repMatch = true;
+                }else if(this.editor.find(this.fromValue,{
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: true,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    // start:{row:1,column:1}
+                }) == undefined){
+                    this.repMatch = false;
+                }else{
+                    this.repMatch = true;
+                }
+            },
+            onReplaceUp(){
+                this.$refs.childMethod.onSearchUp();
+            },
+            onReplaceDown(){
+                this.$refs.childMethod.onSearchDown();
             },
             replace:function(){
                 this.boolReplaceVisible(true);
@@ -348,6 +331,7 @@
             //点击向右滑动
             scrollRight:function(e){
                 console.log('执行向右滑动')
+                this.showOrHideOne = true;
                 var rightArrow = this.$refs.rightbar;
                 var leftArrow = this.$refs.leftbar;
                 var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
@@ -359,13 +343,15 @@
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
                         this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
-                        this.showOrHideTwo = 'hide';
+                        this.showOrHideTwo = false;
+                        // this.showOrHideTwo = 'hide';
                         // this.showOrHideOne = 'hide';
                     }
                 }
             },
             //点击向左滑动
             scrollLeft:function(){
+                this.showOrHideTwo = true;
                 var leftArrow = this.$refs.leftbar;
                 var rightArrow = this.$refs.rightbar;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
@@ -375,8 +361,9 @@
                        this.$refs.files.style.left = `${currentLeft + this.vistual}px`
                     }else{
                         this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
+                        this.showOrHideOne = false;
                         // this.showOrHideTwo = 'hide';
-                        this.showOrHideOne = 'hide';
+                        // this.showOrHideOne = 'hide';
                     }
                 }
             },
@@ -579,6 +566,9 @@
                         this.tipsVisible = true;
                         this.value = "readonly";
                         this.changeFileData([]);
+                        this.showOrHideTwo = false;
+                        this.showOrHideOne = false;
+                        this.$refs.files.style.left = '0';
                     });
 
                 });
@@ -587,6 +577,9 @@
             //nos
             nos:function(e){
                 this.asksVisible = false;
+                // this.showOrHideTwo = false;
+                // this.showOrHideOne = false;
+                // this.$refs.files.style.left = '0';
             },
             //calcels
             calcels:function(){
@@ -606,12 +599,16 @@
                     更新左边文件管理处状态
                     更新fileData为空
                 */
+
                 if(this.editData.length == 0){
                     this.editorVisible = false;
                     this.tipsVisible = true;
                     this.asksVisible = false;
                     this.value = "readonly";
                     this.changeFileData([]);
+                    this.showOrHideTwo = false;
+                    this.showOrHideOne = false;
+                    this.$refs.files.style.left = '0';
                 }else{
                     //保存所有
                     this.asksVisible = true;
@@ -723,19 +720,19 @@
                     var hiddenRight = hiddenLength + currentLeft;
                     if(hiddenLength > 0){
                         //已超过，此时需要显示出来箭头
-                        this.showOrHideTwo = 'show';
-                        this.showOrHideOne = 'show';
+                        this.showOrHideTwo = true;
+                        this.showOrHideOne = true;
                         if(hiddenRight > 0){
                             if(hiddenRight > this.vistual){
                                this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                             }else{
-                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
                             }
                         }
 
                     }else{
-                        this.showOrHideTwo = 'hide';
-                        this.showOrHideOne = 'hide';
+                        this.showOrHideTwo = false;
+                        this.showOrHideOne = false;
                         this.$refs.files.style.left = '0';
                     }
                     // console.log()
@@ -857,7 +854,7 @@
     height:32px;
     line-height:32px;
     position: relative;
-    padding-left:10px;
+    // padding-left:10px;
     .tabs{
         flex-grow: 1;
         position: relative;
@@ -927,7 +924,7 @@
                 }
             }
             .new-file{
-                margin-left:18px;
+                margin-left:10px;
                 padding:0;
                 background-color:transparent;
             }
@@ -1015,62 +1012,54 @@
     top: 40px;
     left: 50%;
     z-index: 100000;
-    margin-left: -260px;
-    padding: 0 10px;
-    width: 520px;
-    height: 80px;
-    line-height: 100px;
+    margin-left: -240px;
+    padding: 10px 10px 0px;
+    width: 480px;
+    height: 90px;
+    // line-height: 50px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
     background-color:#fff;
-    .replace-content{
-        display: flex;
-        flex-wrap:nowrap;
-        flex-direction:row;
-        justify-content:flex-start;
-        height:80px;
-        ul{
-            height:80px;
-            margin-top:0;
-            padding-left:0;
-            flex-grow:1;
-            li{
-                height:40px;
-                line-height: 40px;
-                label{
-                    display: inline-block;
-                    width:50px;
-                }
-                input{
-                    display: inline-block;
-                    width:300px;
-                    height:25px;
-                    line-height: 25px;
-                    &:focus{
-                        outline:none;
-                        border:solid 1px @blue;
-                    }
-                }
-
-                span{
-                    display: inline-block;
-                    height:30px;
-                    line-height: 28px;
-                    width:80px;
-                    text-align: center;
-                    border-radius:3px;
-                }
-            }
-            .close-search{
-                height:80px;
-                line-height: 80px;
-                cursor: pointer;
-                text-align: center;
-            }
-        }
+    padding-right:0;
+    .replace-one{
+        margin-bottom:10px;
     }
-
-
+    .iconfont{
+        font-size:14px;
+        margin:0 5px;
+        cursor:pointer;
+    }
+    input{
+        padding-left:10px;
+        width:266px;
+        height:32px;
+        line-height:32px;
+        border:solid 1px #bfbfbf;
+        &:focus{
+            outline:none;
+            border:solid 1px @blue;
+         }
+    }
+    .btn{
+        display: inline-block;
+        padding:0;
+        width:65px;
+        height:32px;
+        line-height:32px;
+        margin:0 10px;
+        text-align: center;
+        border-radius:3px;
+    }
+    .close-search{
+        float:right;
+        cursor: pointer;
+        margin-right:11px;
+    }
+    .search-err{
+        color:red;
+        display: inline-block;
+        width:42px;
+    }
 }
 .success-model{
     position: absolute;
