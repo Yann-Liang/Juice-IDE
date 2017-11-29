@@ -407,6 +407,7 @@
         border-bottom:solid 1px #e5e5e5;
     }
     .tab-list{
+        box-sizing:border-box;
         width:205px;
         height:32px;
         min-height:32px;
