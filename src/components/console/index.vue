@@ -289,7 +289,7 @@
                 &:focus{
                     outline:none;
                     border:solid 1px @blue;
-                 }
+                }
             }
         }
     }
