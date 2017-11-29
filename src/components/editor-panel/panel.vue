@@ -51,7 +51,7 @@
                 this.editor.find(name,{
                     backwards: false,
                     wrap: true,
-                    caseSensitive: true,
+                    caseSensitive: false,
                     wholeWord: false,
                     regExp: false,
                     range:"",
@@ -328,6 +328,7 @@
         },
         mounted() {
             this.editor = ace.edit('javascript-editor');
+            this.editor.setStyle('font');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
             // console.log(this.editor,this.editor.on,this.editor.off)
@@ -346,6 +347,7 @@
             });
             //设置打印边距可见度
             this.editor.setShowPrintMargin(false);
+            this.editor.setStyle('font')
             //字体大小
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
@@ -521,7 +523,12 @@
     width:100%;
     flex-grow:1;
 }
+.font{
 
+    font-family:"PingFang SC","微软雅黑";
+}
+
+}
 
 
 </style>

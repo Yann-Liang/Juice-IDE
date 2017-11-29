@@ -1,25 +1,29 @@
 <template>
     <div class="">
-        <div class="file-tab bggray">
+        <div class="file-tab bggrayer">
             <div class="tabs" ref='tabs'>
-                <div class='scroll-bar left-bar bggray' ref='leftbar' @click='scrollLeft' >
-                    <i class='el-icon-d-arrow-left darker'></i>
+
+                <div class='scroll-bar left-bar bggrayer'  :class='showOrHideOne' ref='leftbar' @click='scrollLeft' >
+                    <i class="iconfont small">&#xe62f;</i>
+
                 </div>
-                <ul class='files white' ref='files'>
+                <ul class='files' ref='files'>
                     <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
                         <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'>X</span>
+                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
                         <span class="remove" v-if='dian'>...</span>
                     </li>
                     <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
-                <div class='scroll-bar right-bar bggray' @click='scrollRight' ref='rightbar'>
-                    <i class='el-icon-d-arrow-right darker'></i>
+
+                <div class='scroll-bar right-bar bggrayer'  :class='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
+                    <i class="iconfont small">&#xe630;</i>
+
                 </div>
             </div>
             <div class="tools">
                 <div class="tool">
-                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe62a;</i></span>
+                    <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe633;</i></span>
                     <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
                     <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
                     <span @click.prevent='increase' title="字体放大"><i class="iconfont info">&#xe61d;</i></span>
@@ -30,13 +34,12 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.down="onSearchDown" placeholder="搜索" @input='onSearch' style="width:300px;"  ref='search' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text" v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
                     <span class='search-err' v-if='searchErr'>无结果</span>
-                    <!--<span @click='onSearchUp'>↑</span>-->
-                    <!--<span @click='onSearchDown'>↓</span>-->
-                    <!--这里的上下切换，换成了input的键盘事件-->
+                    <span @click='onSearchUp'><i class="iconfont info">&#xe638;</i></span>
+                    <span @click='onSearchDown'><i class="iconfont info">&#xe637;</i></span>
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
             </div>
@@ -76,7 +79,7 @@
                     </h4>
                     <div class="modal-content">
                         <div class="content-tip">
-                            <p class="">{{fileName}}文件已经被更改过，确定关闭？</p>
+                            <p class="warning">{{fileName}}文件已经被更改过了，要保存更改吗？</p>
                         </div>
                     </div>
                     <div class="modal-btn">
@@ -173,6 +176,9 @@
         //实例的数据对象
         data() {
             return {
+                // hiddenLength:"",
+                showOrHideOne:"hide",
+                showOrHideTwo:"hide",
                 fileName:"",
                 searchErr:false,
                 dataarr:[],
@@ -207,7 +213,10 @@
         //计算
         computed: {
             ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor'
-                ,'searchVisible','replaceVisible','removeData','currentName','successVisible'])
+                ,'searchVisible','replaceVisible','removeData','currentName','successVisible']),
+            // hiddenLength:function(){
+            //     return console.log(this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth);
+            // }
         },
         //方法
         methods: {
@@ -336,31 +345,38 @@
             format:function(){
                 this.$refs.childMethod.format();
             },
-            //向右滑动
+            //点击向右滑动
             scrollRight:function(e){
+                console.log('执行向右滑动')
                 var rightArrow = this.$refs.rightbar;
                 var leftArrow = this.$refs.leftbar;
                 var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
-                var currentLeft = this.$refs.files.offsetLeft || 20;
+                var currentLeft = this.$refs.files.offsetLeft || 0;
                 var hiddenRight = hiddenLength + currentLeft;
+                console.log('hiddenRight>>>>>>>>>>>>>>>',hiddenLength,currentLeft,hiddenRight)
                 if(hiddenRight > 0){
                     if(hiddenRight > this.vistual){
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
+                        this.showOrHideTwo = 'hide';
+                        // this.showOrHideOne = 'hide';
                     }
                 }
             },
-            //向左滑动
+            //点击向左滑动
             scrollLeft:function(){
                 var leftArrow = this.$refs.leftbar;
                 var rightArrow = this.$refs.rightbar;
                 var currentLeft = this.$refs.files.offsetLeft || 20;
+                console.log('currentLeft>>>>>>>>>',currentLeft)
                 if(currentLeft < 0){
                     if(currentLeft < -this.vistual){
                        this.$refs.files.style.left = `${currentLeft + this.vistual}px`
                     }else{
-                        this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`
+                        this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
+                        // this.showOrHideTwo = 'hide';
+                        this.showOrHideOne = 'hide';
                     }
                 }
             },
@@ -656,7 +672,7 @@
                 let blo = false;
                 this.fileData.forEach((item,index)=>{
                     if(item.keyId == this.editFile.keyId){
-                        // console.log()
+                        console.log('不push进数组')
                         //为true 高亮显示当前，并且不push
                         this.select = index;
                         this.currentView = index;
@@ -664,10 +680,17 @@
                         this.name = this.editFile.name;
                         this.keyId = this.editFile.keyId;
                         blo = true;
+                        /*
+                            push进数组之后，确定
+                        */
+                        this.$nextTick(()=>{
+                            this.showTabScroll();
+                        })
                     }
                 });
                  //为false，push进数组，并高亮显示数组最后一个
                 if(blo == false){
+                    console.log('push进数组')
 	                let data = this.fileData;
 	                data.push(this.editFile);
 	                this.changeFileData(data);
@@ -676,8 +699,75 @@
                     this.value = this.fileData[this.fileData.length - 1].value;
                     this.name = this.fileData[this.fileData.length - 1].name;
 	                this.keyId = this.fileData[this.fileData.length - 1].keyId;
+
+                    this.$nextTick(()=>{
+                        this.initArrow();
+                    })
+                }
+            },
+            //初始化左移右移箭头
+            initArrow:function(){
+                if(this.fileData.length == 0){
+                    //什么也不做
+                }else{
+                    var leftArrow = this.$refs.leftbar;
+                    var rightArrow = this.$refs.rightbar;
+                    var filetabWidth = this.$refs.files.offsetWidth;
+                    var tabWidth = this.$refs.tabs.offsetWidth;
+                    var hiddenLength = filetabWidth - tabWidth;
+                    // console.log('this.$refs.files>>>>>>>>>>',this.$refs.files)
+                    // console.log('filetabWidth>>>>>>>>>>>>>',filetabWidth);
+                    // console.log('tabWidth>>>>>>>>>>>>>>>>',tabWidth);
+                    // console.log('hiddenLength>>>>>>>>>>>>>>>>>>',hiddenLength)
+                    var currentLeft = this.$refs.files.offsetLeft || 0;
+                    var hiddenRight = hiddenLength + currentLeft;
+                    if(hiddenLength > 0){
+                        //已超过，此时需要显示出来箭头
+                        this.showOrHideTwo = 'show';
+                        this.showOrHideOne = 'show';
+                        if(hiddenRight > 0){
+                            if(hiddenRight > this.vistual){
+                               this.$refs.files.style.left = `${currentLeft - this.vistual}px`
+                            }else{
+                                this.$refs.files.style.left = `${currentLeft - hiddenRight - 50}px`
+                            }
+                        }
+
+                    }else{
+                        this.showOrHideTwo = 'hide';
+                        this.showOrHideOne = 'hide';
+                        this.$refs.files.style.left = '0';
+                    }
+                    // console.log()
+                }
+
+            },
+            /*
+            不push进数组的时候，点击左边的tab，找到右边相对应的位置，在右边菜单栏已有小图标显示的情况下
+            */
+            showTabScroll:function(){
+                if(this.fileData.length == 0){
+                    //什么也不做
+                }else{
+                    var filetabWidth = this.$refs.files.offsetWidth;
+                    var tabWidth = this.$refs.tabs.offsetWidth;
+                    var hiddenLength = filetabWidth - tabWidth;
+                    var currentLeft = this.$refs.files.offsetLeft || 20;
+                    if(hiddenLength > 0){
+                        //证明已超过，此时
+
+                        console.log('currentLeft>>>>>>>>>',currentLeft)
+                        if(currentLeft < 0){
+                            if(currentLeft < -this.vistual){
+                               this.$refs.files.style.left = `${currentLeft + this.vistual}px`
+                            }else{
+                                this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`
+                            }
+                        }
+                    }
                 }
             }
+
         },
         //生命周期函数
         created() {
@@ -723,6 +813,13 @@
             },
             'removeData.id':function(){
             	this.remove(this.removeData.index,this.removeData.fileItem.keyId)
+            },
+            'fileData.length':function(){
+                this.$nextTick(()=>{
+                    console.log('this.fileData.length',this.fileData.length)
+                    this.initArrow();
+                })
+
             }
         },
         //组件
@@ -757,14 +854,15 @@
 .file-tab{
     display:flex;
     align-content: space-between;
-    height:40px;
-    line-height:40px;
+    height:32px;
+    line-height:32px;
     position: relative;
+    padding-left:10px;
     .tabs{
         flex-grow: 1;
         position: relative;
         padding-right:20px;
-        overflow-x:hidden;
+        overflow:hidden;
         .scroll-bar{
             position: absolute;
             width:20px;
@@ -786,17 +884,18 @@
             flex-direction:row;
             justify-content:flex-start;
             position: absolute;
-            left:20px;
+            left:0px;
             overflow:hidden;
             cursor:default;
             li{
                 padding:0 5px 0 10px;
-                border-right:1px solid #fff;
                 display: flex;
                 flex-wrap:nowrap;
                 flex-direction:row;
                 justify-content:flex-end;
-                background-color:#c0c0c0;
+                font-size:12px;
+                color:#888;
+                background-color:#eee;
                 span{
                     display: inline-block;
                     white-space: nowrap;
@@ -815,14 +914,26 @@
                         }
                     }
                 }
+                .remove{
+                    padding:0;
+                    margin-top:14px;
+                    display:inline-block;
+                    width:8px;
+                    height:8px;
+                    background: url(images/close-blue.png) no-repeat center center;
+                    &:hover{
+                         background: url(images/close-darker.png) no-repeat center center;
+                     }
+                }
             }
             .new-file{
-                margin-left:10px;
+                margin-left:18px;
                 padding:0;
                 background-color:transparent;
             }
             .li-active{
-                background-color: #999;
+                color:@fontBase;
+                background-color: #fff;
                 font-weight: bold;
                 border-bottom: 0 none;
             }
@@ -830,13 +941,19 @@
 
     }
 }
+.show{
+    opacity: 1;
+}
+.hide{
+    opacity: 0;
+}
 .tools{
-    width:227px;
+    width:175px;
     position: relative;
     .tool{
         text-align: right;
         span{
-            margin-right:14px;
+            margin-right:8px;
             display: inline-block;
             cursor: pointer;
         }
@@ -850,17 +967,22 @@
     margin-left: -240px;
     padding: 0 10px;
     width: 480px;
-    height: 60px;
-    line-height: 60px;
+    height: 50px;
+    line-height: 50px;
     border:solid 1px #e5e5e5;
     border-radius: 3px;
     background-color:#fff;
     padding-right:0;
+    .iconfont{
+        font-size:14px;
+        margin:0 5px;
+        cursor:pointer;
+    }
     input{
         padding-left:10px;
-        width:300px;
-        height:38px;
-        line-height:38px;
+        width:266px;
+        height:32px;
+        line-height:32px;
         border:solid 1px #bfbfbf;
         &:focus{
             outline:none;
@@ -868,11 +990,12 @@
          }
     }
     .btn{
-        margin:0 10px;
         display: inline-block;
+        padding:0;
         width:60px;
-        height:38px;
-        line-height:38px;
+        height:32px;
+        line-height:32px;
+        margin:0 10px;
         text-align: center;
         border-radius:3px;
     }
@@ -1053,10 +1176,18 @@
     background-color: #0b8aee;
     color: #fff;
     padding: 9px 31px;
-    margin: 0 35px;
+    margin: 0 10px;
     /* border: 1px solid #0b8aee; */
     border-radius: 3px;
     cursor: pointer;
+}
+.cancel{
+    background: #bfbfbf;
+    color: #fff;
+    border: 1px solid #bfbfbf;
+}
+.warning{
+
 }
 
 .javascript-editor{
@@ -1079,7 +1210,9 @@
         font-style: normal;
         // border:1px solid red;
     }
-
-    // background-color:#000;
 }
+    .small{
+        font-size:12px;
+        color:#666;
+    }
 </style>

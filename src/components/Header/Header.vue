@@ -1,5 +1,5 @@
 <template>
-    <div class="header bgwhite info no-chose">
+    <div class="header bggray no-chose">
         <div>
             <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
@@ -389,10 +389,11 @@
 </script>
 
 <style lang="less" scoped>
-@height:30px;
+@height:25px;
    .header{
        height: @height;
        display: flex;
+       font-size:12px;
        flex-direction:row;
        border-bottom:solid 1px #e5e5e5;
        .img{
@@ -408,7 +409,7 @@
         padding-left:20px;
         >li{
             line-height: @height;
-            margin-right:126px;
+            margin-right:30px;
             position: relative;
             ul{
                 position: absolute;
