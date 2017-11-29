@@ -41,7 +41,7 @@
                 },
                 flag:false,
                 args:[],
-                deployedData:contractServies.data,
+                //deployedData:contractServies.data,
                 user:{
                     address:''
                 },
