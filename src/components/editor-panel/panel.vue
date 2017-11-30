@@ -35,7 +35,7 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight'])
         },
         //方法
         methods: {
@@ -489,6 +489,9 @@
                 }
             },
             consoleFlag:function(){
+                this.editor.resize(true);
+            },
+            consoleHeight:function(){
                 this.editor.resize(true);
             }
         },
