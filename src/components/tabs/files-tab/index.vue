@@ -13,13 +13,13 @@
         <ul class="file-content">
             <item v-for="(item,index) in fileTreeData" class="file-item" :key="index" :filesList="item" ref="treeItem"></item>
             <div ref="rightMenu" class="right-menu" v-show="rightMenuBlock" :style="{top:position.y+'px',left:position.x+'px'}">
-                <ul class="wrap-menu-list">
+                <ul class="wrap-menu-list" id="wrap-menu-list">
                     <li @click="newFile()" @mousedown.stop="">新建文件</li>
                     <li @click="newDir()" @mousedown.stop="">新建文件夹</li>
                     <li @click="saveFile()" @mousedown.stop="" v-if="position.item && !position.item.children">保存</li>
                     <li @click="saveOtherPathFn()" @mousedown.stop="" v-if="position.item && !position.item.children">另存为</li>
-                    <li @click="rename" @mousedown.stop="">重命名</li>
-                    <li @click="removeFileFn" @mousedown.stop="">删除</li>
+                    <li @click="rename(position.item)" @mousedown.stop="">重命名</li>
+                    <li @click="removeFile(position.item)" @mousedown.stop="">删除</li>
                 </ul>
             </div>
         </ul>
@@ -53,7 +53,7 @@
                 </h4>
                 <div class="modal-content">
                     <div class="content-tip">
-                        <p class="tip-text"><span class="warning-icon"></span>确定删除{{deleteFile.value || deleteFile.name}}文件吗！</p>
+                        <p class="tip-text"><span class="warning-icon"></span>确定删除{{deleteFile.value || deleteFile.name}}{{deleteFile.id ==2 ? '文件': '文件夹'}}吗！</p>
                     </div>
                 </div>
                 <div class="modal-btn">
@@ -171,7 +171,8 @@
             ...mapActions(['queryFileListData','updateUrl','updateEditFile','updateRightMenuBlock',
                 'updateTreeData','saveAllFile','renameFile','saveEditorFile','saveOtherPath','updateDeleteStatus'
                 ,'updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeShowFileNameModal'
-                ,'changeDirNameModal','setHintInfo','updateNewOpenFile','updateData','updateActiveEditor','changeFileData','setActiveFile']),
+                ,'changeDirNameModal','setHintInfo','updateNewOpenFile','updateData','updateActiveEditor','changeFileData'
+                ,'setActiveFile','changeDeleteFile']),
             newFile(){
             	let blo = true;
 	            this.fileTreeData.forEach((item,index)=>{
@@ -223,14 +224,6 @@
 			        }
 		        });
             },
-	        updateUrlFn(filesList){
-		        this.getUrl.forEach((item,index,data)=>{
-			        if(filesList.value == item.value && filesList.name == item.name){
-				        data.splice(index,1);
-				        this.updateUrl(data)
-			        }
-		        })
-	        },
 	        removeAllFile(){
 		        this.changeShowTipModal(true);
             },
@@ -238,9 +231,9 @@
 	        	this.saveEditorFile();
 		        this.updateRightMenuBlock(false);
             },
-            rename(){ // 重命名
+            rename(item){ // 重命名
 	            this.title = '重命名';
-	            this.ruleForm.newFileName = '';
+	            this.ruleForm.newFileName = item.name;
 	            this.type = 'rename';
 	            this.changeShowFileNameModal(true);
             },
@@ -248,20 +241,24 @@
 		        this.updateRightMenuBlock(false);
 		        this.saveOtherPath(2);
             },
+	        removeFile(filesList){
+		        this.changeDeleteFile(filesList);
+		        this.changeShowDeleteModal(true)
+	        },
 	        cancelFn(){
 	        	this.changeShowTipModal(false);
             },
 	        sureDeleteAllFile(){
-		        const arr = this.getUrl;
+		        var arr = [];
+		        for (var x = 0; x < this.getUrl.length; x++){
+			        arr.push(this.getUrl[x])
+		        }
 		        arr.forEach((item,index)=>{
 		        	if(item.value){
-				        file.removeFile(item.value,()=>{
-					        this.updateUrlFn(item)
-				        })
-                    }else{
-				        this.updateUrlFn(item)
+				        file.removeFile(item.value,()=>{})
                     }
 		        });
+		        this.updateUrl([])
 		        // 更新初始状态
                 this.setActiveFile('');
                 this.updateEditFile({unWatch:true});

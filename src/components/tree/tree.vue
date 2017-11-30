@@ -108,10 +108,24 @@
             },
 			rightMenu(filesList,e){
             	if(e.button === 2){
+		            const documentHeight = window.innerHeight;;
+
+		            let clientY, divWidth;
+		            if(filesList.id == 1){
+			            divWidth = 124
+                    }else{
+			            divWidth = 186
+                    }
+		            if(documentHeight - e.clientY < divWidth){
+			            clientY = e.clientY - divWidth
+		            }else{
+			            clientY = e.clientY
+		            }
+
 		            this.setActiveFile(filesList);
                     const position = {
                     	x:e.clientX,
-                        y:e.clientY,
+                        y:clientY,
                         item:filesList
                     };
                     this.updatePosition(position);

@@ -306,8 +306,13 @@ class file {
 			properties:properties,
 			filters:[{name: 'Custom File Type', extensions: ['sol']},]
 		},(filename)=>{
-			const filepath = filename ? path.normalize(filename[0]).replace(/\\/g,'/') :'';
-			const item = this.GetByValue(data,filepath);
+			let filepath,item;
+			if(filename){
+				filepath = path.normalize(filename[0]).replace(/\\/g,'/');
+				item = this.GetByValue(data,filepath);
+			}else{
+				filepath = '';
+			}
 			if(item){
 				fn && fn(item)
 			}else{
