@@ -123,6 +123,9 @@
             },
             closeValidation(){
                 this.validFlag=false;
+            },
+            formChange(){
+                console.log('formChange')
             }
         },
         //生命周期函数
@@ -138,7 +141,7 @@
         },
         //监视
         watch: {
-
+            'form.select':'formChange'
         },
         //组件
         components: {

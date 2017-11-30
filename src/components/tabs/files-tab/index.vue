@@ -408,7 +408,6 @@
     }
     .tab-list{
         box-sizing:border-box;
-        width:205px;
         height:32px;
         min-height:32px;
         padding:0 15px;
@@ -419,12 +418,15 @@
         height:32px;
         line-height:32px;
         cursor:pointer;
-    }
-    .file-content{
-        .file-item{
-
+        &:last-child{
+            margin-right:0;
         }
     }
+    // .file-content{
+    //     .file-item{
+
+    //     }
+    // }
     .right-menu{
         position:fixed;
         left:0px;
