@@ -35,7 +35,7 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight'])
         },
         //方法
         methods: {
@@ -51,15 +51,14 @@
                 this.editor.find(name,{
                     backwards: false,
                     wrap: true,
-                    caseSensitive: true,
+                    caseSensitive: false,
                     wholeWord: false,
                     regExp: false,
-                    range:"",
+                    // range:"",
                     // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
-                this.onSearchUp();
-                this.onSearchDown();
+                this.editor.findPrevious();
             },
             //向上搜索
             onSearchUp:function(){
@@ -87,8 +86,7 @@
                     // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
-                this.onSearchUp();
-                this.onSearchDown();
+                this.editor.findPrevious();
                 this.editor.replaceAll(newValue);
             },
             //代码格式化
@@ -328,7 +326,6 @@
         },
         mounted() {
             this.editor = ace.edit('javascript-editor');
-            this.editor.setStyle('font');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
             // console.log(this.editor,this.editor.on,this.editor.off)
@@ -347,6 +344,7 @@
             });
             //设置打印边距可见度
             this.editor.setShowPrintMargin(false);
+            this.editor.setStyle('font')
             //字体大小
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
@@ -492,6 +490,9 @@
             },
             consoleFlag:function(){
                 this.editor.resize(true);
+            },
+            consoleHeight:function(){
+                this.editor.resize(true);
             }
         },
         //组件
@@ -522,8 +523,7 @@
     width:100%;
     flex-grow:1;
 }
-.font{
-    /*font-family:"Ubuntu Mono","PingFang SC";*/
-}
+
+
 
 </style>

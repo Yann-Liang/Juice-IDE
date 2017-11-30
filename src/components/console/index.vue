@@ -1,6 +1,7 @@
 <template>
-    <div>
+    <div class="console" :style="{height:consoleHeight+'px'}">
         <div class="log-header">
+             <i class="log-border" @mousedown="mousedown($event)"></i>
             <h4 class="bggray">
                 <span class="default no-chose">控制台</span>
                 <span class="search">
@@ -59,6 +60,7 @@
                 请输入需要执行的命令
             </div>
         </div>
+         <div class="log-ghostbar bgblue" :style="{bottom:ghostbarBottom+'px'}" v-if="ghostbarFlag"></div>
     </div>
 </template>
 
@@ -76,7 +78,9 @@
                 current:0,
                 regList:[],
                 hasMatch:true,
-                currentCommand:0
+                currentCommand:0,
+                ghostbarFlag:false,
+                ghostbarBottom:287,
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -85,17 +89,18 @@
         },
         //计算
         computed: {
-            ...mapGetters(['compileStatus','consoleFlag','consoleDetail','commandList','editor'])
+            ...mapGetters(['compileStatus','consoleFlag','consoleDetail','commandList','editor','consoleHeight'])
         },
         //方法
         methods: {
+            ...mapActions(['updateConsoleHeight']),
             viewLog(){
                 // this.editor.resize(false);
                 consoleService.trigger(!this.consoleFlag);
                 // if(this.consoleFlag == true){
 
                 // }
-
+                this.updateConsoleHeight(this.consoleFlag?287:34);
             },
             viewRecord(){
                 var log = window.localStorage.getItem('deployLog');
@@ -166,7 +171,41 @@
                 this.currentCommand = (this.currentCommand+dire<0)?0:(this.currentCommand+dire>this.commandList.length-1)?this.commandList.length-1:this.currentCommand+dire;
                 var commandLine = this.$el.querySelector("#command");
                 commandLine.innerHTML = this.commandList[this.currentCommand];
-            }
+            },
+            mousedown(event){
+                const cancelGhostbar =(event)=> {
+                    if (event.keyCode === 27) {
+                    document.body.removeChild(ghostbar)
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    }
+                },getPosition =(event)=>  {
+                    return document.body.clientHeight-event.pageY;
+                },moveGhostbar  =(event)=>  {
+                    this.ghostbarBottom = getPosition(event)
+                },removeGhostbar =(event)=>  {
+                    this.ghostbarFlag=false;
+                    document.removeEventListener('mousemove', moveGhostbar)
+                    document.removeEventListener('mouseup', removeGhostbar)
+                    document.removeEventListener('keydown', cancelGhostbar)
+                    let data=getPosition(event);
+                    if(data<120){
+                        this.updateConsoleHeight(120);
+                    }else{
+                        this.updateConsoleHeight(data);
+                    }
+                    this.height=data;
+                }
+                if (event.which === 1) {
+                    moveGhostbar(event)
+                    this.ghostbarFlag=true;
+                    document.addEventListener('mousemove', moveGhostbar)
+                    document.addEventListener('mouseup', removeGhostbar)
+                    document.addEventListener('keydown', cancelGhostbar);
+
+                }
+            },
         },
         mounted() {
         },
@@ -219,7 +258,13 @@
 
 <style lang="less" scoped>
     @import "../../less/modules/theme.less";
+    .console{
+        display: flex;
+        flex-direction: column;
+        height: 287px;
+    }
     .log-header{
+        position: relative;
         align-items:flex-end;
         h4{
             padding:0 14px 0 10px;
@@ -244,19 +289,25 @@
                 &:focus{
                     outline:none;
                     border:solid 1px @blue;
-                 }
+                }
             }
         }
     }
+    .log-border{
+        position: absolute;
+        width: 100%;
+        height: 3px;
+        cursor: row-resize;
+        background-color: transparent;
+    }
     .log-output{
+        flex: 1;
         box-sizing:border-box;
-        width:calc(~"100% - 3px");
-        height:200px;
+        width:100%;
         overflow-x: hidden;
         overflow-y: auto;
         padding:10px 15px;
         line-height:24px;
-        font-size:12px;
     }
     .log-output::-webkit-scrollbar {
         width:5px;
@@ -276,6 +327,12 @@
     }
     .log-item-title{
         margin-bottom:10px;
+    }
+    .log-area{
+        flex: 1;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
     }
     .log-detail{
         p,li,span{
@@ -306,5 +363,14 @@
             outline:none;
             border:solid 1px @blue;
          }
+    }
+    .log-ghostbar{
+        height:3px ;
+        opacity           : 0.5;
+        position          : fixed;
+        cursor            : row-resize;
+        z-index           : 9999;
+        left: 0px;
+        right: 0px;
     }
 </style>

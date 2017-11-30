@@ -9,6 +9,11 @@ class consoleServies {
     trigger(bool){
         //展开/折叠控制台
         store.dispatch('triggerConsoleFlag',bool);
+        if(bool){
+            store.dispatch('updateConsoleHeight','300')
+        }else{
+            store.dispatch('updateConsoleHeight','34')
+        }
     }
     output(...logs){
         //输出内容log,log如果需要颜色变化需要规定key值，否则直接传字符串

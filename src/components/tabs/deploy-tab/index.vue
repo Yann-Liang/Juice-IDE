@@ -41,7 +41,7 @@
                 },
                 flag:false,
                 args:[],
-                deployedData:contractServies.data,
+                //deployedData:contractServies.data,
                 user:{
                     address:''
                 },
@@ -123,6 +123,9 @@
             },
             closeValidation(){
                 this.validFlag=false;
+            },
+            formChange(){
+                console.log('formChange')
             }
         },
         //生命周期函数
@@ -138,7 +141,7 @@
         },
         //监视
         watch: {
-
+            'form.select':'formChange'
         },
         //组件
         components: {
@@ -163,7 +166,9 @@
         .el-form-item{
             margin-bottom:10px;
         }
-
+        .el-select{
+            width: 100%;
+        }
 
     }
     .tab-btn{

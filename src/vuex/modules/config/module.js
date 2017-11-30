@@ -8,7 +8,8 @@ import { configMutation } from './mutation'
 export const config = {
     state: {
         language:'zh_cn',
-        theme:'default',
+        theme: 'default',
+        consoleHeight:34,
     },
     actions: configAction,
     getters: configGetter,

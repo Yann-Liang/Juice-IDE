@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-11-07 14:05:12
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-13 18:27:27
+ * @Last Modified time: 2017-11-29 15:15:24
  * 用于管理部署日志
  */
 
@@ -12,7 +12,7 @@ const isArray = (o) => {
 class DeployLogStorage {
     constructor() {
         this.key = 'deployLog';
-        this.saveLength = 500;//保存日志的数量
+        this.saveLength = 1500;//保存日志的数量
         this.data = [];//存放数据
     }
 

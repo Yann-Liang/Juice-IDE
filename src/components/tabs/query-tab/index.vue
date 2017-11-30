@@ -102,6 +102,9 @@
         .el-form-item{
             margin-bottom:10px;
         }
+        .el-select{
+            width: 100%;
+        }
     }
     .tab-btn,.item{
         margin:30px 0 20px;
