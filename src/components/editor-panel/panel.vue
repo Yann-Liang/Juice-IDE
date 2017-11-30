@@ -58,6 +58,8 @@
                     // start:{row:1,column:1}
                 });
                 // this.editor.findNext(false);
+                // this.editor.findPrevious();
+                // this.editor.findNext();
                 this.editor.findPrevious();
             },
             //向上搜索
