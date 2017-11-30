@@ -388,7 +388,6 @@
     }
     .tab{
         width: 223px;
-
     }
 
     .border{

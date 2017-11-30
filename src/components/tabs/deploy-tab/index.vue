@@ -163,7 +163,9 @@
         .el-form-item{
             margin-bottom:10px;
         }
-
+        .el-select{
+            width: 100%;
+        }
 
     }
     .tab-btn{
