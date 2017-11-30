@@ -892,7 +892,7 @@
                 justify-content:flex-end;
                 font-size:12px;
                 color:#888;
-                background-color:#eee;
+                // background-color:#eee;
                 span{
                     display: inline-block;
                     white-space: nowrap;
