@@ -46,7 +46,7 @@
             <div class="replace-model shadow" v-if='replaceVisible'>
                 <div class="replace-content replace-one">
                     <span>
-                        <input class="dark" type="text"  :style="{backgroundColor:repMatch?'#fff':'#d43718'}" v-model='fromValue'  placeholder="查找内容"  @keyup.up="onReplaceUp" @keyup.left="onReplaceUp" @keyup.down="onReplaceDown" @keyup.right="onReplaceDown"  @input='fromSearch' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text"  :style="{backgroundColor:repMatch?'#fff':'#d43718'}" v-model='fromValue'  placeholder="查找内容"   @keyup.enter="fromSearch" @keyup.up="onReplaceUp" @keyup.left="onReplaceUp" @keyup.down="onReplaceDown" @keyup.right="onReplaceDown"  @input='fromSearch' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='fromSearch'>查找</span>
                     <!-- <span class='search-err' v-if='searchErr'>无结果</span> -->
