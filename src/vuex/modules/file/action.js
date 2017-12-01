@@ -7,8 +7,6 @@ const{dialog} = require('electron').remote;
 export const fileAction = {
 	queryFileListData({ commit, state,rootState, dispatch}){
 		let data = file.getFileList(state.url);
-		console.log(state.url);
-		console.log(data);
 		rootState.editor.editData.forEach((item,index)=>{
 			data = file.updateFile(data,{keyId:item.keyId,save:false})
 		});
@@ -310,18 +308,20 @@ export const fileAction = {
 	
 	removeFileFn({ commit, state ,dispatch ,rootState}){
 		function updateUrlFn(){
-			state.url.forEach((item,index,data)=>{
-				if(state.activeFile.value == item.value && state.activeFile.name == item.name){
-					data.splice(index,1);
-					dispatch('updateUrl',data,{root:true});
+			const arr = state.url.filter((item,index) =>{
+				if(!(state.activeFile.value == item.value && state.activeFile.name == item.name)){
+					return true;
 				}
-			})
+			});
+			dispatch('updateUrl',arr,{root:true});
+			dispatch('queryFileListData',null,{ root: true });
 		}
 		if(state.activeFile.value){
 			if(file.isFile(state.activeFile.value)){ // 如果是文件
 				file.removeFile(state.activeFile.value,()=>{
-					updateUrlFn();
 					dispatch('updateDeleteStatus',state.activeFile,{root:true})
+					updateUrlFn();
+					dispatch('setActiveFile','',{root:true})
 				})
 			}else if(file.isDir(state.activeFile.value)){ //如果是文件夹
 				let activeIndex = 0;
@@ -347,14 +347,16 @@ export const fileAction = {
 				});
 
 				dispatch('updateData',editData,{root:true}) // 更新fileData;
-				file.removeFile(state.activeFile.value,()=>{})
+				file.removeFile(state.activeFile.value,()=>{
+					dispatch('setActiveFile','',{root:true})
+				})
 				updateUrlFn()
 			}
 		}else{
 			updateUrlFn()
 			dispatch('updateDeleteStatus',state.activeFile,{root:true});
+			dispatch('setActiveFile','',{root:true})
 		}
-		dispatch('setActiveFile','',{root:true})
 		dispatch('updateRightMenuBlock',false,{root:true})
 	},
 	changeShowTipModal({ commit, state },blo){

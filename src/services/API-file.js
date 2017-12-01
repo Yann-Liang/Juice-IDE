@@ -4,7 +4,7 @@
 /**
  * Created by zjw on 2017/5/26.
  */
-const [fs,path] = [require('fs-extra'),require('path')];
+const [fs,path,os] = [require('fs-extra'),require('path'),require('os')];
 const{dialog} = require('electron').remote;
 // const watch = require('watch');
 const chokidar = require('chokidar');
@@ -445,6 +445,60 @@ class file {
 	// 另存为
 	saveOtherPath(activeFile,source){
 
+	}
+	
+	originName(name){
+		if(name.indexOf('.sol')){
+			name = name.substr(0,name.length-4);
+			return name;
+		}else{
+			return name;
+		}
+	}
+	
+	//获取当前用户的home目录,返回默认新建文件夹地址；
+	homeDirFn(){
+		const homedirPath = os.homedir().replace(/\\/g,'/') + '/juice-temp';
+		return homedirPath;
+	}
+	
+	//创建文件夹
+	newDirFn(tempPath,fn){
+		fs.mkdir(tempPath,(err)=>{
+			if (err) throw err;
+			fn && fn();
+		});
+	}
+	
+	
+	// 创建临时目录
+	creatTempDir(name,fn){
+		const tempPath = this.homeDirFn();
+		const dirPath = tempPath + '/' + name;
+		if(this.isDir(tempPath)){
+			this.newDirFn(dirPath,fn)
+		}else{
+			this.newDirFn(tempPath,()=>{
+				this.newDirFn(dirPath,fn)
+			})
+		}
+	}
+	
+	// 获取上一级文件夹目录
+	dirnameFn(activePath){
+		const dirnamePath = path.dirname(activePath).replace(/\\/g,'/');
+		return dirnamePath;
+	}
+	
+	// 获取选取文件的路径
+	dialogFn(fn){
+		dialog.showOpenDialog({
+			properties:['openDirectory', 'multiSelections']
+		},(filename)=>{
+			const filepath = filename ? filename[0].replace(/\\/g,'/') :'';
+			console.log(filepath)
+			fn && fn(filepath);
+		})
 	}
 }
 

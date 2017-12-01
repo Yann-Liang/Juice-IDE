@@ -72,8 +72,8 @@
                     <span class="modal-close" @click="cancelFileNameFn"></span>
                 </h4>
                 <div class="modal-content">
-                    <el-form label-width="60px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm">
-                        <el-form-item prop="newFileName" label="Name：">
+                    <el-form label-width="100px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm">
+                        <el-form-item prop="newFileName" :label="label">
                             <el-input v-model="ruleForm.newFileName"></el-input>
                         </el-form-item>
                     </el-form>
@@ -88,16 +88,41 @@
 
 
         <!--输入文件夹提示-->
-        <div class="tip-modal modal" v-if="showDirNameModal">
+        <!--<div class="tip-modal modal" v-if="showDirNameModal">-->
+            <!--<div class="modal-main">-->
+                <!--<h4 class="modal-title">-->
+                    <!--新建文件夹-->
+                    <!--<span class="modal-close" @click="cancelDirNameFn"></span>-->
+                <!--</h4>-->
+                <!--<div class="modal-content">-->
+                    <!--<el-form label-width="100px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm2">-->
+                        <!--<el-form-item prop="newDirName" label="文件夹名：">-->
+                            <!--<el-input v-model="ruleForm.newDirName"></el-input>-->
+                        <!--</el-form-item>-->
+                    <!--</el-form>-->
+                <!--</div>-->
+                <!--<div class="modal-btn">-->
+                    <!--<el-button class="cancel" @click="cancelDirNameFn('ruleForm2')">取消</el-button>-->
+                    <!--<el-button type="primary" @click="sureDirNameFn('ruleForm2')">确定</el-button>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="dir-modal modal" v-if="showDirNameModal">
             <div class="modal-main">
                 <h4 class="modal-title">
-                    文件夹名
+                    新建文件夹
                     <span class="modal-close" @click="cancelDirNameFn"></span>
                 </h4>
                 <div class="modal-content">
-                    <el-form label-width="60px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm2">
-                        <el-form-item prop="newDirName" label="Name：">
+                    <el-form label-width="100px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm2">
+                        <el-form-item prop="newDirName" label="文件夹名">
                             <el-input v-model="ruleForm.newDirName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="存放目录">
+                            <el-input v-model="newDirPathFn" readonly></el-input>
+                            <span class="scan" v-if="isScan" @click="scanFn">
+                                浏览...
+                            </span>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -107,6 +132,10 @@
                 </div>
             </div>
         </div>
+
+
+
+
 
 
         <!--各种提示-->
@@ -143,7 +172,8 @@
 	        return {
 		        ruleForm:{
 			        newFileName:'',
-			        newDirName:''
+			        newDirName:'',
+			        newDirPath:''
                 },
 		        rules: {
 			        newFileName: [
@@ -154,7 +184,10 @@
 			        ],
 		        },
                 title:'SOL文件',
-                type:'newFileName'
+                type:'newFileName',
+		        label: "文件名",
+                isScan: true,
+		        newDirPathFn:''
 	        }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -185,9 +218,11 @@
             		this.title = 'SOL文件';
 		            this.ruleForm.newFileName = '';
 		            this.type = 'newFileName';
+		            this.label = '文件名';
             		this.changeShowFileNameModal(true);
                 }else{
 		            file.newFile('',name,(res)=>{
+
 			            if(this.activeFile.id === 1){
 				            this.updateNewOpenFile(this.activeFile);
 			            }
@@ -233,8 +268,9 @@
             },
             rename(item){ // 重命名
 	            this.title = '重命名';
-	            this.ruleForm.newFileName = item.name;
+	            this.ruleForm.newFileName = this.activeFile.id == 1 ? item.name : file.originName(item.name);
 	            this.type = 'rename';
+	            this.label = this.activeFile.id == 1 ? '文件夹名': '文件名';
 	            this.changeShowFileNameModal(true);
             },
 	        saveOtherPathFn(){
@@ -325,25 +361,59 @@
 	        sureDirNameFn(formName){
 		        this.$refs[formName].validate((valid) => {
 			        if (valid) {
-				        if(this.activeFile.id === 1){
-					        this.updateNewOpenFile(this.activeFile);
-				        }
-				        this.changeDirNameModal(false);
-				        file.newMkdir(this.activeFile.value,this.ruleForm.newDirName,(res)=>{
-					        if(res.code === 0){
-						        this.queryFileListData();
-					        }else if(res.code === 1){
-						        this.setHintInfo({
-							        show:true,
-							        title:'',
-							        message:'文件夹已存在，请更换文件夹名'
-						        })
-					        }else if(res.code === 2){
-
+				        this.changeDirNameModal(false)
+			        	let blo = false;
+				        this.fileTreeData.forEach((item,index) => {
+					        if(this.activeFile.keyId ==item.keyId){
+						        if(item.id == 2){
+							        blo = true;
+						        }
+						        return;
 					        }
-					        this.updateRightMenuBlock(false);
-					        this.ruleForm.newFileName = '';
 				        })
+                        console.log(blo)
+				        console.log(this.activeFile.value)
+				        if(!blo && this.activeFile.value){
+					        // 有父文件夹的情况
+					        if(this.activeFile.id === 1){
+						        this.updateNewOpenFile(this.activeFile);
+					        }
+					        console.log(this.activeFile.value);
+					        console.log(this.ruleForm.newDirName)
+					        file.newMkdir(this.activeFile.value,this.ruleForm.newDirName,(res)=>{
+						        if(res.code === 0){
+							        this.queryFileListData();
+						        }else if(res.code === 1){
+							        this.setHintInfo({
+								        show:true,
+								        title:'',
+								        message:'文件夹已存在，请更换文件夹名'
+							        })
+						        }else if(res.code === 2){
+
+						        }
+						        this.updateRightMenuBlock(false);
+						        this.ruleForm.newFileName = '';
+					        })
+				        }else if(blo || !this.activeFile.value){
+					        if(this.newDirPathFn == file.homeDirFn()){
+						        file.creatTempDir(this.ruleForm.newDirName,()=>{
+							        const url = this.getUrl;
+							        const dirPath = this.newDirPathFn + '/' + this.ruleForm.newDirName;
+							        url.push({value:dirPath,name:this.ruleForm.newDirName});
+							        this.updateUrl(url);
+							        this.ruleForm.newDirName = '';
+						        })
+					        }else{
+						        const url = this.getUrl;
+						        const dirPath = this.newDirPathFn + '/' + this.ruleForm.newDirName;
+						        file.newDirFn(dirPath,()=>{
+							        url.push({value:dirPath,name:this.ruleForm.newDirName});
+							        this.updateUrl(url);
+							        this.ruleForm.newDirName = '';
+                                })
+					        }
+                        }
 			        } else {
 				        this.ruleForm.newDirName = '';
 				        console.log('error submit!!');
@@ -357,7 +427,43 @@
                     title:'',
                     message:''
                 })
-            }
+            },
+	        scanFn(){
+	        	file.dialogFn((filename)=>{
+	        		if(filename){
+				        this.newDirPathFn = filename
+                    }
+                })
+            },
+	        newDirPathFunction(){
+		        this.newDirPathFn = null;
+		        if(this.activeFile && this.activeFile.value){
+			        this.fileTreeData.forEach((item,index) => {
+				        if(this.activeFile.keyId ==item.keyId){
+					        if(item.id == 1){
+						        this.newDirPathFn =  item.value;
+					        }else if(item.id == 2){
+						        this.newDirPathFn = file.homeDirFn();
+					        }
+					        return;
+				        }
+			        })
+			        if(!this.newDirPathFn){
+				        if(file.isDir(this.activeFile.value)){
+					        this.newDirPathFn = this.activeFile.value;
+				        }else{
+					        this.newDirPathFn = file.dirnameFn(this.activeFile.value);
+				        }
+			        }
+		        }else{
+			        this.newDirPathFn = file.homeDirFn();
+		        }
+		        if(this.newDirPathFn  == file.homeDirFn()){
+			        this.isScan = true;
+		        }else{
+			        this.isScan = false;
+		        }
+	        }
         },
         //生命周期函数
         created() {
@@ -372,7 +478,11 @@
         },
         //监视
         watch: {
-
+            'showDirNameModal':function(){
+            	if(this.showDirNameModal){
+            		this.newDirPathFunction();
+                }
+            }
         },
         //组件
         components: {
@@ -462,6 +572,17 @@
             }
         }
     }
+    .dir-modal{
+        .modal-main{
+            width:650px;
+            .modal-content{
+                padding-right:10px;
+            }
+            .el-input{
+                width:450px;
+            }
+        }
+    }
     .warning-icon{
         display:inline-block;
         width:30px;
@@ -473,5 +594,10 @@
     }
     .tip-text{
         line-height:30px;
+    }
+    .scan{
+        margin-left:15px;
+        color:#20a0ff;
+        cursor: pointer;
     }
 </style>
