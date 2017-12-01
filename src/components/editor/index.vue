@@ -34,10 +34,10 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}"  v-model='inputValue' @keyup.enter="onSearch" @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus"  @focus="saveData"  v-focus>
+                        <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" v-model='inputValue' @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
                     </span>
                     <span class="btn btn-info" @click='onSearch'>查找</span>
-                    <span class='search-err' v-if='searchErr'>无结果</span>
+                    <!-- <span class='search-err' v-if='searchErr'>无结果</span> -->
                     <span @click='onSearchUp'><i class="iconfont info">&#xe638;</i></span>
                     <span @click='onSearchDown'><i class="iconfont info">&#xe637;</i></span>
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
@@ -223,7 +223,7 @@
                 // this.searchVisible = !this.searchVisible;
             },
             saveData:function(){
-                this.htmlData = this.editor.getValue();
+                this.htmlData = document.getElementById('javascript-editor').innerHTML
             },
             //全局搜索
             onSearch:function(){
@@ -231,52 +231,54 @@
                 //获取到当前选中的元素
                 // console.log('1111111111111111111111')
                 // console.log('getcopytext',this.editor.getCopyText());
-                // this.searchValue = this.inputValue;
-                // this.$refs.childMethod.onSearch(this.inputValue);
-                // if(this.inputValue == ""){
-                //     this.hasMatch = true;
-                // }else if(this.editor.find(this.inputValue,{
-                //     backwards: false,
-                //     wrap: true,
-                //     caseSensitive: true,
-                //     wholeWord: false,
-                //     regExp: false,
-                //     range:"",
-                //     // start:{row:1,column:1}
-                // }) == undefined){
-                //     this.hasMatch = false;
-                // }else{
-                //     this.hasMatch = true;
-                // }
+                console.log(11111111)
                 this.searchValue = this.inputValue;
-                this.highlight(this.inputValue);
-
+                this.$refs.childMethod.onSearch(this.inputValue);
+                if(this.inputValue == ""){
+                    this.hasMatch = true;
+                }else if(this.editor.find(this.inputValue,{
+                    backwards: false,
+                    wrap: true,
+                    caseSensitive: false,
+                    wholeWord: false,
+                    regExp: false,
+                    range:"",
+                    // start:{row:1,column:1}
+                }) == undefined){
+                    this.hasMatch = false;
+                }else{
+                    this.hasMatch = true;
+                }
             },
             //高亮显示搜索内容
             highlight:function(key){
-                console.log(this.editor.getValue())
-                // this.editor.getValue() = data;
-                // var data = JSON.parse(JSON.stringify(this.htmlData));
-                // if(key && key.length>0){
-                //     var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
-                //     //高亮显示
-                //     this.editor.getValue()=data.replace(reg,'<span style="border:solid 1px #0066cc;" class="high-lighter">' +key+ '</span>' );
-                //     //滚动条定位
-                //     this.regList = document.getElementsByClassName('high-lighter');
-                //     var container = this.$el.querySelector("#javascript-editor");
-                //     if(container && this.regList.length>0){ //有匹配值
-                //         container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
-                //         this.current = 0;
-                //         this.regList[0].style.backgroundColor="#0066cc";
-                //         this.regList[0].style.color="#fff";
-                //         this.hasMatch = true;
-                //     }else{ //无匹配值
-                //         this.hasMatch = false;
-                //     }
-                // }else{
-                //     this.hasMatch = true;
-                //     this.editor.getValue()=data;
-                // }
+                console.log(11111111111111)
+                // console.log(this.editor.getValue())
+                console.log(this.$el.querySelector("#javascript-editor"));
+                console.log(document.getElementById('javascript-editor').innerHTML)
+                this.editor.focus();
+                document.getElementById('javascript-editor').innerHTML = data;
+                var data = JSON.parse(JSON.stringify(this.htmlData));
+                if(key && key.length>0){
+                    var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
+                    //高亮显示
+                    document.getElementById('javascript-editor').innerHTML=data.replace(reg,'<span style="border:solid 1px #0066cc;" class="high-lighter">' +key+ '</span>' );
+                    //滚动条定位
+                    this.regList = document.getElementsByClassName('high-lighter');
+                    var container = this.$el.querySelector("#javascript-editor");
+                    if(container && this.regList.length>0){ //有匹配值
+                        container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
+                        this.current = 0;
+                        this.regList[0].style.backgroundColor="#0066cc";
+                        this.regList[0].style.color="#fff";
+                        this.hasMatch = true;
+                    }else{ //无匹配值
+                        this.hasMatch = false;
+                    }
+                }else{
+                    this.hasMatch = true;
+                    document.getElementById('javascript-editor').innerHTML=data;
+                }
             },
             //向上搜索
             onSearchUp:function(){
@@ -295,7 +297,9 @@
                 this.inputValue = "";
                 this.searchValue = "";
                 this.searchErr = false;
-                this.htmlData = "";
+                // document.getElementById('javascript-editor').innerHTML = this.htmlData;
+
+                // this.htmlData = "";
             },
             fromSearch:function(){
                 this.$refs.childMethod.onSearch(this.fromValue);
@@ -328,6 +332,7 @@
             //单个替换
             replaceSign:function(){
                 // this.$refs.childMethod.onSearch(this.fromValue);
+                console.log(this.editor.getValue())
                 this.$refs.childMethod.replaceSign(this.fromValue,this.toValue);
             },
             //全部替换
@@ -942,6 +947,7 @@
                 justify-content:flex-end;
                 font-size:12px;
                 color:#888;
+                border-right:1px dashed #eee;
                 // background-color:#eee;
                 span{
                     display: inline-block;
@@ -963,7 +969,7 @@
                 }
                 .remove{
                     padding:0;
-                    margin-top:14px;
+                    margin-top:12px;
                     display:inline-block;
                     width:8px;
                     height:8px;
@@ -977,6 +983,7 @@
                 margin-left:10px;
                 padding:0;
                 background-color:transparent;
+                border-right:none;
             }
             .li-active{
                 color:@fontBase;
