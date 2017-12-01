@@ -8,7 +8,7 @@
 
                 </div>
                 <ul class='files' ref='files'>
-                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)">
+                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)" :id='item.name'>
                         <span>{{item.name}}</span>
                         <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
                         <span class="remove" v-if='dian'>...</span>
@@ -328,45 +328,6 @@
             format:function(){
                 this.$refs.childMethod.format();
             },
-            //点击向右滑动
-            scrollRight:function(e){
-                console.log('执行向右滑动')
-                this.showOrHideOne = true;
-                var rightArrow = this.$refs.rightbar;
-                var leftArrow = this.$refs.leftbar;
-                var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
-                var currentLeft = this.$refs.files.offsetLeft || 0;
-                var hiddenRight = hiddenLength + currentLeft;
-                console.log('hiddenRight>>>>>>>>>>>>>>>',hiddenLength,currentLeft,hiddenRight)
-                if(hiddenRight > 0){
-                    if(hiddenRight > this.vistual){
-                       this.$refs.files.style.left = `${currentLeft - this.vistual}px`
-                    }else{
-                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
-                        this.showOrHideTwo = false;
-                        // this.showOrHideTwo = 'hide';
-                        // this.showOrHideOne = 'hide';
-                    }
-                }
-            },
-            //点击向左滑动
-            scrollLeft:function(){
-                this.showOrHideTwo = true;
-                var leftArrow = this.$refs.leftbar;
-                var rightArrow = this.$refs.rightbar;
-                var currentLeft = this.$refs.files.offsetLeft || 20;
-                console.log('currentLeft>>>>>>>>>',currentLeft)
-                if(currentLeft < 0){
-                    if(currentLeft < -this.vistual){
-                       this.$refs.files.style.left = `${currentLeft + this.vistual}px`
-                    }else{
-                        this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
-                        this.showOrHideOne = false;
-                        // this.showOrHideTwo = 'hide';
-                        // this.showOrHideOne = 'hide';
-                    }
-                }
-            },
             //切换tab
             selectProp: function (index,item) {
                 this.select = index;
@@ -677,11 +638,10 @@
                         this.name = this.editFile.name;
                         this.keyId = this.editFile.keyId;
                         blo = true;
-                        /*
-                            push进数组之后，确定
-                        */
+                        //获取当前这个元素
                         this.$nextTick(()=>{
-                            this.showTabScroll();
+                            var id = this.editFile.name;
+                            this.alreadyArrow(id);
                         })
                     }
                 });
@@ -702,6 +662,45 @@
                     })
                 }
             },
+            //点击向右滑动
+            scrollRight:function(e){
+                console.log('执行向右滑动')
+                this.showOrHideOne = true;
+                var rightArrow = this.$refs.rightbar;
+                var leftArrow = this.$refs.leftbar;
+                var hiddenLength = this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth;
+                var currentLeft = this.$refs.files.offsetLeft || 0;
+                var hiddenRight = hiddenLength + currentLeft;
+                console.log('hiddenRight>>>>>>>>>>>>>>>',hiddenLength,currentLeft,hiddenRight)
+                if(hiddenRight > 0){
+                    if(hiddenRight > this.vistual){
+                       this.$refs.files.style.left = `${currentLeft - this.vistual}px`
+                    }else{
+                        this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
+                        this.showOrHideTwo = false;
+                        // this.showOrHideTwo = 'hide';
+                        // this.showOrHideOne = 'hide';
+                    }
+                }
+            },
+            //点击向左滑动
+            scrollLeft:function(){
+                this.showOrHideTwo = true;
+                var leftArrow = this.$refs.leftbar;
+                var rightArrow = this.$refs.rightbar;
+                var currentLeft = this.$refs.files.offsetLeft || 20;
+                console.log('currentLeft>>>>>>>>>',currentLeft)
+                if(currentLeft < 0){
+                    if(currentLeft < -this.vistual){
+                       this.$refs.files.style.left = `${currentLeft + this.vistual}px`
+                    }else{
+                        this.$refs.files.style.left = `${currentLeft - currentLeft }px`;
+                        this.showOrHideOne = false;
+                        // this.showOrHideTwo = 'hide';
+                        // this.showOrHideOne = 'hide';
+                    }
+                }
+            },
             //初始化左移右移箭头
             initArrow:function(){
                 if(this.fileData.length == 0){
@@ -712,15 +711,12 @@
                     var filetabWidth = this.$refs.files.offsetWidth;
                     var tabWidth = this.$refs.tabs.offsetWidth;
                     var hiddenLength = filetabWidth - tabWidth;
-                    // console.log('this.$refs.files>>>>>>>>>>',this.$refs.files)
-                    // console.log('filetabWidth>>>>>>>>>>>>>',filetabWidth);
-                    // console.log('tabWidth>>>>>>>>>>>>>>>>',tabWidth);
-                    // console.log('hiddenLength>>>>>>>>>>>>>>>>>>',hiddenLength)
                     var currentLeft = this.$refs.files.offsetLeft || 0;
                     var hiddenRight = hiddenLength + currentLeft;
+                    console.log('hiddenLength',hiddenLength)
                     if(hiddenLength > 0){
                         //已超过，此时需要显示出来箭头
-                        this.showOrHideTwo = true;
+                        // this.showOrHideTwo = true;
                         this.showOrHideOne = true;
                         if(hiddenRight > 0){
                             if(hiddenRight > this.vistual){
@@ -739,29 +735,44 @@
                 }
 
             },
-            /*
-            不push进数组的时候，点击左边的tab，找到右边相对应的位置，在右边菜单栏已有小图标显示的情况下
-            */
-            showTabScroll:function(){
+            //已push进数组
+            alreadyArrow:function(id){
                 if(this.fileData.length == 0){
                     //什么也不做
                 }else{
                     var filetabWidth = this.$refs.files.offsetWidth;
                     var tabWidth = this.$refs.tabs.offsetWidth;
                     var hiddenLength = filetabWidth - tabWidth;
-                    var currentLeft = this.$refs.files.offsetLeft || 20;
+                    var element = document.getElementById(""+id+"");
+                    var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+                    var elementWidth = element.offsetWidth;//当前元素的宽度
+                    // console.log('fileLeft',fileLeft)
+                    // console.log('elementLeft',elementLeft)
+                    // console.log('elementWidth',elementWidth)
+                    // console.log('current',current );
+                    var currentLeft = this.$refs.files.offsetLeft || 0;
+                    var hiddenRight = hiddenLength + currentLeft;
+                    console.log('hiddenRight',hiddenRight)
                     if(hiddenLength > 0){
-                        //证明已超过，此时
-
-                        console.log('currentLeft>>>>>>>>>',currentLeft)
-                        if(currentLeft < 0){
-                            if(currentLeft < -this.vistual){
-                               this.$refs.files.style.left = `${currentLeft + this.vistual}px`
-                            }else{
-                                this.$refs.files.style.left = `${currentLeft - currentLeft + 20}px`
-                            }
+                        //已超过
+                        this.showOrHideTwo = true;
+                        if(elementLeft == 0){
+                            this.showOrHideOne = false;
+                            this.$refs.files.style.left = `0px`;
+                        }else{
+                            this.showOrHideOne = true;
+                            this.$refs.files.style.left = `${ - elementLeft + 100}px`;
                         }
+                    }else{
+                        this.showOrHideTwo = false;
+                        this.showOrHideOne = false;
+                        this.$refs.files.style.left = `0px`;
                     }
+                    // if(elementLeft == 0){
+
+                    // }else{
+
+                    // }
                 }
             }
 
@@ -804,8 +815,14 @@
         //监视
         watch: {
             editFile:function(){
-            	if(!this.editFile.unWatch){
-		            this.pushArray();
+            	console.log('this.editFile.unWatch',this.editFile.unWatch)
+                if(!this.editFile.unWatch){
+                    if(this.editFile){
+                        if(this.editFile.keyId){
+                            this.pushArray();
+                        }
+                    }
+
                 }
             },
             'removeData.id':function(){
