@@ -286,7 +286,6 @@
             },
             //向下搜索
             onSearchDown:function(){
-
                 this.$refs.childMethod.onSearchDown();
             },
             //关闭弹窗
@@ -332,7 +331,7 @@
             //单个替换
             replaceSign:function(){
                 // this.$refs.childMethod.onSearch(this.fromValue);
-                console.log(this.editor.getValue())
+                // console.log(this.editor.getValue())
                 this.$refs.childMethod.replaceSign(this.fromValue,this.toValue);
             },
             //全部替换
@@ -866,13 +865,13 @@
             'removeData.id':function(){
             	this.remove(this.removeData.index,this.removeData.fileItem.keyId)
             },
-            'fileData.length':function(){
-                this.$nextTick(()=>{
-                    console.log('this.fileData.length',this.fileData.length)
-                    this.initArrow();
-                })
+            // 'fileData.length':function(){
+            //     this.$nextTick(()=>{
+            //         console.log('this.fileData.length',this.fileData.length)
+            //         this.initArrow();
+            //     })
 
-            }
+            // }
         },
         //组件
         components: {
@@ -947,7 +946,7 @@
                 justify-content:flex-end;
                 font-size:12px;
                 color:#888;
-                border-right:1px dashed #eee;
+                border-right:1px dashed #fefefe;
                 // background-color:#eee;
                 span{
                     display: inline-block;
