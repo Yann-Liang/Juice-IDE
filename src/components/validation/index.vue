@@ -58,8 +58,8 @@ export default{
                 activeColor:"",
                 disabled:false,
                 rules:{
-                    accountPwd:{required:true,message:helpText.PASSWORD},
-                    code:{required:true,message:helpText.CODE}
+                    accountPwd:{required:true,message:helpText.NOTEMPTY.pwd},
+                    code:{required:true,message:helpText.NOTEMPTY.code}
                 }
             }
         },
@@ -197,8 +197,8 @@ export default{
   .modal{
         .modal-main{
             .modal-btn{
-                height:45px;
-                line-height: 45px;
+                height:70px;
+                line-height: 70px;
                 span{
                     cursor: pointer;
                 }
@@ -214,7 +214,7 @@ export default{
             }
             .model-password{
                 color: #000;
-                padding: 15px 25px 35px;
+                padding: 28px 25px 5px;
             }
 
 
