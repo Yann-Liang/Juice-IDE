@@ -25,7 +25,8 @@ class ApiService {
     constructor() {
 
         this.log = {
-            search:this.post.bind(this, API.LOG.search),
+            search: this.post.bind(this, API.LOG.search),
+            juethSearch:this.post.bind(this, API.LOG.juethSearch),
         }
 
         this.user = {

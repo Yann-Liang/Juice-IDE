@@ -9,9 +9,11 @@
                     type="textarea"
                     :rows="8"
                     placeholder="输入合约ABI" v-model="form.abi"></el-input>
+
             </el-form-item>
-            <el-button class="tab-btn btn-info" @click="query">查询合约</el-button>
+            <el-button class="tab-btn btn-info" @click="query" :disabled="disabled">查询合约</el-button>
         </el-form>
+
     	<run v-if="flag" :abi="abi" :address="form.address"></run>
         <validation :valid-flag="validFlag" @emitDeploy='queryContract' @close="closeValidation"></validation>
     </div>
@@ -44,7 +46,9 @@
         },
         //计算
         computed: {
-
+            disabled(){
+                return !(this.form.address && this.form.abi);
+            },
         },
         //方法
         methods: {
@@ -95,7 +99,6 @@
 </script>
 
 <style lang="less" scoped>
-    @import "../../../less/modules/theme.less";
     .run-index{
         padding:28px 10px;
         color:#666;
@@ -107,7 +110,7 @@
         }
     }
     .tab-btn,.item{
-        margin:30px 0 20px;
+        margin:10px 0 20px;
     }
     .top20{
         margin-top:20px;

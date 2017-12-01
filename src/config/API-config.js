@@ -3,7 +3,8 @@ const BASE = 'http://192.168.9.92:9200/',//'http://192.168.9.94:9200/juevm/'//pr
     USER_URL = `${BASE}/user/`,
 
     LOG = {
-        search:`${BASE}juevm/juevm/_search`,
+        search: `${BASE}juevm/juevm/_search`,
+        juethSearch:`${BASE}jueth/jueth/_search`,
     },
     //用户
     USER = {
