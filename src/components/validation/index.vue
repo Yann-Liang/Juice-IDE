@@ -160,6 +160,8 @@ export default{
             } catch (error) {
 
             }
+            this.login2.accountPwd='';
+            this.login2.code='';
             this.codeURL();
         },
         beforeMount() {
