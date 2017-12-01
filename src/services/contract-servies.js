@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-11-30 16:17:33
+ * @Last Modified time: 2017-12-01 11:07:27
  */
 //引入web3
 let Web3 = require('web3'),
@@ -376,10 +376,9 @@ class DeployService {
 
         this.data = {};
 
-        this.queryTime = '';
-
+        this.queryTime = '';//查询用户打印的日志
+        this.queryBackgroundTime = '';//查询后台打印的日志
     }
-
 
     //设置节点地址
     setProvider(url) {
@@ -423,7 +422,7 @@ class DeployService {
             From: userAddress,
             abi:''
         };
-        debugger;
+
         return new Promise((resolve, reject) => {
             this.deployRunning();
             let calcContract = this.web3.eth.contract(abi);
@@ -444,7 +443,7 @@ class DeployService {
                     nonce: this.web3.nonce(),
                     gasPrice: 20000000000,
                     gasLimit: 4300000,
-                    gas:99999999999,
+                    gas:9999999999999,
                     value: 0,
                     data: bin,
                 };
@@ -595,6 +594,7 @@ class DeployService {
                 cb(e);
             }
             this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+            this.getBackgroundLog(this.provider)
         } else {
             let data = '';
             debugger;
@@ -635,6 +635,7 @@ class DeployService {
                     wrapCount: this.wrapCount,
                 }
                 this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+                this.getBackgroundLog(this.provider)
                 this.getTransactionReceipt(hash);
             });
 
@@ -649,6 +650,11 @@ class DeployService {
         //16进制 需要加上0x
         contractAddress.substring(0, 2) == '0x' ? "" : contractAddress = '0x' + contractAddress;
 
+        if (!this.web3.isAddress(contractAddress)) {
+            this.queryFailure('无效合约地址');
+            return false;
+        }
+
         if (isString(abi)) {
             try {
                 abi = JSON.parse(abi)
@@ -658,32 +664,38 @@ class DeployService {
                 return false;
             }
         }
+        const code = this.web3.eth.getCode(contractAddress);
+        if (code !='0x') {
+            try {
+                let contractABI = this.web3.eth.contract(abi),
+                    contractInstance = contractABI.at(contractAddress);
 
-        try {
-            let contractABI = this.web3.eth.contract(abi),
-                contractInstance = contractABI.at(contractAddress);
-
-            this.data[contractAddress] = {
-                contractAddress: contractAddress,
-                from: '',
-                fileName: '',
-                contractName: '',
-                contract: contractInstance,
-            };
-            return contractInstance;
-        } catch (error) {
-            console.warn(error);
-            this.queryFailure(error);
+                this.data[contractAddress] = {
+                    contractAddress: contractAddress,
+                    from: '',
+                    fileName: '',
+                    contractName: '',
+                    contract: contractInstance,
+                };
+                return contractInstance;
+            } catch (error) {
+                console.warn(error);
+                this.queryFailure(error);
+                return false;
+            }
+        } else {
+            this.queryFailure('查询结果为空');
             return false;
+
         }
 
     }
 
-    queryFailure(err) {
+    queryFailure(msg) {
         consoleService.output('[查询失败]', {
             logError: 'query failure'
         }, {
-            logError: err.message
+            logError: msg
         });
         return true;
     }
@@ -698,6 +710,8 @@ class DeployService {
     }
 
     runFinish(result) {
+        //this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+        //this.getBackgroundLog(this.provider)
         consoleService.output('[运行结果]', 'Invoke finish', result);
     }
 
@@ -817,7 +831,6 @@ class DeployService {
         }
         console.log(JSON.stringify(params))
         APIServies.log.search(params).then((res) => {
-            console.log('res', res)
             console.log(res.hits.hits);
             if (res && res.hits.hits.length > 0) {
                 let arr = res.hits.hits;
@@ -832,6 +845,68 @@ class DeployService {
                 })
             }
         })
+    }
+
+    getBackgroundLog(nodeId, queryTime) {
+        let params = {
+            "_source": [
+                "message",
+                "logdate",
+                "@timestamp",
+                "ip"
+            ],
+            "query": {
+                "bool": {
+                    "must": [{
+                        "term": {
+                            "ip": nodeId.substring(nodeId.indexOf('//') + 2, nodeId.lastIndexOf(':'))
+                        }
+                    }],
+                    "must_not": [],
+                    "should": []
+                },
+                "wildcard": {
+                    "message": this.user.address.substring(0, 2) == '0x' ? "" : this.user.address.substr(1),
+                }
+            },
+            "from": 0,
+            "size": queryTime ? 1000 : 1,
+            "sort": [
+                {
+                    "@timestamp": {
+                        "order": "desc"
+                    }
+                }
+            ],
+            "aggs": {}
+        }
+
+        if (queryTime) {
+            params.query.bool.filter = {
+                "range": {
+                    "@timestamp": {
+                        "gt": queryTime
+                    }
+                }
+            }
+        }
+        console.log(JSON.stringify(params))
+        APIServies.log.juethSearch(params).then((res) => {
+            console.log('res', res)
+            if (res && res.hits.hits.length > 0) {
+                let arr = res.hits.hits;
+                arr.map((item, index) => {
+                    consoleService.output('[合约日志]', {
+                        ip: item._source.ip,
+                        //time: item._source['@timestamp'],
+                        address: item._source.address,
+                        message: item._source.message,
+                    });
+                    this.queryBackgroundTime = item._source['@timestamp'];
+                })
+            }
+        })
+
     }
 }
 
