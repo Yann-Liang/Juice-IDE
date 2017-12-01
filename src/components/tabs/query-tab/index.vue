@@ -62,7 +62,9 @@
 				if(contract){
 					this.flag=true;
 					this.abi=contract.abi;
-				}
+				}else{
+                    this.flag=false;
+                }
             },
              closeValidation(){
                 this.validFlag=false;
