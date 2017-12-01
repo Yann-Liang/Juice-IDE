@@ -54,13 +54,13 @@
                     caseSensitive: false,
                     wholeWord: false,
                     regExp: false,
-                    // range:"",
-                    // start:{row:1,column:1}
+                    range:"",
                 });
-                // this.editor.findNext(false);
-                // this.editor.findPrevious();
                 // this.editor.findNext();
                 this.editor.findPrevious();
+                // this.editor.findNext(false);
+                // this.onSearchUp();
+                // this.onSearchDown();
             },
             //向上搜索
             onSearchUp:function(){
@@ -73,23 +73,37 @@
             },
             //单个替换
             replaceSign:function(oldValue,newValue){
-                this.editor.find(oldValue);
-                this.editor.replace(newValue);
+                if(newValue == ""){
+                    //什么也不做
+                }else{
+                    this.editor.find(oldValue);
+                    this.editor.replace(newValue);
+                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                    this.initChange();
+                }
             },
             //全部替换
             replaceAll:function(oldValue,newValue){
-                this.editor.find(oldValue,{
-                    backwards: false,
-                    wrap: true,
-                    caseSensitive: true,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                    // start:{row:1,column:1}
-                });
-                // this.editor.findNext(false);
-                this.editor.findPrevious();
-                this.editor.replaceAll(newValue);
+                if(newValue == ""){
+                    //什么也不做
+                }else{
+                    this.editor.find(oldValue,{
+                        backwards: false,
+                        wrap: true,
+                        caseSensitive: true,
+                        wholeWord: false,
+                        regExp: false,
+                        range:"",
+                        // start:{row:1,column:1}
+                    });
+                    // this.editor.findNext(false);
+                    this.editor.findPrevious();
+                    this.editor.replaceAll(newValue);
+                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                    this.initChange();
+                }
+
+
             },
             //代码格式化
             format:function(){

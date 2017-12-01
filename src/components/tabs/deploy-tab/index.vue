@@ -125,7 +125,19 @@
                 this.validFlag=false;
             },
             formChange(){
-                console.log('formChange')
+                console.log('formChange',this.compileResult,this.form.contractItem,this.form.address);
+                let flag=false;
+                for (const key in this.deployedData) {
+                    let item=this.deployedData[key];
+                    if (this.form.select==item.fileName&&this.form.contractItem.contractName==item.contractName) {
+                        this.flag=true;
+                        this.form.address=item.contractAddress;
+                        this.abi=item.contract.abi;
+                        flag=true;
+                        break;
+                    }
+                }
+                this.flag=flag;
             }
         },
         //生命周期函数
@@ -141,7 +153,8 @@
         },
         //监视
         watch: {
-            'form.select':'formChange'
+            'form.select':'formChange',
+            'form.contractItem':'formChange',
         },
         //组件
         components: {
@@ -172,6 +185,6 @@
 
     }
     .tab-btn{
-        margin:20px 0 30px;
+        margin:10px 0 30px;
     }
 </style>

@@ -22,9 +22,9 @@ export default {
         password: "请设置登录密码！",
         name: "请填写姓名",
         code: "验证码不能为空",
-        busiLicense: "请填写企业营业执照号"
+        busiLicense: "请填写企业营业执照号",
+        pwd:"密码不能为空"
     },
     USERNAME: "请输入用户名",
-    PASSWORD: "请输入密码",
-    CODE: "验证码不能为空"
+
 }
