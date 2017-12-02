@@ -310,45 +310,47 @@
             setIntSol(){
             	const url = this.getUrl;
             	if(url && url.length === 0){
-            		const data = [
-                        {
-                        	name: 'example1.sol',
-                            value:'',
-                            keyId:file.keyIdFn('') + 'example1.sol'
-                        },
-			            {
+            		let data = [];
+            		const path1 = file.getTemplatePath('example1.sol');
+		            const path2 = file.getTemplatePath('example2.sol');
+            		if(file.isFile(path1)){
+			            data.push({
+				            name: 'example1.sol',
+				            value:path1
+			            })
+                    }
+                    if(file.isFile(path2)){
+			            data.push({
 				            name: 'example2.sol',
-				            value:'',
-				            keyId:file.keyIdFn('')+'example2.sol'
-			            }
-                    ]
+				            value:path2
+			            })
+                    }
 		            this.updateUrl(data);
                 }
             },
-//	        setStorageFn(){
-//		        const data = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : [];
-//		        if(data.length === 0){
-//
-//			        localStorage.setItem('fileList',JSON.stringify(
-//				        [{
-//					        name:'example1.sol',
-//					        value:file.getTemplatePath('example1.sol'),
-//					        keyId: file.keyIdFn('template1.sol'),
-//				        }]
-//			        ))
-//			        this.queryFileListData();
-//		        }else{
-//
-//		        }
-//
-//	        }
+	        setStorageFn(){
+		        const data = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : [];
+		        this.setIntSol();
+		        if(data.length === 0){
+		        	const itemFile = file.GetById(this.fileTreeData,2);
+                    console.log(itemFile);
+			        localStorage.setItem('fileData',JSON.stringify(
+				        [{
+					        name:itemFile.name,
+					        value:itemFile.value,
+					        keyId: itemFile.keyId,
+				        }]
+			        ))
+		        }
+
+	        }
         },
         //生命周期函数
         created() {
             this.setProvider();
             this.getUserInfo();
 	        this.initUrlFn();
-	        this.setIntSol();
+	        this.setStorageFn();
         },
         beforeMount() {},
         mounted() {

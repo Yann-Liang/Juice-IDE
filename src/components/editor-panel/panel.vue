@@ -32,10 +32,10 @@
             }
         },
         //数组或对象，用于接收来自父组件的数据
-        props: ["currentView","value","searchValue",'name','keyId','fileData'],
+        props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData'])
         },
         //方法
         methods: {
@@ -123,18 +123,14 @@
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
-                        if(this.value == 'readonly'){
-                            this.editor.setReadOnly(true);
-                        }else{
-                           fs.readFile(this.value,"utf-8",  (err, data)=> {
-                                if (err) {
-                                    return console.error(err);
-                                }
-                                console.log('读取路径文件的值')
-                                this.editor.setValue(data.toString(),1);
-	                            this.setActiveEditor(this.getResult);
-                            });
-                        }
+	                    fs.readFile(this.value,"utf-8",  (err, data)=> {
+		                    if (err) {
+			                    return console.error(err);
+		                    }
+		                    console.log('读取路径文件的值')
+		                    this.editor.setValue(data.toString(),1);
+		                    this.setActiveEditor(this.getResult);
+	                    });
                     }else{
                         this.editor.setValue("pragma solidity ^0.4.2;",1);
 	                    this.setActiveEditor(this.getResult);
@@ -332,13 +328,14 @@
                     cb();
                 }
             },
-//	        intiFileData(){
-//		        this.queryFileData();
-//		        const data = this.fileData;
-//		        if( data.length > 0){
-//			        this.updateEditFile(data[0]);
-//		        }
-//	        },
+	        intiFileData(){
+		        this.queryFileData();
+		        console.log(this.fileData)
+		        const data = this.fileData;
+		        if( data.length > 0){
+			        this.updateEditFile(data[0]);
+		        }
+	        },
         },
         //生命周期函数
         created() {
@@ -503,7 +500,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
-//            this. intiFileData();
+            this. intiFileData();
         },
         //监视
         watch: {

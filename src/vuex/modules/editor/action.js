@@ -125,6 +125,7 @@ export const editorAction = {
 	},
 	queryFileData({commit, state}){
 		const fileData = localStorage.getItem('fileData')? JSON.parse(localStorage.getItem('fileData')) : [];
+		console.log(localStorage.getItem('fileData'))
 		commit('UPDATE_File_DATA',fileData)
 	},
 	// 删除文件后更新状态

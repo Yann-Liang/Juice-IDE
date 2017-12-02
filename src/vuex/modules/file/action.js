@@ -109,7 +109,7 @@ export const fileAction = {
 						const filepath = filename ? filename.replace(/\\/g,'/') :'';
 						if(filepath){
 							arr = file.deleteArrItem(arr,currentFile);
-							dispatch('updateData',arr,{ root: true });  
+							dispatch('updateData',arr,{ root: true });
 							file.writeFile(filepath,currentFile.source,(err)=>{
 								if(err){
 
@@ -158,7 +158,9 @@ export const fileAction = {
 	},
 	renameFile({ commit, state,rootState,dispatch},name){
 		const filesList = state.position.item;
+		debugger;
 		file.watcher.close();
+		console.log(file.watcher);
 		file.renameFile(filesList.value,name,(newFilePath)=>{
 			// 重命名成功更新状态
 			const keyId = newFilePath ? file.keyIdFn(newFilePath) : filesList.keyId;
