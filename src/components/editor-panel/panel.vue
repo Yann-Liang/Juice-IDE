@@ -32,7 +32,7 @@
             }
         },
         //数组或对象，用于接收来自父组件的数据
-        props: ["currentView","value","searchValue",'name','keyId'],
+        props: ["currentView","value","searchValue",'name','keyId','fileData'],
         //计算
         computed: {
             ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight'])
@@ -41,7 +41,7 @@
         methods: {
             ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
-	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile']),
+	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile','queryFileData']),
             //放大缩小字体
             editorFontSize:function(incr){
                 this.editor.setFontSize(this.editor.getFontSize() + incr)
@@ -332,6 +332,13 @@
                     cb();
                 }
             },
+//	        intiFileData(){
+//		        this.queryFileData();
+//		        const data = this.fileData;
+//		        if( data.length > 0){
+//			        this.updateEditFile(data[0]);
+//		        }
+//	        },
         },
         //生命周期函数
         created() {
@@ -496,6 +503,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
+//            this. intiFileData();
         },
         //监视
         watch: {

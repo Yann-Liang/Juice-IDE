@@ -314,7 +314,7 @@
                         {
                         	name: 'example1.sol',
                             value:'',
-                            keyId:file.keyIdFn('')+'example1.sol'
+                            keyId:file.keyIdFn('') + 'example1.sol'
                         },
 			            {
 				            name: 'example2.sol',
@@ -324,7 +324,24 @@
                     ]
 		            this.updateUrl(data);
                 }
-            }
+            },
+//	        setStorageFn(){
+//		        const data = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : [];
+//		        if(data.length === 0){
+//
+//			        localStorage.setItem('fileList',JSON.stringify(
+//				        [{
+//					        name:'example1.sol',
+//					        value:file.getTemplatePath('example1.sol'),
+//					        keyId: file.keyIdFn('template1.sol'),
+//				        }]
+//			        ))
+//			        this.queryFileListData();
+//		        }else{
+//
+//		        }
+//
+//	        }
         },
         //生命周期函数
         created() {

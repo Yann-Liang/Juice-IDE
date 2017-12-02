@@ -25,6 +25,7 @@ export const editorMutation = {
         state.replaceVisible = bool
     },
 	['UPDATE_File_DATA'](state,data){
+    	localStorage.setItem('fileData',JSON.stringify(data));
 		state.fileData = data
 	},
 	['UPDATE_REMOVE_DATA'](state,data){

@@ -500,6 +500,20 @@ class file {
 			fn && fn(filepath);
 		})
 	}
+	
+	// 删除数组的某一项
+	deleteArrItem(arr,delItem){
+		const newArr = arr.filter((item,index)=>{
+			return item.keyId !== delItem.keyId;
+		})
+		return newArr;
+	}
+	
+	//获取solc路径
+	getTemplatePath(name) {
+		const app = require('electron').remote.app;
+		return process.env.NODE_ENV === 'development' ? `'src/services/compile-exe/solcs/${name}`: path.join(app.getPath('exe'), '..', `/solcs/${name}`);
+	}
 }
 
 

@@ -123,6 +123,10 @@ export const editorAction = {
 	changeFileData({commit,state},data){
 		commit('UPDATE_File_DATA',data)
 	},
+	queryFileData({commit, state}){
+		const fileData = localStorage.getItem('fileData')? JSON.parse(localStorage.getItem('fileData')) : [];
+		commit('UPDATE_File_DATA',fileData)
+	},
 	// 删除文件后更新状态
 	updateDeleteStatus({dispatch,commit,state,rootState},fileItem){
 		// 判断tabs列表有没有
