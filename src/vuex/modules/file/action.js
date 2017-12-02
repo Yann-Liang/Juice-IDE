@@ -78,6 +78,7 @@ export const fileAction = {
 	saveAllFile({ commit, state,rootState,dispatch},cb){
 		// 获取编辑未保存的文件数据
 		const data = rootState.editor.editData;
+		let arr = localStorage.getItem('editFileData') ? JSON.parse(localStorage.getItem('editFileData')):[];
 		if(data.length>0){
 			let fileData =data.filter((item)=>{
 				return item.value;
@@ -88,11 +89,15 @@ export const fileAction = {
 			// 递归调用保存有地址的文件
 			file.saveAllHaveFile(fileData,(err,item)=>{
 				if(err){
-
+					alert(`${item.name}文件保存失败！`)
 				}else{
+					arr = file.deleteArrItem(arr,item);
+					dispatch('updateData',arr,{ root: true });
 					dispatch('updateTreeData',{keyId:item.keyId,save:true},{ root: true });
 				}
-			})
+			});
+			
+			
 
 			// 递归调用保存没有地址的文件
 			function saveAllNoFile(dialogFile){
@@ -103,6 +108,8 @@ export const fileAction = {
 					},(filename)=>{
 						const filepath = filename ? filename.replace(/\\/g,'/') :'';
 						if(filepath){
+							arr = file.deleteArrItem(arr,currentFile);
+							dispatch('updateData',arr,{ root: true });
 							file.writeFile(filepath,currentFile.source,(err)=>{
 								if(err){
 
@@ -142,7 +149,7 @@ export const fileAction = {
 				}
 			}
 			// 更新未保存vuex的状态
-			dispatch('updateData',[],{ root: true });
+			// dispatch('updateData',[],{ root: true });
 			saveAllNoFile(dialogFile);
 			if(cb && typeof(cb)=='function'){
                 cb();
@@ -151,7 +158,9 @@ export const fileAction = {
 	},
 	renameFile({ commit, state,rootState,dispatch},name){
 		const filesList = state.position.item;
+		debugger;
 		file.watcher.close();
+		console.log(file.watcher);
 		file.renameFile(filesList.value,name,(newFilePath)=>{
 			// 重命名成功更新状态
 			const keyId = newFilePath ? file.keyIdFn(newFilePath) : filesList.keyId;

@@ -194,10 +194,10 @@ class compileServies {
     }
 
     //获取solc路径
-    getSolcPath() {
-        const app = require('electron').remote.app;
-        return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : path.join(app.getPath('exe'), '..', '/solcs/solc');
-    }
+	getSolcPath() {
+		const app = require('electron').remote.app;
+		return process.env.NODE_ENV === 'development' ? 'src/services/compile-exe/solcs/solc' : path.join(app.getPath('exe'), '..', '/solcs/solc');
+	}
 }
 
 export default new compileServies;

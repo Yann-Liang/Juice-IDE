@@ -362,6 +362,25 @@ class file {
 		}
 	}
 	
+	// 根据value来获取树结构的值
+	GetById(Data,id){
+		var Deep,T;
+		var blo = true;
+		for (let F = 0 ;F < Data.length;F++)
+		{
+			T = Data[F]
+			if (id == T.id) {
+				blo = false;
+				return T
+			}
+			if (T.children && blo)
+			{
+				Deep = this.GetById(T.children,id)
+				if (Deep) return Deep
+			}
+		}
+	}
+	
 	
 
 	// 获取文件的信息
@@ -499,6 +518,21 @@ class file {
 			console.log(filepath)
 			fn && fn(filepath);
 		})
+	}
+	
+	// 删除数组的某一项
+	deleteArrItem(arr,delItem){
+		const newArr = arr.filter((item,index)=>{
+			return item.keyId !== delItem.keyId;
+		})
+		return newArr;
+	}
+	
+	//获取solc路径
+	getTemplatePath(name) {
+		const app = require('electron').remote.app;
+		const exmPath = path.join(__static,'..',`src/services/compile-exe/solcs/${name}`);
+		return process.env.NODE_ENV === 'development' ? exmPath : path.join(app.getPath('exe'), '..', `/solcs/${name}`);
 	}
 }
 

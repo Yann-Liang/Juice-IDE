@@ -37,13 +37,13 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData'])
         },
         //方法
         methods: {
             ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
-	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile']),
+	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile','queryFileData']),
             //放大缩小字体
             editorFontSize:function(incr){
                 this.editor.setFontSize(this.editor.getFontSize() + incr)
@@ -125,18 +125,14 @@
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
-                        if(this.value == 'readonly'){
-                            this.editor.setReadOnly(true);
-                        }else{
-                           fs.readFile(this.value,"utf-8",  (err, data)=> {
-                                if (err) {
-                                    return console.error(err);
-                                }
-                                console.log('读取路径文件的值')
-                                this.editor.setValue(data.toString(),1);
-	                            this.setActiveEditor(this.getResult);
-                            });
-                        }
+	                    fs.readFile(this.value,"utf-8",  (err, data)=> {
+		                    if (err) {
+			                    return console.error(err);
+		                    }
+		                    console.log('读取路径文件的值')
+		                    this.editor.setValue(data.toString(),1);
+		                    this.setActiveEditor(this.getResult);
+	                    });
                     }else{
                         this.editor.setValue("pragma solidity ^0.4.2;",1);
 	                    this.setActiveEditor(this.getResult);
@@ -335,6 +331,7 @@
                     cb();
                 }
             },
+
             isReplace:function(){
                 var even = document.getElementsByClassName('ace_replacebtn')
                 console.log('even',even)
@@ -365,7 +362,17 @@
                         })
                     })
                 }
-            }
+            },
+
+	        intiFileData(){
+		        this.queryFileData();
+		        console.log(this.fileData)
+		        const data = this.fileData;
+		        if( data.length > 0){
+			        this.updateEditFile(data[0]);
+		        }
+	        },
+
         },
         //生命周期函数
         created() {
@@ -541,6 +548,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
+            this. intiFileData();
         },
         //监视
         watch: {

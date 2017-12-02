@@ -107,8 +107,9 @@
             </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive
-                  class='javascript-editor' ref="childMethod" v-if='editorVisible' @findFunction='findFunction'
-                  @replaceFunction='replaceFunction' v-show="fileData.length > 0">
+                  class='javascript-editor' ref="childMethod" @findFunction='findFunction'
+                  @replaceFunction='replaceFunction' v-show="fileData.length > 0">。
+
         </v-editor>
         <div class="tips default"  v-show="fileData.length == 0">
             <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
@@ -389,7 +390,6 @@
                     //提示用户打开文件
                     this.editorVisible = false;
                     this.tipsVisible = true;
-                    this.value = "readonly";
                     this.changeFileData([]);
                 }else{
                     this.editorVisible = true;
@@ -566,7 +566,6 @@
                     this.success(()=>{
                         this.editorVisible = false;
                         this.tipsVisible = true;
-                        this.value = "readonly";
                         this.changeFileData([]);
                         this.showOrHideTwo = false;
                         this.showOrHideOne = false;
@@ -606,7 +605,6 @@
                     this.editorVisible = false;
                     this.tipsVisible = true;
                     this.asksVisible = false;
-                    this.value = "readonly";
                     this.changeFileData([]);
                     this.showOrHideTwo = false;
                     this.showOrHideOne = false;
@@ -648,7 +646,6 @@
                     //不显示tab
                     this.select = "";
                     this.currentView = "";
-                    this.value = "readonly";
                     this.name='';
                     this.editorVisible = false;
                     this.tipsVisible = true;
