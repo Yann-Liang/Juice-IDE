@@ -25,7 +25,7 @@
                 <div class="tool">
                     <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe633;</i></span>
                     <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
-                    <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
+                    <span @click.prevent='replace' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
                     <span @click.prevent='increase' title="字体放大"><i class="iconfont info">&#xe61d;</i></span>
                     <span @click.prevent='decrease' title="字体缩小"><i class="iconfont info">&#xe622;</i></span>
                     <span @click.prevent='close' title="关闭所有窗口"><i class="iconfont info">&#xe61e;</i></span>
@@ -218,9 +218,13 @@
             //点击搜索
             search:function(){
                 //弹窗出现
-                this.boolSearchVisible(true);
-
-                // this.searchVisible = !this.searchVisible;
+                // this.boolSearchVisible(true);
+                // console.log(this.editor.commands.commands.find.exec(this.editor));
+                this.editor.commands.commands.find.exec(this.editor,true);
+                // this.editor.commands.commands.replace.exec(this.editor);
+            },
+            replace:function(){
+                this.editor.commands.commands.find.exec(this.editor,true);
             },
             saveData:function(){
                 this.htmlData = document.getElementById('javascript-editor').innerHTML
@@ -821,14 +825,6 @@
             document.onkeydown = function(event){
                 event.stopPropagation();
                 var e = event || window.event || arguments.callee.caller.arguments[0];
-                if(e && e.keyCode==38){ // 按 up
-                    //要做的事情
-                    _this.onSearchUp();
-                }
-                if(e && e.keyCode==40){ // 按 down
-                    //要做的事情
-                    _this.onSearchDown();
-                }
                 if(e && e.keyCode==27){ // 按 Esc
                     //要做的事情
                     _this.offSearch();
@@ -840,9 +836,12 @@
                 if (e.ctrlKey && e.keyCode == 189){ //按 ctrl--
                     _this.decrease();
                 }
+                if(e.keyCode==72 &&  e.ctrlKey){ // 按 Esc
+                    console.log(111111111111122222222222222222222222)
+                }
 
             }
-        },
+         },
         beforeMount() {
 
         },
