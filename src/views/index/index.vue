@@ -43,7 +43,13 @@
     import contractServies from '@/services/contract-servies';
     import hotkeys from 'hotkeys-js'
     import file from '@/services/API-file'
-    const beautify = require('js-beautify').js_beautify
+    const beautify = require('js-beautify').js_beautify;
+    let ipcRenderer=null;
+    try {
+       ipcRenderer= require('electron').ipcRenderer;
+    } catch (error) {
+        console.warn('不是eletron环境',error);
+    }
     export default {
         //组件名
         name: "index",
@@ -307,6 +313,17 @@
                     console.warn('Juice.user.getUserInfo:',error)
                 }
             },
+            setLastTime(){
+                if(ipcRenderer!=null){
+                    document.addEventListener('mousemove',(e)=>{
+                        ipcRenderer.send('item-last-time',new Date().getTime())
+                    });
+
+                    document.addEventListener('keyup',(e)=>{
+                        ipcRenderer.send('item-last-time',new Date().getTime())
+                    });
+                }
+            },
             setIntSol(){
             	const url = this.getUrl;
             	if(url && url.length === 0){
@@ -351,6 +368,7 @@
             this.getUserInfo();
 	        this.initUrlFn();
 	        this.setStorageFn();
+            this.setLastTime();
         },
         beforeMount() {},
         mounted() {
