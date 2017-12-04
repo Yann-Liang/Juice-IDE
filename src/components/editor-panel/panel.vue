@@ -48,65 +48,6 @@
             editorFontSize:function(incr){
                 this.editor.setFontSize(this.editor.getFontSize() + incr)
             },
-            //全局搜索
-            onSearch:function(name){
-                this.editor.find(name,{
-                    backwards: false,
-                    wrap: true,
-                    caseSensitive: false,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                });
-                // this.editor.findNext();
-                this.editor.findPrevious();
-                // this.editor.findNext(false);
-                // this.onSearchUp();
-                // this.onSearchDown();
-            },
-            //向上搜索
-            onSearchUp:function(){
-
-                this.editor.findPrevious(true);
-            },
-            //向下搜索
-            onSearchDown:function(){
-                this.editor.findNext(false);
-            },
-            //单个替换
-            replaceSign:function(oldValue,newValue){
-                if(newValue == ""){
-                    //什么也不做
-                }else{
-                    this.editor.find(oldValue);
-                    this.editor.replace(newValue);
-                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                    this.initChange();
-                }
-            },
-            //全部替换
-            replaceAll:function(oldValue,newValue){
-                if(newValue == ""){
-                    //什么也不做
-                }else{
-                    this.editor.find(oldValue,{
-                        backwards: false,
-                        wrap: true,
-                        caseSensitive: true,
-                        wholeWord: false,
-                        regExp: false,
-                        range:"",
-                        // start:{row:1,column:1}
-                    });
-                    // this.editor.findNext(false);
-                    this.editor.findPrevious();
-                    this.editor.replaceAll(newValue);
-                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                    this.initChange();
-                }
-
-
-            },
             //代码格式化
             format:function(){
                 this.editor.setValue(beautify(this.editor.getValue()),1);
@@ -332,38 +273,6 @@
                 }
             },
 
-            isReplace:function(){
-                var even = document.getElementsByClassName('ace_replacebtn')
-                console.log('even',even)
-                // document.getElementsByClassName('ace_replacebtn').addEventListener('click' , ()=> {
-                //     this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                //     this.initChange();
-                // });
-
-
-                // document.getElementsByClassName('ace_editor').onclick = function(event){
-                //  event = event || window.event;
-                //  var target = event.target || event.srcElement;
-                //  console.log('target',target)
-                //  console.log('even',even)
-
-                //  if(target == even[0] || target == even[1]){
-                //         alert(1111111111111111);
-                //  }
-                // }
-                //监听ctrl-h时间
-                // document.addEventListener('keydown',)
-                if(even.length != 0){
-                    console.log(even)
-                    even.map((item,index)=>{
-                        console.log(item)
-                        item.addEventListener('click',()=>{
-                            alert(11111111111)
-                        })
-                    })
-                }
-            },
-
 	        intiFileData(){
 		        this.queryFileData();
 		        console.log(this.fileData)
@@ -376,15 +285,6 @@
         },
         //生命周期函数
         created() {
-            // document.onkeydown = function(event){
-            //     console.log('eventeventeventeventeventeventeventeventeventeventeventeventeventeventevent')
-            //     event.stopPropagation();
-            //     var e = event || window.event || arguments.callee.caller.arguments[0];
-            //     console.log(e)
-            //     if(e.ctrlKey && e.keyCode==72){ // 按 Esc
-            //         console.log(111111111111122222222222222222222222)
-            //     }
-            // }
 
         },
         beforeMount() {
@@ -441,26 +341,24 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
-            this.isReplace();
             //绑定搜索
-            // this.editor.commands.addCommand({
-            //     name: 'find',
-            //     bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
-            //     exec: function(editor) {
-            //         _this.$emit("findFunction",true);
-            //     },
-            //     readOnly: true // 如果不需要使用只读模式，这里设置false
-            // });
+            this.editor.commands.addCommand({
+                name: 'find',
+                bindKey: {win: 'Ctrl-F',  mac: 'Command-F'},
+                exec: function(editor) {
+                    _this.$emit("findFunction",true);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
             //绑定替换
-            // this.editor.commands.addCommand({
-            //     name: 'replace',
-            //     bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
-            //     exec: function(editor) {
-            //         // _this.$emit("replaceFunction",true);
-            //         // _this.editor.commands.commands.replace.exec(_this.editor);
-            //     },
-            //     readOnly: true // 如果不需要使用只读模式，这里设置false
-            // });
+            this.editor.commands.addCommand({
+                name: 'replace',
+                bindKey: {win: 'Ctrl-H',  mac: 'Command-H'},
+                exec: function(editor) {
+                    _this.$emit("replaceFunction",true);
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
             //绑定新建文件
             this.editor.commands.addCommand({
                 name: 'newFile',
@@ -563,6 +461,7 @@
             consoleHeight:function(){
                 this.editor.resize(true);
             }
+
         },
         //组件
         components: {
