@@ -34,31 +34,29 @@
             <div class="search-model shadow" v-if='searchVisible'>
                 <div class='search-content'>
                     <span>
-                        <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" v-model='inputValue' @keyup.up="onSearchUp" @keyup.left="onSearchUp" @keyup.down="onSearchDown" @keyup.right="onSearchDown" placeholder="搜索" @input='onSearch'  ref='search' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" v-model='inputValue' @keyup.up="findPrev" @keyup.left="findPrev" @keyup.down="findNext" @keyup.right="findNext" placeholder="搜索" @input='find' @keyup.enter='find' ref='search' autofocus="autofocus"  spellcheck="false" v-focus>
                     </span>
-                    <span class="btn btn-info" @click='onSearch'>查找</span>
-                    <!-- <span class='search-err' v-if='searchErr'>无结果</span> -->
-                    <span @click='onSearchUp'><i class="iconfont info">&#xe638;</i></span>
-                    <span @click='onSearchDown'><i class="iconfont info">&#xe637;</i></span>
+                    <span class="btn btn-info" @click='find'>查找</span>
+                    <span @click='findPrev'><i class="iconfont info">&#xe638;</i></span>
+                    <span @click='findNext'><i class="iconfont info">&#xe637;</i></span>
                     <span @click="offSearch" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
             </div>
             <div class="replace-model shadow" v-if='replaceVisible'>
                 <div class="replace-content replace-one">
                     <span>
-                        <input class="dark" type="text"  :style="{backgroundColor:repMatch?'#fff':'#d43718'}" v-model='fromValue'  placeholder="查找内容"   @keyup.enter="fromSearch" @keyup.up="onReplaceUp" @keyup.left="onReplaceUp" @keyup.down="onReplaceDown" @keyup.right="onReplaceDown"  @input='fromSearch' autofocus="autofocus" v-focus>
+                        <input class="dark" type="text"  :style="{backgroundColor:repMatch?'#fff':'#d43718'}" v-model='fromValue'  placeholder="查找内容"  @keyup.up="findReplacePrev" @keyup.left="findReplacePrev" @keyup.down="findReplaceNext" @keyup.right="findReplaceNext"  @input='findReplace'   @keyup.enter="findReplace" autofocus="autofocus"  spellcheck="false" v-focus>
                     </span>
-                    <span class="btn btn-info" @click='fromSearch'>查找</span>
-                    <!-- <span class='search-err' v-if='searchErr'>无结果</span> -->
-                    <span @click='onReplaceUp'><i class="iconfont info">&#xe638;</i></span>
-                    <span @click='onReplaceDown'><i class="iconfont info">&#xe637;</i></span>
+                    <span class="btn btn-info" @click='findReplace'>查找</span>
+                    <span @click='findReplacePrev'><i class="iconfont info">&#xe638;</i></span>
+                    <span @click='findReplaceNext'><i class="iconfont info">&#xe637;</i></span>
                     <span @click="offReplace" class="close-search"><i class="iconfont dark">&#xe61f;</i></span>
                 </div>
                 <div class="replace-content">
                     <span>
-                        <input class="dark" type="text" v-model='toValue'  placeholder="替换为">
+                        <input class="dark" type="text" v-model='toValue'  placeholder="替换为" @keyup.enter='replace' spellcheck="false">
                     </span>
-                    <span class="btn btn-info" @click='replaceSign'>替换</span>
+                    <span class="btn btn-info" @click='replaceAndFindNext'>替换</span>
                     <span class="btn btn-info" @click='replaceAll'>全部替换</span>
                 </div>
             </div>
@@ -113,7 +111,6 @@
         </v-editor>
         <div class="tips default"  v-show="fileData.length == 0">
             <i class='icons'>请在文件管理器面板中点击打开一个文件</i>
-
         </div>
         <!-- 弹窗 -->
 
@@ -121,14 +118,10 @@
 </template>
 
 <script>
-    //import  from ''
-    //brace
+
     import {mapState, mapActions, mapGetters} from 'vuex';
     import Editor from '@/components/editor-panel/panel'
     import file from '@/services/API-file'
-    // import {remote} from 'electron'
-    // const globalShortcut = remote.globalShortcut
-    const {globalShortcut} = require('electron').remote
 
     export default {
         //组件名
@@ -177,9 +170,6 @@
         computed: {
             ...mapGetters(['editFile','fileTreeData','activeFile','getUrl','saveCode','editData','fileData','editor'
                 ,'searchVisible','replaceVisible','removeData','currentName','successVisible']),
-            // hiddenLength:function(){
-            //     return console.log(this.$refs.files.offsetWidth - this.$refs.tabs.offsetWidth);
-            // }
         },
         //方法
         methods: {
@@ -210,84 +200,52 @@
             },
             findFunction:function(bool){
                 this.boolSearchVisible(bool);
-                // this.searchVisible = bool;
             },
             replaceFunction:function(bool){
                 this.boolReplaceVisible(bool);
-                // this.replaceVisible = bool;
             },
             //点击搜索
             search:function(){
                 //弹窗出现
                 this.boolSearchVisible(true);
-
-                // this.searchVisible = !this.searchVisible;
+                // this.editor.commands.commands.find.exec(this.editor);
             },
-            saveData:function(){
-                this.htmlData = document.getElementById('javascript-editor').innerHTML
+            highlight :function(value) {
+                // console.log(value)
+                var re =new RegExp("" + value + "","gim");
+                console.log(re);
+                if(value == ""){
+                    this.editor.session.highlight(false);
+                }else{
+                    this.editor.session.highlight(re);
+                }
+                this.editor.renderer.updateBackMarkers();
             },
-            //全局搜索
-            onSearch:function(){
-                // console.log('diandiandian',this.inputValue)
-                //获取到当前选中的元素
-                // console.log('1111111111111111111111')
-                // console.log('getcopytext',this.editor.getCopyText());
-                console.log(11111111)
-                this.searchValue = this.inputValue;
-                this.$refs.childMethod.onSearch(this.inputValue);
-                if(this.inputValue == ""){
-                    this.hasMatch = true;
-                }else if(this.editor.find(this.inputValue,{
-                    backwards: false,
+            find:function(skipCurrent, backwards, preventScroll){
+                var range = this.editor.find(this.inputValue,{
+                    skipCurrent: skipCurrent,
+                    backwards: backwards,
                     wrap: true,
+                    regExp: undefined,
                     caseSensitive: false,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                    // start:{row:1,column:1}
-                }) == undefined){
+                    wholeWord: undefined,
+                    preventScroll: preventScroll
+                });
+                var noMatch = !range && this.inputValue;
+                if(noMatch == false || noMatch == ""){
+                    this.hasMatch = true;
+                }else{
                     this.hasMatch = false;
-                }else{
-                    this.hasMatch = true;
                 }
-            },
-            //高亮显示搜索内容
-            highlight:function(key){
-                console.log(11111111111111)
-                // console.log(this.editor.getValue())
-                console.log(this.$el.querySelector("#javascript-editor"));
-                console.log(document.getElementById('javascript-editor').innerHTML)
-                this.editor.focus();
-                document.getElementById('javascript-editor').innerHTML = data;
-                var data = JSON.parse(JSON.stringify(this.htmlData));
-                if(key && key.length>0){
-                    var reg =  new  RegExp(key+ "(?=[^<>]*<)" , "ig" );
-                    //高亮显示
-                    document.getElementById('javascript-editor').innerHTML=data.replace(reg,'<span style="border:solid 1px #0066cc;" class="high-lighter">' +key+ '</span>' );
-                    //滚动条定位
-                    this.regList = document.getElementsByClassName('high-lighter');
-                    var container = this.$el.querySelector("#javascript-editor");
-                    if(container && this.regList.length>0){ //有匹配值
-                        container.scrollTop = this.regList[0].offsetTop-container.offsetTop;
-                        this.current = 0;
-                        this.regList[0].style.backgroundColor="#0066cc";
-                        this.regList[0].style.color="#fff";
-                        this.hasMatch = true;
-                    }else{ //无匹配值
-                        this.hasMatch = false;
-                    }
-                }else{
-                    this.hasMatch = true;
-                    document.getElementById('javascript-editor').innerHTML=data;
-                }
-            },
-            //向上搜索
-            onSearchUp:function(){
-                this.$refs.childMethod.onSearchUp();
+                this.highlight(this.inputValue);
             },
             //向下搜索
-            onSearchDown:function(){
-                this.$refs.childMethod.onSearchDown();
+            findNext:function(){
+                this.find(true,false);
+            },
+            //向上搜索
+            findPrev:function(){
+                this.find(true,true);
             },
             //关闭弹窗
             offSearch:function(){
@@ -296,48 +254,77 @@
                 // this.searchVisible = false;
                 this.inputValue = "";
                 this.searchValue = "";
-                this.searchErr = false;
-                // document.getElementById('javascript-editor').innerHTML = this.htmlData;
-
-                // this.htmlData = "";
+                this.hasMatch = true;
             },
-            fromSearch:function(){
-                this.$refs.childMethod.onSearch(this.fromValue);
-                if(this.fromValue == ""){
-                    this.repMatch = true;
-                }else if(this.editor.find(this.fromValue,{
-                    backwards: false,
+            //替换的搜索
+            findReplace:function(skipCurrent, backwards, preventScroll){
+                console.log('this.fromValue',this.fromValue)
+                var range = this.editor.find(this.fromValue,{
+                    skipCurrent: skipCurrent,
+                    backwards: backwards,
                     wrap: true,
-                    caseSensitive: true,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                    // start:{row:1,column:1}
-                }) == undefined){
-                    this.repMatch = false;
-                }else{
+                    regExp: undefined,
+                    caseSensitive: undefined,
+                    wholeWord: undefined,
+                    preventScroll: preventScroll
+                });
+                var noMatch = !range && this.fromValue;
+                if(noMatch == false || noMatch == ""){
                     this.repMatch = true;
+                }else{
+                    this.repMatch = false;
                 }
+                this.highlight(this.fromValue);
             },
-            onReplaceUp(){
-                this.$refs.childMethod.onSearchUp();
+            //向下搜索
+            findReplaceNext:function(){
+                this.findReplace(true,false);
             },
-            onReplaceDown(){
-                this.$refs.childMethod.onSearchDown();
+            //向上搜索
+            findReplacePrev:function(){
+                this.findReplace(true,true);
             },
-            replace:function(){
-                this.boolReplaceVisible(true);
-                // this.replaceVisible = !this.replaceVisible;
+            //enter替换
+            replace :function(){
+                if(!this.editor.getReadOnly()){
+                    //进行判断
+                    if(this.toValue == ""){
+                        //什么也不做
+                    }else{
+                        this.editor.replace(this.toValue);
+                        this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                        this.$refs.childMethod.initChange();
+                        this.highlight(this.fromValue);
+                    }
+                }
+
             },
             //单个替换
-            replaceSign:function(){
-                // this.$refs.childMethod.onSearch(this.fromValue);
-                // console.log(this.editor.getValue())
-                this.$refs.childMethod.replaceSign(this.fromValue,this.toValue);
+            replaceAndFindNext :function(){
+                if(!this.editor.getReadOnly()){
+                    if(this.toValue == ""){
+                        //什么也不做
+                    }else{
+                        this.editor.replace(this.toValue);
+                        this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                        this.$refs.childMethod.initChange();
+                        this.findReplaceNext();
+                    }
+
+                }
             },
             //全部替换
             replaceAll:function(){
-                this.$refs.childMethod.replaceAll(this.fromValue,this.toValue);
+                if(!this.editor.getReadOnly()){
+                    if(this.toValue == ""){
+                        //什么也不做
+                    }else{
+                        this.editor.replaceAll(this.toValue);
+                        this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+                        this.$refs.childMethod.initChange();
+                    }
+
+                }
             },
             //关闭替换弹窗
             offReplace:function(){
@@ -818,28 +805,13 @@
             document.onkeydown = function(event){
                 event.stopPropagation();
                 var e = event || window.event || arguments.callee.caller.arguments[0];
-                if(e && e.keyCode==38){ // 按 up
-                    //要做的事情
-                    _this.onSearchUp();
-                }
-                if(e && e.keyCode==40){ // 按 down
-                    //要做的事情
-                    _this.onSearchDown();
-                }
-                if(e && e.keyCode==27){ // 按 Esc
-                    //要做的事情
+                if(e.keyCode == 27 && e){ // 按 Esc
                     _this.offSearch();
                     _this.offReplace();
                 }
-                if (e.ctrlKey && e.keyCode == 187){ //按 ctrl++
-                    _this.increase();
-                }
-                if (e.ctrlKey && e.keyCode == 189){ //按 ctrl--
-                    _this.decrease();
-                }
 
             }
-        },
+         },
         beforeMount() {
 
         },
@@ -856,7 +828,6 @@
                             this.pushArray();
                         }
                     }
-
                 }
             },
             'removeData.id':function(){

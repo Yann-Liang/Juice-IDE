@@ -13,6 +13,7 @@
     import 'brace/mode/javascript';
     import 'brace/theme/tomorrow';
     import 'brace/ext/language_tools'
+    import 'brace/ext/searchbox'
     import '@/services/Mode-solidity'
     import 'brace/keybinding/vim'
     import {mapState, mapActions, mapGetters} from 'vuex';
@@ -21,6 +22,7 @@
     var beautify = require('js-beautify').js_beautify
     var fs = require('fs')
     ace.acequire('ace/ext/language_tools')
+    ace.acequire('ace/ext/searchbox')
     export default {
         //组件名
         name: '',
@@ -45,65 +47,6 @@
             //放大缩小字体
             editorFontSize:function(incr){
                 this.editor.setFontSize(this.editor.getFontSize() + incr)
-            },
-            //全局搜索
-            onSearch:function(name){
-                this.editor.find(name,{
-                    backwards: false,
-                    wrap: true,
-                    caseSensitive: false,
-                    wholeWord: false,
-                    regExp: false,
-                    range:"",
-                });
-                // this.editor.findNext();
-                this.editor.findPrevious();
-                // this.editor.findNext(false);
-                // this.onSearchUp();
-                // this.onSearchDown();
-            },
-            //向上搜索
-            onSearchUp:function(){
-
-                this.editor.findPrevious(true);
-            },
-            //向下搜索
-            onSearchDown:function(){
-                this.editor.findNext(false);
-            },
-            //单个替换
-            replaceSign:function(oldValue,newValue){
-                if(newValue == ""){
-                    //什么也不做
-                }else{
-                    this.editor.find(oldValue);
-                    this.editor.replace(newValue);
-                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                    this.initChange();
-                }
-            },
-            //全部替换
-            replaceAll:function(oldValue,newValue){
-                if(newValue == ""){
-                    //什么也不做
-                }else{
-                    this.editor.find(oldValue,{
-                        backwards: false,
-                        wrap: true,
-                        caseSensitive: true,
-                        wholeWord: false,
-                        regExp: false,
-                        range:"",
-                        // start:{row:1,column:1}
-                    });
-                    // this.editor.findNext(false);
-                    this.editor.findPrevious();
-                    this.editor.replaceAll(newValue);
-                    this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
-                    this.initChange();
-                }
-
-
             },
             //代码格式化
             format:function(){
@@ -158,6 +101,7 @@
 	            // console.log(this.editor.getSession().off)
                 let red = null;
 	            this.editor.on("focus",()=>{
+                    console.log('focusssssssssssss',red)
 	            	if(!red){
 			            red = this.editor.getSession().on('change', (e)=> {
 				            console.log("开始监听")
@@ -328,6 +272,7 @@
                     cb();
                 }
             },
+
 	        intiFileData(){
 		        this.queryFileData();
 		        console.log(this.fileData)
@@ -336,6 +281,7 @@
 			        this.updateEditFile(data[0]);
 		        }
 	        },
+
         },
         //生命周期函数
         created() {
@@ -348,10 +294,10 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            // console.log(this.editor,this.editor.on,this.editor.off)
+            // console.log(this.editor.session.onChange())
             var _this = this;
-            require('brace/ext/language_tools')
             ace.acequire('ace/ext/language_tools')
+            ace.acequire('ace/ext/searchbox')
             this.editor = ace.edit('javascript-editor');
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
@@ -515,6 +461,7 @@
             consoleHeight:function(){
                 this.editor.resize(true);
             }
+
         },
         //组件
         components: {
@@ -543,6 +490,22 @@
 .javascript-editor{
     width:100%;
     flex-grow:1;
+
+}
+.ace_editor{
+    .ace_search.right{
+        border-right:3px;
+        right:0;
+    }
+    .ace_search{
+        background-color: red;
+        box-shadow: inset 1px -1px 0 0 rgba(0,0,0,.4);
+        max-width: 480px;
+        width: 480px;
+        line-height: 50px;
+        padding: 0 0 8px;
+        border: 1px solid #e5e5e5;
+    }
 }
 
 
