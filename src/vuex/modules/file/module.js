@@ -30,6 +30,12 @@ export const file = {
 	    },
 	    newOpenFile:{
 	    	id: 0
+	    },
+	    typeERR:false,
+	    dialogInfo: {
+	    	type: 'newFileName',
+		    title:'SOL文件',
+		    label: '文件名'
 	    }
     },
     actions: fileAction,

@@ -43,5 +43,11 @@ export const fileMutation = {
 	},
 	['UPDATE_NEW_OPEN_FILE'](state,data){
 		state.newOpenFile = data;
+	},
+	['CHANGE_TYPE_ERR'](state,blo){
+		state.typeERR = blo;
+	},
+	['CHANGE_DIALOG_INFO'](state,dialogInfo){
+		state.dialogInfo = dialogInfo;
 	}
 };

@@ -35,7 +35,7 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData','activeEditor'])
         },
         //方法
         methods: {
@@ -161,9 +161,9 @@
 	            	if(!red){
 			            red = this.editor.getSession().on('change', (e)=> {
 				            console.log("开始监听")
-				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+				            this.updateTreeData({keyId:this.activeEditor.keyId,save:false});
+				            alert(3333);
 				            this.initChange();
-
 			            })
                     }
 

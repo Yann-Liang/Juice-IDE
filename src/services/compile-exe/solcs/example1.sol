@@ -2,22 +2,22 @@ pragma solidity ^0.4.2;
 
 contract Migrations {
   address public owner;
-  uint public last_completed_migration;
+  uint public last_completed_migration;  
 
   modifier restricted() {
-    if (msg.sender == owner) _;
+    if (msg.sender == owner) _;dsafasfaf
   }
 
-  function Migrations() {
-    owner = msg.sender;
-  }
+  function Migrations() {   
+    owner = msg.sender; 
+  }    
 
   function setCompleted(uint completed) restricted {
     last_completed_migration = completed;
   }
-
-  function upgrade(address new_address) restricted {
-    Migrations upgraded = Migrations(new_address);
+ 
+  function upgrade(address new_address) restricted { 
+    Migrations upgraded = Migrations(new_address);dfsafasdfa
     upgraded.setCompleted(last_completed_migration);
   }
-}
+} 

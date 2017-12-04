@@ -158,11 +158,13 @@ export const fileAction = {
 	},
 	renameFile({ commit, state,rootState,dispatch},name){
 		const filesList = state.position.item;
-		debugger;
 		file.watcher.close();
-		console.log(file.watcher);
-		file.renameFile(filesList.value,name,(newFilePath)=>{
+		file.renameFile(filesList.value,name,(newFilePath,err)=>{
 			// 重命名成功更新状态
+			if(err){
+				dispatch('changeTypeERR');
+				throw err;
+			}
 			const keyId = newFilePath ? file.keyIdFn(newFilePath) : filesList.keyId;
 			name = file.isDir(newFilePath) ? name :file.uffixName(name);
 			// 更新updateFileData编辑去tabs
@@ -393,5 +395,14 @@ export const fileAction = {
 			newFile:fileItem
 		}
 		commit('UPDATE_NEW_OPEN_FILE',data)
+	},
+	changeTypeERR({ commit, state }){
+		commit('CHANGE_TYPE_ERR',true)
+		setTimeout(()=>{
+			commit('CHANGE_TYPE_ERR',false)
+		},2000)
+	},
+	changeDialogInfo({ commit, state },data){
+		commit('CHANGE_DIALOG_INFO',data)
 	}
 }

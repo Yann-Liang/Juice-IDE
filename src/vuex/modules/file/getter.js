@@ -47,5 +47,11 @@ export const fileGetter = {
 	},
 	newOpenFile(state){
 		return state.newOpenFile;
+	},
+	typeERR(state){
+		return state.typeERR;
+	},
+	dialogInfo(state){
+		return state.dialogInfo;
 	}
 };

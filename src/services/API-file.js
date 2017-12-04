@@ -6,7 +6,6 @@
  */
 const [fs,path,os] = [require('fs-extra'),require('path'),require('os')];
 const{dialog} = require('electron').remote;
-// const watch = require('watch');
 const chokidar = require('chokidar');
 
 
@@ -28,7 +27,7 @@ class file {
 			if(this.isDir(item.value)){
 				rootItem = {
 					name:item.name,
-					value:item.value,
+					value:this.formatPath(item.value),
 					children:[],
 					id:1,
 					save:true,
@@ -37,7 +36,7 @@ class file {
 			}else{
 				rootItem = {
 					name:item.name,
-					value:item.value,
+					value:this.formatPath(item.value),
 					id:2,
 					save:true,
 					keyId:keyId
@@ -283,10 +282,7 @@ class file {
 		const newFilePath = oldpath ? path.dirname(oldpath).replace(/\\/g,'/') + '/'+name :'';
 		if(newFilePath){
 			fs.rename(oldpath,newFilePath, function(err) {
-				if (err) {
-					throw err;
-				}
-				fn && fn(newFilePath);
+				fn && fn(newFilePath,err);
 			})
 		}else{
 			fn && fn(newFilePath);
@@ -309,7 +305,8 @@ class file {
 			let filepath,item;
 			if(filename){
 				filepath = path.normalize(filename[0]).replace(/\\/g,'/');
-				item = this.GetByValue(data,filepath);
+				const keyId = this.keyIdFn(filepath);
+				item = this.GetByKeyId(data,keyId);
 			}else{
 				filepath = '';
 			}
@@ -348,15 +345,15 @@ class file {
 	}
 	
 	// 根据value来获取树结构的值
-	GetByValue(Data,value){
+	GetByKeyId(Data,keyId){
 		var Deep,T,F;
 		for (F = Data.length;F;)
 		{
 			T = Data[--F]
-			if (value === T.value) return T
+			if (keyId === T.keyId) return T
 			if (T.children)
 			{
-				Deep = this.GetByValue(T.children,value)
+				Deep = this.GetByKeyId(T.children,keyId)
 				if (Deep) return Deep
 			}
 		}
@@ -531,7 +528,8 @@ class file {
 	//获取solc路径
 	getTemplatePath(name) {
 		const app = require('electron').remote.app;
-		const exmPath = path.join(__static,'..',`src/services/compile-exe/solcs/${name}`);
+		let exmPath = path.join(__static,'..',`src/services/compile-exe/solcs/${name}`);
+		exmPath = this.formatPath(exmPath);
 		return process.env.NODE_ENV === 'development' ? exmPath : path.join(app.getPath('exe'), '..', `/solcs/${name}`);
 	}
 }
