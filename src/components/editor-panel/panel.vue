@@ -62,7 +62,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source,1);
+                    this.editor.setValue(arr[0].source,-1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -71,11 +71,11 @@
 			                    return console.error(err);
 		                    }
 		                    console.log('读取路径文件的值')
-		                    this.editor.setValue(data.toString(),1);
+		                    this.editor.setValue(data.toString(),-1);
 		                    this.setActiveEditor(this.getResult);
 	                    });
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;",1);
+                        this.editor.setValue("pragma solidity ^0.4.2;",-1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -107,6 +107,7 @@
 				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
 				            this.initChange();
+                            // alert(11111111)
 
 			            })
                     }
