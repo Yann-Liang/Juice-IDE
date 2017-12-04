@@ -286,7 +286,7 @@
             },
             //设置节点地址
             setProvider(){
-                //contractServies.setProvider('http://192.168.9.95:5788')
+                contractServies.setProvider('http://192.168.9.76:6789')
                 try {
                     Juice.app.getAppInfo((res)=>{
                         if(!res.code){
