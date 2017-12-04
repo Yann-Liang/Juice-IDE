@@ -808,8 +808,9 @@
             document.onkeydown = function(event){
                 event.stopPropagation();
                 var e = event || window.event || arguments.callee.caller.arguments[0];
-                if(e.keyCode == 72 && e.ctrlKey){ // 按 Esc
-                    console.log(111111111111122222222222222222222222)
+                if(e.keyCode == 27 && e){ // 按 Esc
+                    _this.offSearch();
+                    _this.offReplace();
                 }
 
             }
