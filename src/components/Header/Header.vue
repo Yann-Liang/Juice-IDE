@@ -305,7 +305,7 @@
                 }
             },
             help(){
-                shell.openExternal('http://www.juzhen.io/index.php');
+                shell.openExternal('http://192.168.9.71:20000/#/document');
             },
 	        newFile(){
 		        let blo = true;

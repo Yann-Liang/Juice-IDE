@@ -210,9 +210,6 @@
                 this.boolSearchVisible(true);
                 // this.editor.commands.commands.find.exec(this.editor);
             },
-            replace:function(){
-                this.editor.commands.commands.replace.exec(this.editor);
-            },
             highlight :function(value) {
                 // console.log(value)
                 var re =new RegExp("" + value + "","gim");
