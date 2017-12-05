@@ -89,7 +89,7 @@
                     </h4>
                     <div class="modal-content">
                         <div class="content-tip">
-                            <p class="">有尚未保存的文件，确定关闭所有窗口吗！</p>
+                            <p class="warning">有尚未保存的文件，确定关闭所有窗口吗！</p>
                         </div>
                     </div>
                     <div class="modal-btn">
@@ -1200,7 +1200,9 @@
     border: 1px solid #bfbfbf;
 }
 .warning{
-
+    background:url(images/warnning.png) no-repeat left center;
+    padding-left:34px;
+    color:#000;
 }
 
 .javascript-editor{

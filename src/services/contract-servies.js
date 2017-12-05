@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-01 11:07:27
+ * @Last Modified time: 2017-12-04 17:57:46
  */
 //引入web3
 let Web3 = require('web3'),
@@ -10,11 +10,7 @@ let Web3 = require('web3'),
 
 import consoleService from '@/services/console/console-service';
 import APIServies from '@/services/API-servies';
-//import store from '@/vuex/store';
 import DeployLogService from '@/services/deploy/deploy-log-servises'
-import {
-    debug
-} from 'util';
 
 const deployLogService = new DeployLogService();
 
@@ -361,7 +357,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '2198a4f18156d1964387afd07df44e1325cc0f457be45add4fb22908ddd98007',//用户私钥
+            privateKey: '9842e8e174e70eb133354ccd46e1b8ade11540e52eb2afd8310cfb01208a9558',//用户私钥
             address: '', //用户钱包地址
             username: '',//用户名
             type:'',
@@ -414,8 +410,8 @@ class DeployService {
 
     //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
-        this.deployStart(fileName, contractName);
         this.user.address = userAddress;
+        this.deployStart(fileName, contractName);
         this.result = {
             contractAddress: '',
             TxHash: '',
@@ -452,11 +448,13 @@ class DeployService {
                     calcContract.deploy(serializedTxHex, (err, myContract) => {
                         console.log('err', err, myContract)
                         if (!err) {
+                            this.getBackgroundLog(this.provider, this.queryBackgroundTime);
                             if (!myContract.address) {
                                 this.result.TxHash = myContract.transactionHash;
                                 console.log("部署合约的交易哈希值: " + myContract.transactionHash);
                             } else {
                                 console.log("合约的部署地址: " + myContract.address);
+                                this.getContractLog(this.provider, myContract.address, this.getQueryTime());
                                 this.result.contractAddress = myContract.address;
                                 this.data[myContract.address] = {
                                     contractAddress: this.result.contractAddress,
@@ -472,6 +470,7 @@ class DeployService {
                             }
                         } else {
                             resolve();
+                            console.warn(err);
                             this.deployFailure(err);
                         }
                     });
@@ -493,6 +492,7 @@ class DeployService {
             str = `${fileName}:${contractName}合约正在部署`;
         consoleService.output(time, '[开始部署]', str, );
         deployLogService.push(time, '[开始部署]', str);
+        this.getBackgroundLog(this.provider, this.queryBackgroundTime);
         return new Promise((resolve, reject) => {
 
         })
@@ -577,7 +577,7 @@ class DeployService {
                     from: this.user.address
                 });
                 let result = contract[contractFnName].apply(null, argumentList);
-                debugger;
+
                 console.log("result:\n", result);
 
                 if (isJson(result)) {
@@ -594,7 +594,7 @@ class DeployService {
                 cb(e);
             }
             this.getContractLog(this.provider, contractAddress, this.getQueryTime());
-            this.getBackgroundLog(this.provider)
+            this.getBackgroundLog(this.provider, this.queryBackgroundTime)
         } else {
             let data = '';
             debugger;
@@ -635,7 +635,7 @@ class DeployService {
                     wrapCount: this.wrapCount,
                 }
                 this.getContractLog(this.provider, contractAddress, this.getQueryTime());
-                this.getBackgroundLog(this.provider)
+                this.getBackgroundLog(this.provider,this.queryBackgroundTime)
                 this.getTransactionReceipt(hash);
             });
 
@@ -660,7 +660,7 @@ class DeployService {
                 abi = JSON.parse(abi)
             } catch (error) {
                 console.warn(error);
-                this.queryFailure(error);
+                this.queryFailure(error.message);
                 return false;
             }
         }
@@ -710,8 +710,8 @@ class DeployService {
     }
 
     runFinish(result) {
-        //this.getContractLog(this.provider, contractAddress, this.getQueryTime());
-        //this.getBackgroundLog(this.provider)
+        this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+        this.getBackgroundLog(this.provider)
         consoleService.output('[运行结果]', 'Invoke finish', result);
     }
 
@@ -754,28 +754,28 @@ class DeployService {
 
     sign(txParams) {
         //调试用
-        // return new Promise((resolve, reject) => {
-        //     let tx = new EthereumTx(txParams);
-        //     console.log('txParams', txParams);
-        //     //钱包签名
-        //     let privateKey = Buffer.from(this.user.privateKey, 'hex');
-        //     tx.sign(privateKey);
-        //     const serializedTx = tx.serialize(),
-        //         serializedTxHex = "0x" + serializedTx.toString('hex');
-        //     resolve(serializedTxHex);
-        // })
-
         return new Promise((resolve, reject) => {
-            Juice.wallet.sign(txParams, (res) => {
-                if (res.code == 0) {
-                    resolve(res.data);
-                } else {
-                    consoleService.output('[签名失败]', {
-                        logError: res.msg
-                    });
-                }
-            })
+            let tx = new EthereumTx(txParams);
+            console.log('txParams', txParams);
+            //钱包签名
+            let privateKey = Buffer.from(this.user.privateKey, 'hex');
+            tx.sign(privateKey);
+            const serializedTx = tx.serialize(),
+                serializedTxHex = "0x" + serializedTx.toString('hex');
+            resolve(serializedTxHex);
         })
+
+        // return new Promise((resolve, reject) => {
+        //     Juice.wallet.sign(txParams, (res) => {
+        //         if (res.code == 0) {
+        //             resolve(res.data);
+        //         } else {
+        //             consoleService.output('[签名失败]', {
+        //                 logError: res.msg
+        //             });
+        //         }
+        //     })
+        // })
     }
 
     //获取要查询的时间
@@ -792,7 +792,7 @@ class DeployService {
 
     getContractLog(nodeId, contractAddress, queryTime) {
         let params = {
-            "_source": [ /* "address", "ip", "message","@timestamp" */ ],
+            "_source": ["address", "ip", "message","@timestamp" ],
             "query": {
                 "bool": {
                     "must": [{
@@ -829,7 +829,7 @@ class DeployService {
                 }
             }
         }
-        console.log(JSON.stringify(params))
+        console.log('getContractLog',JSON.stringify(params))
         APIServies.log.search(params).then((res) => {
             console.log(res.hits.hits);
             if (res && res.hits.hits.length > 0) {
@@ -848,6 +848,9 @@ class DeployService {
     }
 
     getBackgroundLog(nodeId, queryTime) {
+        return false;
+        let address = this.user.address.substring(0, 2) == '0x' ? this.user.address.substr(2) : this.user.address,
+            message = `*${address}*`;
         let params = {
             "_source": [
                 "message",
@@ -856,17 +859,8 @@ class DeployService {
                 "ip"
             ],
             "query": {
-                "bool": {
-                    "must": [{
-                        "term": {
-                            "ip": nodeId.substring(nodeId.indexOf('//') + 2, nodeId.lastIndexOf(':'))
-                        }
-                    }],
-                    "must_not": [],
-                    "should": []
-                },
                 "wildcard": {
-                    "message": this.user.address.substring(0, 2) == '0x' ? "" : this.user.address.substr(1),
+                    "message": message,
                 }
             },
             "from": 0,
@@ -882,31 +876,59 @@ class DeployService {
         }
 
         if (queryTime) {
-            params.query.bool.filter = {
-                "range": {
-                    "@timestamp": {
-                        "gt": queryTime
+            params.query =  {
+                "bool": {
+                  "must": [
+                    {
+                        "wildcard": {
+                            "message": message
+                        }
+                    },
+                    {
+                        "term": {
+                            "ip": nodeId.substring(nodeId.indexOf('//') + 2, nodeId.lastIndexOf(':'))
+                        }
                     }
+                  ],
+                  "must_not": [],
+                  "should": [],
+                  "filter": {
+                    "range": {
+                      "@timestamp": {
+                        "gt": queryTime
+                      }
+                    }
+                  }
                 }
-            }
+              };
         }
-        console.log(JSON.stringify(params))
+        console.log('getBackgroundLog',JSON.stringify(params))
         APIServies.log.juethSearch(params).then((res) => {
             console.log('res', res)
             if (res && res.hits.hits.length > 0) {
                 let arr = res.hits.hits;
-                arr.map((item, index) => {
-                    consoleService.output('[合约日志]', {
-                        ip: item._source.ip,
-                        //time: item._source['@timestamp'],
-                        address: item._source.address,
-                        message: item._source.message,
+                if (this.queryBackgroundTime) {
+                    let logs = [],log={
+                        ip: '',
+                        address: '',
+                        message: '',
+                    };
+                    arr.map((item, index) => {
+                        log = {
+                            ip: item._source.ip,
+                            address: item._source.address,
+                            message: item._source.message,
+                        };
+                        logs.push(log);
+                        this.queryBackgroundTime = item._source['@timestamp'];
                     });
-                    this.queryBackgroundTime = item._source['@timestamp'];
-                })
+                    consoleService.output('[系统日志]', logs);
+                } else {
+                    this.queryBackgroundTime = arr[arr.length - 1]._source['@timestamp'];
+                }
+
             }
         })
-
     }
 }
 

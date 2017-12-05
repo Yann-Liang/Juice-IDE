@@ -43,7 +43,7 @@
                 args:[],
                 //deployedData:contractServies.data,
                 user:{
-                    address:''
+                    address:contractServies.user.address
                 },
                 validFlag:false,
             }
@@ -108,7 +108,7 @@
                 }
             },
             getUserInfo(callback){
-                //this.user.address='0x00c7d00f41f528794f002de6a8fe72ec35519ae6'
+                this.user.address='0xa1d4d8b4f598c5cf8eb87fa88349a1b0080e6a76'
                 try {
                     Juice.user.getUserInfo((res)=>{
                         if(!res.code){

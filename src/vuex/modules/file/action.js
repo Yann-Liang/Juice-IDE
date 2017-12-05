@@ -43,8 +43,11 @@ export const fileAction = {
 					if(item.value === data.path){
 						if(rootState.editor.activeEditor.value === data.path){
 							//  设置值
+							const sessionData = rootState.editor.editor.getValue();
 							const source = file.readFileSync(data.path);
-							rootState.editor.editor.setValue(source.toString(),1);
+							if(sessionData != source){
+								rootState.editor.editor.setValue(source.toString());
+							}
 						}else{
 							// 更新source
 							const arr = rootState.editor.editData;

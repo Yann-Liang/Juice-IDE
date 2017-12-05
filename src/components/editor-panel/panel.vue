@@ -62,7 +62,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source,1);
+                    this.editor.setValue(arr[0].source,-1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -71,11 +71,11 @@
 			                    return console.error(err);
 		                    }
 		                    console.log('读取路径文件的值')
-		                    this.editor.setValue(data.toString(),1);
+		                    this.editor.setValue(data.toString(),-1);
 		                    this.setActiveEditor(this.getResult);
 	                    });
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;",1);
+                        this.editor.setValue("pragma solidity ^0.4.2;",-1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -97,16 +97,11 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-             //    console.log(this.editor.getSession().on)
-	            // console.log(this.editor.getSession().off)
                 let red = null;
 	            this.editor.on("focus",()=>{
-                    console.log('focusssssssssssss',red)
 	            	if(!red){
 			            red = this.editor.getSession().on('change', (e)=> {
-				            console.log("开始监听")
 				            this.updateTreeData({keyId:this.activeEditor.keyId,save:false});
-				            alert(3333);
 				            this.initChange();
 			            })
                     }
@@ -121,7 +116,6 @@
 
             //设置错误警示css
             setBreakpoint:function(row,css){
-                // console.log(row,css)
                 this.editor.session.setBreakpoint(row,css);
             },
             //语法检查
@@ -256,7 +250,6 @@
 				        })
 			        }else if(filename){
 				        const url = this.getUrl;
-				        console.log(file.basename(filename));
 				        url.push({value:filename,name:file.basename(filename)});
 				        this.updateUrl(url);
 			        }
@@ -275,7 +268,6 @@
 
 	        intiFileData(){
 		        this.queryFileData();
-		        console.log(this.fileData)
 		        const data = this.fileData;
 		        if( data.length > 0){
 			        this.updateEditFile(data[0]);
