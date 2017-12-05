@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-05 10:32:29
+ * @Last Modified time: 2017-12-05 14:30:41
  */
 //引入web3
 let Web3 = require('web3'),
@@ -767,7 +767,7 @@ class DeployService {
 
     getContractLog(nodeId, contractAddress, queryTime) {
         let params = {
-            "_source": ["address", "ip", "message","@timestamp" ],
+            "_source": ["address", "ip", "message","@timestamp","logdata" ],
             "query": {
                 "bool": {
                     "must": [{
