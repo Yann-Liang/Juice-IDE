@@ -12,7 +12,7 @@ contract Migrations {
     owner = msg.sender;
   }
 
-  function setCompleted(uint completed) restricted {
+  function setCompleted(uint completed)s restricted {
     last_completed_migration = completed;
   }
 
@@ -21,3 +21,4 @@ contract Migrations {
     upgraded.setCompleted(last_completed_migration);
   }
 }
+ssssssssssssssssssssssssssssssssss

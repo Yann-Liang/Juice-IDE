@@ -43,7 +43,9 @@ export const fileAction = {
 					if(item.value === data.path){
 						if(rootState.editor.activeEditor.value === data.path){
 							//  设置值
+
 							const sessionData = rootState.editor.editor.getValue();
+
 							const source = file.readFileSync(data.path);
 							if(sessionData != source){
 								rootState.editor.editor.setValue(source.toString());
@@ -99,8 +101,8 @@ export const fileAction = {
 					dispatch('updateTreeData',{keyId:item.keyId,save:true},{ root: true });
 				}
 			});
-			
-			
+
+
 
 			// 递归调用保存没有地址的文件
 			function saveAllNoFile(dialogFile){
@@ -173,7 +175,7 @@ export const fileAction = {
 			// 更新updateFileData编辑去tabs
 			if(file.isFile(newFilePath) || newFilePath === ''){ // 如果是文件
 				dispatch('updateFileData',{param:{keyId:keyId,value:newFilePath,name:name}},{ root: true });
-				
+
 				// 更新当前编辑的状态
 				if(keyId == rootState.editor.activeEditor.keyId){
 					dispatch('updateActiveEditor',{
@@ -185,7 +187,7 @@ export const fileAction = {
 					// 更新当前激活的文件状态
 					dispatch('updateEditFile',{keyId:keyId,value:newFilePath,name:name},{ root: true });
 				}
-				
+
 				// 更新未保存vuex的状态
 				let edit = rootState.editor.editData;
 				rootState.editor.editData.forEach((item,index)=>{
@@ -208,16 +210,16 @@ export const fileAction = {
 						activeIndex = index;
 					}
 				})
-				
+
 				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
 				dispatch('updateRemoveData',{index:activeIndex,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
-				
+
 				let editData = rootState.editor.editData.filter((item,index) => {
 					if(item.value.indexOf(filesList.value) === -1){
 						return true;
 					}
 				});
-				
+
 				dispatch('updateData',editData,{root:true}) // 更新fileData;
 			}
 			// 更新url
@@ -319,7 +321,7 @@ export const fileAction = {
 		let id = state.fileCurrentId + 1;
 		commit('UPDATE_CURRENT_ID', id);
 	},
-	
+
 	removeFileFn({ commit, state ,dispatch ,rootState}){
 		function updateUrlFn(){
 			const arr = state.url.filter((item,index) =>{
@@ -349,8 +351,8 @@ export const fileAction = {
 						activeIndex = index;
 					}
 				})
-				
-				
+
+
 				dispatch('changeFileData',fileDataArr,{root:true}) // 更新fileData;
 				dispatch('updateRemoveData',{index:0,fileItem:{keyId:'setValue'}},{ root: true }); // 更新触发remove方法
 
