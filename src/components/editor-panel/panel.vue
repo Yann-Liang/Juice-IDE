@@ -315,7 +315,8 @@
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
-            this.setValue();
+//            this.setValue();
+	        this. intiFileData();
             this.change();
             this.editor.clearSelection();
 
@@ -446,7 +447,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
-            this. intiFileData();
+
         },
         //监视
         watch: {

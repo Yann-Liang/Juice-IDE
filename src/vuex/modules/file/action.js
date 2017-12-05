@@ -44,7 +44,7 @@ export const fileAction = {
 						if(rootState.editor.activeEditor.value === data.path){
 							//  设置值
 							const source = file.readFileSync(data.path);
-							rootState.editor.editor.setValue(source.toString());
+							rootState.editor.editor.setValue(source.toString(),1);
 						}else{
 							// 更新source
 							const arr = rootState.editor.editData;
