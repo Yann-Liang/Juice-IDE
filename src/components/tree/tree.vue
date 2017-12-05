@@ -68,6 +68,7 @@
                 'compileWatch','updateDeleteStatus','changeShowDeleteModal','changeDeleteFile']),
 			toggle(itemInfo) {
 				console.log('正在点击的→→→→→→→→→→→→→→→→');
+				console.log(itemInfo);
 				this.compileWatch(0);//编译状态重置
 				this.setActiveFile(itemInfo);
 				if (this.isFolder) {
@@ -79,6 +80,7 @@
                         keyId:itemInfo.keyId
                     })
 				}
+				this.updateRightMenuBlock(false)
 			},
 			changeType: function () {
 				if (!this.isFolder) {

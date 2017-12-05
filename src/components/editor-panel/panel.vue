@@ -37,7 +37,7 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData','activeEditor'])
         },
         //方法
         methods: {
@@ -97,18 +97,12 @@
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
-             //    console.log(this.editor.getSession().on)
-	            // console.log(this.editor.getSession().off)
                 let red = null;
 	            this.editor.on("focus",()=>{
-                    console.log('focusssssssssssss',red)
 	            	if(!red){
 			            red = this.editor.getSession().on('change', (e)=> {
-				            console.log("开始监听")
-				            this.updateTreeData({keyId:this.keyId,save:false,value:this.value});
+				            this.updateTreeData({keyId:this.activeEditor.keyId,save:false});
 				            this.initChange();
-                            // alert(11111111)
-
 			            })
                     }
 
@@ -122,7 +116,6 @@
 
             //设置错误警示css
             setBreakpoint:function(row,css){
-                // console.log(row,css)
                 this.editor.session.setBreakpoint(row,css);
             },
             //语法检查
@@ -257,7 +250,6 @@
 				        })
 			        }else if(filename){
 				        const url = this.getUrl;
-				        console.log(file.basename(filename));
 				        url.push({value:filename,name:file.basename(filename)});
 				        this.updateUrl(url);
 			        }
@@ -276,7 +268,6 @@
 
 	        intiFileData(){
 		        this.queryFileData();
-		        console.log(this.fileData)
 		        const data = this.fileData;
 		        if( data.length > 0){
 			        this.updateEditFile(data[0]);
@@ -316,7 +307,8 @@
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
-            this.setValue();
+//            this.setValue();
+	        this. intiFileData();
             this.change();
             this.editor.clearSelection();
 
@@ -447,7 +439,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
-            this. intiFileData();
+
         },
         //监视
         watch: {

@@ -62,8 +62,7 @@ export const editorAction = {
 							edit.push(item);
 						}
 					})
-					edit = JSON.stringify(edit)
-					dispatch('updateData',JSON.parse(edit),{ root: true });
+					dispatch('updateData',edit,{ root: true });
 					if(cb && typeof(cb)=='function'){
 						cb();
 					}

@@ -10,7 +10,7 @@
                 <li @click="queryTab()" :class="{active:activeMenu==4}"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray no-chose">
-                <files-tab class="tab" v-if="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
+                <files-tab class="tab" v-show="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
 
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
                 <keep-alive>
@@ -25,6 +25,116 @@
 
         </div>
         <div class="ghostbar bgblue" :style="{left:ghostbarLeft+'px'}" v-if="ghostbarFlag"></div>
+
+        <!--删除所有提示-->
+        <div class="tip-modal modal" v-if="showTipModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    提示
+                    <span class="modal-close" @click="cancelFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <div class="content-tip">
+                        <p class="tip-text"><span class="warning-icon"></span>确定删除全部文件吗！</p>
+                    </div>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelFn">取消</el-button>
+                    <el-button type="primary" @click="sureDeleteAllFile()">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+
+        <!--删除提示-->
+        <div class="tip-modal modal" v-if="showDeleteModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    提示
+                    <span class="modal-close" @click="cancelDeleteFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <div class="content-tip">
+                        <p class="tip-text"><span class="warning-icon"></span>确定删除{{deleteFile.value || deleteFile.name}}{{deleteFile.id ==2 ? '文件': '文件夹'}}吗！</p>
+                    </div>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelDeleteFn">取消</el-button>
+                    <el-button type="primary" @click="sureDeleteFile()">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+        <!--输入提示-->
+        <div class="tip-modal modal" v-if="showFileNameModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    {{dialogInfo.title}}
+                    <span class="modal-close" @click="cancelFileNameFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <el-form label-width="100px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm">
+                        <el-form-item prop="newFileName" :label="dialogInfo.label">
+                            <el-input v-model="ruleForm.newFileName"></el-input>
+                        </el-form-item>
+                    </el-form>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelFileNameFn('ruleForm')">取消</el-button>
+                    <el-button type="primary" @click="sureFileNameFn('ruleForm')">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+
+        <!--输入文件夹提示-->
+        <div class="dir-modal modal" v-if="showDirNameModal">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    新建文件夹
+                    <span class="modal-close" @click="cancelDirNameFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <el-form label-width="100px" :model="ruleForm" :rules="rules" class="demo-dynamic" ref="ruleForm2">
+                        <el-form-item prop="newDirName" label="文件夹名">
+                            <el-input v-model="ruleForm.newDirName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="存放目录">
+                            <el-input v-model="newDirPathFn" readonly></el-input>
+                            <span class="scan" v-if="isScan" @click="scanFn">
+                                浏览...
+                            </span>
+                        </el-form-item>
+                    </el-form>
+                </div>
+                <div class="modal-btn">
+                    <el-button class="cancel" @click="cancelDirNameFn('ruleForm2')">取消</el-button>
+                    <el-button type="primary" @click="sureDirNameFn('ruleForm2')">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+        <!--各种提示-->
+        <div class="tip-modal modal" v-if="hintInfo.show">
+            <div class="modal-main">
+                <h4 class="modal-title">
+                    提示
+                    <span class="modal-close" @click="cancelHintModalFn"></span>
+                </h4>
+                <div class="modal-content">
+                    <div class="content-tip">
+                        <p class="tip-text"><span class="warning-icon"></span>{{hintInfo.message}}</p>
+                    </div>
+                </div>
+                <div class="modal-btn">
+                    <el-button type="primary" @click="cancelHintModalFn">确定</el-button>
+                </div>
+            </div>
+        </div>
+
+        <transition name="fade">
+            <div class="error-type" v-show="typeERR">文件被占用，重命名失败！</div>
+        </transition>
     </div>
 </template>
 
@@ -62,20 +172,36 @@
                 ghostbarFlag:false,
                 ghostbarLeft:100,
                 tabWidth:223,
-                activeMenu:'1' //当前操作菜单项
+                activeMenu:'1', //当前操作菜单项
+	            ruleForm:{
+		            newFileName:'',
+		            newDirName:'',
+		            newDirPath:''
+	            },
+	            rules: {
+		            newFileName: [
+			            {required: true, message: '请输入名字', trigger: 'change,blur'}
+		            ],
+		            newDirName: [
+			            {required: true, message: '请输入名字', trigger: 'change,blur'}
+		            ],
+	            },
+	            newDirPathFn:'',
             };
         },
         //数组或对象，用于接收来自父组件的数据
         props: {},
         //计算
         computed: {
-	        ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','currentName'])
+	        ...mapGetters(['fileTreeData','activeFile','getUrl','editFile','currentName','typeERR','showTipModal','showDeleteModal'
+                ,'deleteFile','showFileNameModal','dialogInfo','showDirNameModal','hintInfo'])
         },
         //方法
         methods: {
 	        ...mapActions(['updateRightMenuBlock','saveEditorFile','saveOtherPath','saveAllFile','removeAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','removeFileFn','changeShowTipModal','changeShowDeleteModal','changeDeleteFile'
-            ,'boolSuccessVisible','boolSearchVisible','boolReplaceVisible','changeShowFileNameModal','changeDirNameModal','setHintInfo','updateData']),
+            ,'boolSuccessVisible','boolSearchVisible','boolReplaceVisible','changeShowFileNameModal','changeDirNameModal','setHintInfo','updateData'
+            ,'setActiveFile','updateActiveEditor','changeFileData','updateNewOpenFile','renameFile','changeDialogInfo']),
 
             filesTab() {
                 this.filesTabFlag = !this.filesTabFlag;
@@ -281,9 +407,189 @@
                 });
 	            this.updateUrl(data)
             },
-            deleteFile(){
+	        cancelFn(){
+		        this.changeShowTipModal(false);
+	        },
+	        sureDeleteAllFile(){
+		        var arr = [];
+		        for (var x = 0; x < this.getUrl.length; x++){
+			        arr.push(this.getUrl[x])
+		        }
+		        arr.forEach((item,index)=>{
+			        if(item.value){
+				        file.removeFile(item.value,()=>{})
+			        }
+		        });
+		        this.updateUrl([])
+		        // 更新初始状态
+		        this.setActiveFile('');
+		        this.updateEditFile({unWatch:true});
+		        this.updateData([]);
+		        this.updateActiveEditor({});
+		        this.changeFileData([]);
 
-            },
+		        this.changeShowTipModal(false);
+	        },
+	        cancelDeleteFn(){
+		        this.changeShowDeleteModal(false);
+	        },
+	        sureDeleteFile(){
+		        this.removeFileFn();
+		        this.changeShowDeleteModal(false);
+		        this.updateRightMenuBlock(false);
+	        },
+	        cancelFileNameFn(){
+		        this.ruleForm.newFileName = '';
+		        this.changeShowFileNameModal(false)
+	        },
+	        sureFileNameFn(formName){
+		        this.$refs[formName].validate((valid) => {
+			        if (valid) {
+				        this.changeShowFileNameModal(false);
+				        if(this.dialogInfo.type == 'newFileName'){
+					        file.newFile(this.activeFile.value,this.ruleForm.newFileName,(res)=>{
+						        if(this.activeFile.id === 1){
+							        this.updateNewOpenFile(this.activeFile);
+						        }
+						        if(res.code === 0){
+							        this.queryFileListData();
+							        this.updateEditFile({
+								        name:file.uffixName(this.ruleForm.newFileName),
+								        value:res.value,
+								        keyId:res.keyId
+							        })
+						        }else if(res.code === 1){
+							        this.setHintInfo({
+								        show:true,
+								        title:'',
+								        message:'文件已存在，请更换文件名'
+							        })
+						        }
+						        this.ruleForm.newFileName = '';
+					        })
+				        }else if(this.dialogInfo.type == 'rename'){
+					        this.changeDialogInfo({
+						        type: 'newFileName',
+						        title:'SOL文件',
+						        label: '文件名'
+                            });
+					        this.renameFile(this.ruleForm.newFileName);
+					        this.ruleForm.newFileName = '';
+				        }
+
+			        } else {
+				        this.ruleForm.newFileName = '';
+				        console.log('error submit!!');
+				        return false;
+			        }
+		        });
+	        },
+	        cancelDirNameFn(formName){
+		        this.ruleForm.newDirName = '';
+		        this.changeDirNameModal(false)
+	        },
+	        sureDirNameFn(formName){
+		        this.$refs[formName].validate((valid) => {
+			        if (valid) {
+				        this.changeDirNameModal(false)
+				        let blo = false;
+				        this.fileTreeData.forEach((item,index) => {
+					        if(this.activeFile.keyId ==item.keyId){
+						        if(item.id == 2){
+							        blo = true;
+						        }
+						        return;
+					        }
+				        })
+				        if(!blo && this.activeFile.value){
+					        // 有父文件夹的情况
+					        if(this.activeFile.id === 1){
+						        this.updateNewOpenFile(this.activeFile);
+					        }
+					        file.newMkdir(this.activeFile.value,this.ruleForm.newDirName,(res)=>{
+						        if(res.code === 0){
+							        this.queryFileListData();
+						        }else if(res.code === 1){
+							        this.setHintInfo({
+								        show:true,
+								        title:'',
+								        message:'文件夹已存在，请更换文件夹名'
+							        })
+						        }else if(res.code === 2){
+
+						        }
+						        this.updateRightMenuBlock(false);
+						        this.ruleForm.newFileName = '';
+					        })
+				        }else if(blo || !this.activeFile.value){
+					        if(this.newDirPathFn == file.homeDirFn()){
+						        file.creatTempDir(this.ruleForm.newDirName,()=>{
+							        const url = this.getUrl;
+							        const dirPath = this.newDirPathFn + '/' + this.ruleForm.newDirName;
+							        url.push({value:dirPath,name:this.ruleForm.newDirName});
+							        this.updateUrl(url);
+							        this.ruleForm.newDirName = '';
+						        })
+					        }else{
+						        const url = this.getUrl;
+						        const dirPath = this.newDirPathFn + '/' + this.ruleForm.newDirName;
+						        file.newDirFn(dirPath,()=>{
+							        url.push({value:dirPath,name:this.ruleForm.newDirName});
+							        this.updateUrl(url);
+							        this.ruleForm.newDirName = '';
+						        })
+					        }
+				        }
+			        } else {
+				        this.ruleForm.newDirName = '';
+				        console.log('error submit!!');
+				        return false;
+			        }
+		        });
+	        },
+	        newDirPathFunction(){
+		        this.newDirPathFn = null;
+		        if(this.activeFile && this.activeFile.value){
+			        this.fileTreeData.forEach((item,index) => {
+				        if(this.activeFile.keyId ==item.keyId){
+					        if(item.id == 1){
+						        this.newDirPathFn =  item.value;
+					        }else if(item.id == 2){
+						        this.newDirPathFn = file.homeDirFn();
+					        }
+					        return;
+				        }
+			        })
+			        if(!this.newDirPathFn){
+				        if(file.isDir(this.activeFile.value)){
+					        this.newDirPathFn = this.activeFile.value;
+				        }else{
+					        this.newDirPathFn = file.dirnameFn(this.activeFile.value);
+				        }
+			        }
+		        }else{
+			        this.newDirPathFn = file.homeDirFn();
+		        }
+		        if(this.newDirPathFn  == file.homeDirFn()){
+			        this.isScan = true;
+		        }else{
+			        this.isScan = false;
+		        }
+	        },
+	        cancelHintModalFn(){
+		        this.setHintInfo({
+			        show:false,
+			        title:'',
+			        message:''
+		        })
+	        },
+	        scanFn(){
+		        file.dialogFn((filename)=>{
+			        if(filename){
+				        this.newDirPathFn = filename
+			        }
+		        })
+	        },
             //设置节点地址
             setProvider(){
                 contractServies.setProvider('http://192.168.9.76:6789')
@@ -350,7 +656,6 @@
 		        this.setIntSol();
 		        if(data.length === 0){
 		        	const itemFile = file.GetById(this.fileTreeData,2);
-                    console.log(itemFile);
 			        localStorage.setItem('fileData',JSON.stringify(
 				        [{
 					        name:itemFile.name,
@@ -376,7 +681,13 @@
 	        this.updateData([]);
         },
         //监视
-        watch: {},
+        watch: {
+	        'showDirNameModal':function(){
+		        if(this.showDirNameModal){
+			        this.newDirPathFunction();
+		        }
+	        }
+        },
         //组件
         components: {
             comTitle,
@@ -473,5 +784,65 @@
     .active{
         color:rgba(255,255,255,1)
     }
-
+    .error-type{
+        position: fixed;
+        left:50%;
+        top:20px;
+        margin-left:-100px;
+        min-width:200px;
+        padding:0 20px;
+        height:50px;
+        line-height:50px;
+        text-indent: 35px;
+        background:url(./images/error.png)no-repeat 20px center #fff;
+        background-size: 30px 30px;
+        border:1px solid #f1f1f1;
+        z-index:9999;
+    }
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+        opacity: 0
+    }
+    .tip-modal{
+        .modal-main{
+            width:511px;
+        }
+        .cancel{
+            background:#bfbfbf;
+            color:#fff;
+            &.el-button:hover{
+                border-color:#bfbfbf;
+            }
+        }
+    }
+    .dir-modal{
+        .modal-main{
+            width:650px;
+            .modal-content{
+                padding-right:10px;
+            }
+            .el-input{
+                width:450px;
+            }
+        }
+    }
+    .warning-icon{
+        display:inline-block;
+        width:30px;
+        height:30px;
+        vertical-align: top;
+        line-height:30px;
+        background:url(./images/warning.png) no-repeat center;
+        margin-right:10px;
+    }
+    .tip-text{
+        line-height:30px;
+    }
+    .scan{
+        margin-left:15px;
+        color:#20a0ff;
+        cursor: pointer;
+    }
 </style>
