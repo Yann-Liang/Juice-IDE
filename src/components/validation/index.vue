@@ -20,9 +20,9 @@
                             <img :src='imgURL'>
                             <input type="text" v-model='checkCode' :style='{color:activeColor}'>
                         </div>
-                        <span unselectable="on" @click="codeURL">
-                        换一张
-                        </span>
+                        <span unselectable="on" @click="codeURL" class='update-code'>
+
+                            </span>
                         <div class="el-form-item__error" v-if="codeERR">验证码不正确</div>
                     </el-form-item>
                 </el-form>
@@ -258,6 +258,16 @@ export default{
             font-size:20px;
             // color:blue;
         }
+    }
+    .update-code{
+        display: inline-block;
+        width: 25px;
+        height:25px;
+        float:right;
+        margin-top:2px;
+        margin-right:10px;
+        background: url('images/update.png') no-repeat  center 7px;
+        cursor: pointer;
     }
     .el-icon-refresh{
         height:36px;
