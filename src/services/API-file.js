@@ -94,6 +94,10 @@ class file {
 			}
 		}
 		if(this.isDir(path)){
+			const str = file.substr(0,1);
+			if(str.indexOf('.') == -1){
+				return;
+			}
 			const files = fs.readdirSync(path);//需要用到同步读取
 			files.forEach(walk);
 		}
