@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-04 17:57:46
+ * @Last Modified time: 2017-12-05 10:32:29
  */
 //引入web3
 let Web3 = require('web3'),
@@ -427,14 +427,6 @@ class DeployService {
             bin.substring(0, 2) == '0x' ? "" : bin = '0x' + bin;
 
             try {
-
-                // let myContractReturned = calcContract.new({
-                //     data: bin,
-                //     from: userAddress,
-                //     gasPrice: 21000000000,
-                //     gasLimit: 843314949521407,
-                // }, (err, myContract) => {
-
                 const txParams = {
                     nonce: this.web3.nonce(),
                     gasPrice: 20000000000,
@@ -463,7 +455,6 @@ class DeployService {
                                     contractName: contractName,
                                     contract: myContract
                                 };
-                                //store.dispatch('addDeployedData',this.data[myContract.address]);
 
                                 this.deployFinish();
                                 resolve(myContract.address);
@@ -475,15 +466,11 @@ class DeployService {
                         }
                     });
                 });
-
-
             } catch (error) {
                 console.warn(error);
-                this.deployFailure(error)
+                this.deployFailure(error);
             }
-
         })
-
     }
 
     //合约部署-开始
@@ -493,9 +480,6 @@ class DeployService {
         consoleService.output(time, '[开始部署]', str, );
         deployLogService.push(time, '[开始部署]', str);
         this.getBackgroundLog(this.provider, this.queryBackgroundTime);
-        return new Promise((resolve, reject) => {
-
-        })
     }
 
     //合约部署-部署中
@@ -561,14 +545,6 @@ class DeployService {
             }
         })
 
-        // inputs.map((item, index) => {
-        //     if (item.type == 'string') {
-
-        //     } else {
-
-        //     }
-        // });
-
         this.runStart(contractAddress, contractFnName, constant, payable);
         if (constant) {
             try {
@@ -585,7 +561,7 @@ class DeployService {
                 } else {
                     cb(result);
                 }
-                this.runFinish({
+                this.runFinish(contractAddress,{
                     result: result,
                 })
             } catch (e) {
@@ -636,9 +612,8 @@ class DeployService {
                 }
                 this.getContractLog(this.provider, contractAddress, this.getQueryTime());
                 this.getBackgroundLog(this.provider,this.queryBackgroundTime)
-                this.getTransactionReceipt(hash);
+                this.getTransactionReceipt(hash,contractAddress);
             });
-
         }
     }
 
@@ -709,7 +684,7 @@ class DeployService {
         });
     }
 
-    runFinish(result) {
+    runFinish(contractAddress,result) {
         this.getContractLog(this.provider, contractAddress, this.getQueryTime());
         this.getBackgroundLog(this.provider)
         consoleService.output('[运行结果]', 'Invoke finish', result);
@@ -724,7 +699,7 @@ class DeployService {
         return true;
     }
 
-    getTransactionReceipt(hash) {
+    getTransactionReceipt(hash,contractAddress) {
         console.log('getTransactionReceipt hash==>', hash);
         let id = '',
             result = this.web3.eth.getTransactionReceipt(hash),
@@ -733,17 +708,17 @@ class DeployService {
         if (result && result.transactionHash && hash == result.transactionHash) {
             console.log('getTransactionReceipt.result=', result)
             clearTimeout(id);
-            this.runFinish(result);
+            this.runFinish(contractAddress,result);
             this.callbacks[hash].cb(result);
             delete this.callbacks[hash];
         } else {
             if (this.callbacks[hash].wrapCount--) {
                 console.log(this.wrapCount - this.callbacks[hash].wrapCount);
                 id = setTimeout(() => {
-                    this.getTransactionReceipt(hash);
+                    this.getTransactionReceipt(hash,contractAddress);
                 }, 1000);
             } else {
-                this.runFinish('查询sendRawTrasaction结果超时');
+                this.runFinish(contractAddress,'查询sendRawTrasaction结果超时');
                 this.callbacks[hash].cb(1000, '超时');
                 console.warn('sendRawTrasaction超时');
                 id = '';
@@ -848,7 +823,6 @@ class DeployService {
     }
 
     getBackgroundLog(nodeId, queryTime) {
-        return false;
         let address = this.user.address.substring(0, 2) == '0x' ? this.user.address.substr(2) : this.user.address,
             message = `*${address}*`;
         let params = {
@@ -904,25 +878,18 @@ class DeployService {
         }
         console.log('getBackgroundLog',JSON.stringify(params))
         APIServies.log.juethSearch(params).then((res) => {
-            console.log('res', res)
+            console.log('getBackgroundLog res', res)
             if (res && res.hits.hits.length > 0) {
                 let arr = res.hits.hits;
                 if (this.queryBackgroundTime) {
-                    let logs = [],log={
-                        ip: '',
-                        address: '',
-                        message: '',
-                    };
-                    arr.map((item, index) => {
-                        log = {
-                            ip: item._source.ip,
-                            address: item._source.address,
-                            message: item._source.message,
-                        };
-                        logs.push(log);
-                        this.queryBackgroundTime = item._source['@timestamp'];
-                    });
-                    consoleService.output('[系统日志]', logs);
+                    if (arr.length != 0) {
+                        arr.reverse();
+                        consoleService.output('[系统日志]');
+                        arr.map((item, index) => {
+                            this.queryBackgroundTime = item._source['@timestamp'];
+                            consoleService.output(item._source.message);
+                        });
+                    }
                 } else {
                     this.queryBackgroundTime = arr[arr.length - 1]._source['@timestamp'];
                 }
