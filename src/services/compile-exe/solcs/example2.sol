@@ -12,7 +12,7 @@ import "./interfaces/IActionManager.sol";
 import "./interfaces/IRoleManager.sol";
 
 contract ActionManager is OwnerNamed,IActionManager {
-    
+
     using LibAction for *;
     using LibString for *;
     using LibInt for *;
@@ -23,8 +23,11 @@ contract ActionManager is OwnerNamed,IActionManager {
     string[]                                    actionIdList;
     string[]                                    tempActionIdList;
 
-    mapping(string=>string)                     keyMap; //<resKey_opKey, id>
-    mapping(string=>string)                     opKeyMap;//<opKeySha3, opKey>
+
+	function MetaCoin() {
+		balances[tx.origin] = 10000;
+	}
+
 
     LibAction.Action        internal            m_Action;
 
@@ -46,7 +49,7 @@ contract ActionManager is OwnerNamed,IActionManager {
     function findActionByType(uint256 _type) constant public returns(string _json) {
 
         uint len = 0;
-    
+
         uint counter = 0;
         len = LibStack.push("");
         for (uint index = 0; index < actionIdList.length; index++) {
@@ -97,7 +100,7 @@ contract ActionManager is OwnerNamed,IActionManager {
     * @return _json Objects in json string
     */
     function listByForUK(uint _cond,string _value) constant public returns(string _json) {
-        uint tatal = 0;     
+        uint tatal = 0;
         for(uint i = 0 ; i < actionIdList.length; ++i){
             if(actionMap[actionIdList[i]].state != LibAction.ActionState.INVALID){
                 tatal++;
@@ -202,7 +205,7 @@ contract ActionManager is OwnerNamed,IActionManager {
 
     /**
     * check if action id exists
-    * @param _actionId 
+    * @param _actionId
     * @return 0 , the action exists, else not exists
     */
     function actionExists(string _actionId) constant public returns(uint _ret){
@@ -231,7 +234,7 @@ contract ActionManager is OwnerNamed,IActionManager {
     function findByKey(string _resKey, string _opKey) constant public returns(string _actionJson) {
         string memory strKey = _resKey;
         strKey = strKey.concat("_", _opKey);
-        
+
         string memory actionId = keyMap[strKey];
 
         uint len = 0;
@@ -284,12 +287,12 @@ contract ActionManager is OwnerNamed,IActionManager {
     * @return the result json, items contain the object
     */
     function listContractActions(string _contractName) constant public returns(string _actionListJson) {
-       
+
         uint len = 0;
         uint counter = 0;
         len = LibStack.push("");
         for (uint index = 0; index < actionIdList.length; index++) {
-            if (actionMap[actionIdList[index]].state != LibAction.ActionState.INVALID && 
+            if (actionMap[actionIdList[index]].state != LibAction.ActionState.INVALID &&
                 actionMap[actionIdList[index]].resKey.equals(_contractName)) {
                 if (counter > 0) {
                     len = LibStack.append(",");
@@ -380,7 +383,7 @@ contract ActionManager is OwnerNamed,IActionManager {
             Notify(errno, "contract not registered");
             return;
         }
-        
+
         // check if action already exists
         if (actionMap[m_Action.id].state != LibAction.ActionState.INVALID) {
             log("duplicate action id insert", "ActionManager");
@@ -393,7 +396,7 @@ contract ActionManager is OwnerNamed,IActionManager {
         key = key.concat("_", m_Action.opKey);
         keyMap[key] = m_Action.id;
 
-        // insert action 
+        // insert action
         m_Action.createTime = now*1000;
         m_Action.updateTime = now*1000;
         m_Action.state = LibAction.ActionState.VALID;
@@ -411,11 +414,11 @@ contract ActionManager is OwnerNamed,IActionManager {
         if (!_isFind) {
             actionIdList.push(m_Action.id);
         }
-        
+
         uint sha3Value = uint(sha3(m_Action.opKey));//bytes32
         string memory funNameSha3 = sha3Value.toHexString64().toLower().substr(2, 8); //toHexString64();//TODO: 注意此处需要sha3 sha3Value.toHexString64();
         opKeyMap[funNameSha3] = m_Action.opKey;
-        
+
         log("insert action success", "ActionManager");
         m_Action.resetAction();
         _ret = true;
@@ -577,7 +580,7 @@ contract ActionManager is OwnerNamed,IActionManager {
     }
 
     /**
-    * get action count 
+    * get action count
     * @return the length of actionIdList
     */
     function getCount() constant returns(uint _count) {
