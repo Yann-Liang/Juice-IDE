@@ -132,6 +132,8 @@ export default{
                                 },(res)=>{
                                     this.codeURL();//更新验证码
                                     if(!res.code){
+                                        this.login2.accountPwd='';
+                                        this.login2.code='';
                                         this.$emit('emitDeploy');
                                     }else{
                                         //不存在
