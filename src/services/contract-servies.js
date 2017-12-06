@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-05 15:11:56
+ * @Last Modified time: 2017-12-05 18:36:29
  */
 //引入web3
 let Web3 = require('web3'),
@@ -410,6 +410,8 @@ class DeployService {
 
     //部署合约
     deploy(fileName, contractName, abi, bin, userAddress) {
+        console.log('abi', abi)
+
         this.user.address = userAddress;
         this.deployStart(fileName, contractName);
         this.result = {
@@ -446,7 +448,7 @@ class DeployService {
                                 console.log("部署合约的交易哈希值: " + myContract.transactionHash);
                             } else {
                                 console.log("合约的部署地址: " + myContract.address);
-                                this.getContractLog(this.provider, myContract.address, this.getQueryTime());
+                                this.getContractLog(this.provider, myContract.address, this.queryTime);
                                 this.result.contractAddress = myContract.address;
                                 this.data[myContract.address] = {
                                     contractAddress: this.result.contractAddress,
@@ -610,7 +612,7 @@ class DeployService {
                     cb: cb,
                     wrapCount: this.wrapCount,
                 }
-                this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+                this.getContractLog(this.provider, contractAddress, this.queryTime);
                 this.getBackgroundLog(this.provider,this.queryBackgroundTime)
                 this.getTransactionReceipt(hash,contractAddress);
             });
@@ -685,7 +687,7 @@ class DeployService {
     }
 
     runFinish(contractAddress,result) {
-        this.getContractLog(this.provider, contractAddress, this.getQueryTime());
+        this.getContractLog(this.provider, contractAddress, this.queryTime);
         this.getBackgroundLog(this.provider)
         consoleService.output('[运行结果]', 'Invoke finish', result);
     }
