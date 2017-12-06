@@ -6,7 +6,7 @@
 */
 pragma solidity ^0.4.2;
 
-import "./library/LibAction.sol";
+import "./library/.sol";
 import "./sysbase/OwnerNamed.sol";
 import "./interfaces/IActionManager.sol";
 import "./interfaces/IRoleManager.sol";
