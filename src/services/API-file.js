@@ -58,30 +58,32 @@ class file {
 	}
 
 	//遍历读取文件
-	readFile(path,filesList,targetObj) {
+	readFile(path2,filesList,targetObj) {
 		const that = this;
 		function walk(file){
-			const states = fs.statSync(path+'/'+file);
-			const filePath = path+'/'+file;
+			const states = fs.statSync(path2+'/'+file);
+			const filePath = path2+'/'+file;
 			const preId = states.ino;
 			if(states.isDirectory()){
 				var item ;
-				if(targetObj["children"]){
-					item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
-					targetObj["children"].push(item);
+				const str = file.substr(0,1);
+				if(str.indexOf('.') == -1){
+					if(targetObj["children"]){
+						item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
+						targetObj["children"].push(item);
+					}
+					else{
+						item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
+						filesList.push(item);
+					}
+					that.readFile(path2+'/'+file,filesList,item);
 				}
-				else{
-					item = {name:file,children:[],value:filePath,id:1,save:true,keyId:preId};
-					filesList.push(item);
-				}
-
-				that.readFile(path+'/'+file,filesList,item);
 			}else{
 				//创建一个对象保存信息
 				var obj = new Object();
 				obj.size = states.size;//文件大小，以字节为单位
 				obj.name = file;//文件名
-				obj.path = path+'/'+file; //文件绝对路径
+				obj.path = path2+'/'+file; //文件绝对路径
 
 				if(targetObj["children"]){
 					var item = {name:file,value:obj.path,id:2,save:true,keyId:preId}
@@ -93,12 +95,8 @@ class file {
 				}
 			}
 		}
-		if(this.isDir(path)){
-			// const str = file.substr(0,1);
-			// if(str.indexOf('.') == -1){
-			// 	return;
-			// }
-			const files = fs.readdirSync(path);//需要用到同步读取
+		if(this.isDir(path2)){
+			const files = fs.readdirSync(path2);//需要用到同步读取
 			files.forEach(walk);
 		}
 	}

@@ -10,7 +10,7 @@
                 <li @click="queryTab()" :class="{active:activeMenu==4}"><i class="iconfont" title="查询并运行合约">&#xe616;</i></li>
             </ul>
             <div class="tab-box bggray no-chose">
-                <files-tab class="tab" v-show="filesTabFlag" :style="{width:tabWidth+'px'}"></files-tab>
+                <files-tab class="tab" v-show="filesTabFlag" :style="{width:tabWidth+'px'}" @fileNameFn="fileNameFn"></files-tab>
 
                 <deploy-tab class="tab" v-if="deployTabFlag" :style="{width:tabWidth+'px'}"></deploy-tab>
                 <keep-alive>
@@ -350,6 +350,9 @@
             },
 	        topFn(){
 		        this.updateRightMenuBlock(false);
+            },
+	        fileNameFn(data){
+                this.ruleForm.newFileName = data;
             },
 	        newFile(){
 		        let blo = true;

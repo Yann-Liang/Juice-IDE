@@ -203,6 +203,7 @@ export const fileAction = {
 				let fileDataArr = rootState.editor.fileData.filter((item,index) => {
 					if(item.value.indexOf(filesList.value) === -1){
 						return true;
+						
 					}
 				});
 				fileDataArr.forEach((item,index)=>{

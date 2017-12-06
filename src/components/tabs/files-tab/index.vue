@@ -200,7 +200,7 @@
 			            title:'SOL文件',
 			            label:'文件名'
 		            })
-		            this.ruleForm.newFileName = '';
+//		            this.ruleForm.newFileName = '';
             		this.changeShowFileNameModal(true);
                 }else{
 		            file.newFile('',name,(res)=>{
@@ -254,7 +254,8 @@
 		            title:'重命名',
 		            label:this.activeFile.id == 1 ? '文件夹名': '文件名'
                 })
-	            this.ruleForm.newFileName = this.activeFile.id == 1 ? item.name : file.originName(item.name);
+	            let data = this.activeFile.id == 1 ? item.name : file.originName(item.name);
+	            this.$emit('fileNameFn',data)
 	            this.changeShowFileNameModal(true);
             },
 	        saveOtherPathFn(){
