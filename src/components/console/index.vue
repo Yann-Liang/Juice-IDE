@@ -3,7 +3,7 @@
         <div class="log-header">
              <i class="log-border" @mousedown="mousedown($event)"></i>
             <h4 class="bggray">
-                <span class="default no-chose">控制台</span>
+                <span class="default no-chose"  ondragstart="return false">控制台</span>
                 <span class="search">
                     <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.right="near(1)" @keyup.left="near(-1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <!--<span class="direction" @click="near(-1)">↑</span>-->

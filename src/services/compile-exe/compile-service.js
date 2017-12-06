@@ -45,7 +45,7 @@ class compileServies {
             });
             // 捕获标准错误输出并将其打印到控制台
             free.stderr.on('data', function (data) {
-                compileError.push(data.toString());
+                compileError.push(new TextDecoder("GB2312").decode(data));
             });
             // 注册子进程关闭事件
             free.on('exit', function (code, signal) {
