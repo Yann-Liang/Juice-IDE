@@ -1,5 +1,9 @@
 //请求地址
-const BASE = 'http://192.168.9.92:9200/',//'http://192.168.9.94:9200/juevm/'//process.env.API_ROOT,
+import fs from 'fs';
+import path from 'path';
+const app = require('electron').remote.app;
+
+const BASE = process.env.NODE_ENV === 'development' ? 'http://192.168.9.92:9200/' : JSON.parse(fs.readFileSync(path.join(app.getPath('exe'), '..', 'config.json'),'utf8')).logUrl,//'http://192.168.9.94:9200/juevm/'//process.env.API_ROOT,
     USER_URL = `${BASE}/user/`,
 
     LOG = {

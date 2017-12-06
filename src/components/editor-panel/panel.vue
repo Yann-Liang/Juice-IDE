@@ -132,9 +132,9 @@
                         */
                         let css='';
                         result.errors.forEach((error)=>{
-                            var errorId = error.match(/\w+\.sol\:[0-9]+/i);
-                            var rowId = errorId[0].match(/\w+\.sol\:(\S*)/i);
-                            var tips = errorId.input.replace(/\s/g,"").match(/\w+\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
+                            var errorId = error.match(/\.sol\:[0-9]+/i);
+                            var rowId = errorId[0].match(/\.sol\:(\S*)/i);
+                            var tips = errorId.input.replace(/\s/g,"").match(/\.sol\:[0-9]+\:[0-9]+\:(\S*)\:/i)
                             console.log(rowId[1],tips[1]);
                             if(tips[1] == 'Warning'){
                                 css = 'ace_warning';
