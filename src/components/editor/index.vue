@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="tools">
-                <div class="tool">
+                <div class="tool no-chose">
                     <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe633;</i></span>
                     <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
                     <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="search-model shadow" v-if='searchVisible'>
-                <div class='search-content'>
+                <div class='search-content no-chose'>
                     <span>
                         <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" v-model='inputValue' @keyup.up="findPrev" @keyup.left="findPrev" @keyup.down="findNext" @keyup.right="findNext" placeholder="搜索" @input='find' @keyup.enter='find' ref='search' autofocus="autofocus"  spellcheck="false" v-focus>
                     </span>
