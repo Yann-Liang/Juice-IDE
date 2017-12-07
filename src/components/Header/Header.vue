@@ -246,7 +246,6 @@
                     case '9':
                     case 9:
                         //删除所有文件
-//                        _this.removeAllFile();
 	                    _this.changeShowTipModal(true)
                         break;
                 }
@@ -275,9 +274,11 @@
                         break;
                     case '3':
                     case 3:
-                        console.log(_this.editor.getCopyText())
-                        _this.updateCopyText(_this.editor.getCopyText());//复制
-                        // _this.editor.onCopy();
+                    console.log('aaaaaaaaaaaaa',this.editor.commands.commands.find.exec(this.editor))
+                    console.log('bbbbbbbbb',this.editor.onCopy())
+                        // console.log(_this.editor.getCopyText())
+                        // _this.updateCopyText(_this.editor.getCopyText());//复制
+                        _this.editor.onCopy();
 
                         break;
                     case '4':

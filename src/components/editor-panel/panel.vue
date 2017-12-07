@@ -62,7 +62,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source,-1);
+                    this.editor.setValue(beautify(arr[0].source),-1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -71,11 +71,11 @@
 			                    return console.error(err);
 		                    }
 		                    console.log('读取路径文件的值')
-		                    this.editor.setValue(data.toString(),-1);
+		                    this.editor.setValue(beautify(data.toString()),-1);
 		                    this.setActiveEditor(this.getResult);
 	                    });
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;",-1);
+                        this.editor.setValue(beautify("pragma solidity ^0.4.2;"),-1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -286,7 +286,7 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            // console.log(this.editor.session.onChange())
+            console.log(this.editor)
             var _this = this;
             ace.acequire('ace/ext/language_tools')
             ace.acequire('ace/ext/searchbox')
