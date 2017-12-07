@@ -1,7 +1,7 @@
 <template>
     <div class="header bggray no-chose">
         <div>
-            <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
+            <ul class="list no-chose" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
