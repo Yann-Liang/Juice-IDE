@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="sole">
         <div class="file-tab bggrayer">
             <div class="tabs" ref='tabs'>
 
@@ -870,6 +870,9 @@
 -->
 <style lang="less" scoped>
     @import "../../less/modules/theme.less";
+    .sole{
+        height:100%;
+    }
 .file-tab{
     display:flex;
     align-content: space-between;

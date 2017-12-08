@@ -62,7 +62,7 @@
                 });
                 if(arr.length != 0){
                     console.log('缓存中的值')
-                    this.editor.setValue(arr[0].source,-1);
+                    this.editor.setValue(beautify(arr[0].source),-1);
                     this.setActiveEditor(this.getResult);
                 }else{
                     if(this.value){
@@ -71,11 +71,11 @@
 			                    return console.error(err);
 		                    }
 		                    console.log('读取路径文件的值')
-		                    this.editor.setValue(data.toString(),-1);
+		                    this.editor.setValue(beautify(data.toString()),-1);
 		                    this.setActiveEditor(this.getResult);
 	                    });
                     }else{
-                        this.editor.setValue("pragma solidity ^0.4.2;",-1);
+                        this.editor.setValue(beautify("pragma solidity ^0.4.2;"),-1);
 	                    this.setActiveEditor(this.getResult);
                     }
                 }
@@ -286,7 +286,7 @@
             this.editor = ace.edit('javascript-editor');
             //把editor对象存在vuex中，方便在别的文件中使用editor的方法
             this.saveEditor(this.editor);
-            // console.log(this.editor.session.onChange())
+            console.log(this.editor)
             var _this = this;
             ace.acequire('ace/ext/language_tools')
             ace.acequire('ace/ext/searchbox')
@@ -307,7 +307,7 @@
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
-//            this.setValue();
+
 	        this. intiFileData();
             this.change();
             this.editor.clearSelection();
@@ -439,6 +439,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
+            this.editor.resize(true);
 
         },
         //监视
@@ -448,11 +449,10 @@
 		            this.setValue();
                 }
             },
-            consoleFlag:function(){
-                this.editor.resize(true);
-            },
             consoleHeight:function(){
-                this.editor.resize(true);
+                console.log('consoleHeight',this.consoleHeight)
+                console.log(this.editor.resize())
+                this.editor.resize();
             }
 
         },
