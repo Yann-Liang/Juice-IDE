@@ -30,6 +30,10 @@ table {
     border-spacing: 0;
 }
 
+input, textarea, select, button{
+    font-family: "微软雅黑","PingFangSC-Regular","PingFang SC","Helvetica Neue",Helvetica,"Hiragino Sans GB",Arial,sans-serif;
+}
+
 /*左浮动*/
 .fl {
     float: left;
