@@ -21,3 +21,83 @@ contract Migrations {
         upgraded.setCompleted(last_completed_migration);
     }
 }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    function upgrade(address new_address) restricted{
+        Migrations upgrades = Migrations(new_address);
+        upgraded.setCompleted(last_completed_migration);
+    }
+    

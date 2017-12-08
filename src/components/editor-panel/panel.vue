@@ -307,7 +307,7 @@
             this.editor.setFontSize(14);
             //自动换行,设置为off关闭
             this.editor.setOption("wrap", "free");
-//            this.setValue();
+
 	        this. intiFileData();
             this.change();
             this.editor.clearSelection();
@@ -439,6 +439,7 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
+            this.editor.resize(true);
 
         },
         //监视
@@ -448,11 +449,10 @@
 		            this.setValue();
                 }
             },
-            consoleFlag:function(){
-                this.editor.resize(true);
-            },
             consoleHeight:function(){
-                this.editor.resize(true);
+                console.log('consoleHeight',this.consoleHeight)
+                console.log(this.editor.resize())
+                this.editor.resize();
             }
 
         },
