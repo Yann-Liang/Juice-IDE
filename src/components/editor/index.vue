@@ -1,5 +1,5 @@
 <template>
-    <div class="sole">
+    <div class="">
         <div class="file-tab bggrayer">
             <div class="tabs" ref='tabs'>
 
@@ -698,9 +698,8 @@
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
                         this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
-                        this.showOrHideTwo = false;
-                        // this.showOrHideTwo = 'hide';
-                        // this.showOrHideOne = 'hide';
+                        // this.showOrHideTwo = false;
+
                     }
                 }
             },
@@ -737,7 +736,7 @@
                     console.log('hiddenLength',hiddenLength)
                     if(hiddenLength > 0){
                         //已超过，此时需要显示出来箭头
-                        // this.showOrHideTwo = true;
+                        this.showOrHideTwo = true;
                         this.showOrHideOne = true;
                         if(hiddenRight > 0){
                             if(hiddenRight > this.vistual){
@@ -757,45 +756,102 @@
 
             },
             //已push进数组
+            // alreadyArrow:function(id){
+            //     if(this.fileData.length == 0){
+            //         //什么也不做
+            //     }else{
+            //         var filetabWidth = this.$refs.files.offsetWidth;
+            //         var tabWidth = this.$refs.tabs.offsetWidth;
+            //         var hiddenLength = filetabWidth - tabWidth;
+            //         var element = document.getElementById(""+id+"");
+            //         var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+            //         var elementWidth = element.offsetWidth;//当前元素的宽度
+            //         var currentLeft = this.$refs.files.offsetLeft || 0;
+            //         var hiddenRight = hiddenLength + currentLeft;
+            //         console.log('hiddenRight',hiddenRight)
+            //         if(hiddenLength > 0){
+            //             //已超过
+            //             this.showOrHideTwo = true;
+            //             if(elementLeft == 0){
+            //                 this.showOrHideOne = false;
+            //                 this.$refs.files.style.left = `0px`;
+            //             }else{
+            //                 this.showOrHideOne = true;
+            //                 this.$refs.files.style.left = `${ - elementLeft + 100}px`;
+            //             }
+            //         }else{
+            //             this.showOrHideTwo = false;
+            //             this.showOrHideOne = false;
+            //             this.$refs.files.style.left = `0px`;
+            //         }
+            //     }
+            // },
             alreadyArrow:function(id){
                 if(this.fileData.length == 0){
                     //什么也不做
                 }else{
-                    var filetabWidth = this.$refs.files.offsetWidth;
-                    var tabWidth = this.$refs.tabs.offsetWidth;
-                    var hiddenLength = filetabWidth - tabWidth;
+                    console.log(this.$refs.files.offsetLeft)
+                    var fileLeft = Math.abs(this.$refs.files.offsetLeft);//父元素的left
+                    var tabWidth = this.$refs.tabs.offsetWidth;//tabs的宽度
                     var element = document.getElementById(""+id+"");
                     var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
                     var elementWidth = element.offsetWidth;//当前元素的宽度
-                    // console.log('fileLeft',fileLeft)
-                    // console.log('elementLeft',elementLeft)
-                    // console.log('elementWidth',elementWidth)
-                    // console.log('current',current );
-                    var currentLeft = this.$refs.files.offsetLeft || 0;
-                    var hiddenRight = hiddenLength + currentLeft;
-                    console.log('hiddenRight',hiddenRight)
-                    if(hiddenLength > 0){
-                        //已超过
-                        this.showOrHideTwo = true;
+                    console.log('fileLeft',fileLeft);
+                    console.log('tabWidth',tabWidth);
+                    console.log('elementLeft',elementLeft);
+                    console.log('elementWidth',elementWidth);
+                    console.log('fileLeft+tabWidth',fileLeft+tabWidth);
+                    if( (fileLeft+tabWidth) < elementLeft){
+                        //当前元素被隐藏在右边
+                        var x = elementLeft + elementWidth - fileLeft;
+                        console.log('x',x);
+                        var y = x+fileLeft;
+                        console.log('y',y);
+                        // this.$refs.files.style.left = `{- y }px`
+                        this.$refs.files.style.left = `${- y}px`;
+                    }else if( (fileLeft+tabWidth) > elementLeft){
+                        //当前元素被隐藏在左边
                         if(elementLeft == 0){
                             this.showOrHideOne = false;
                             this.$refs.files.style.left = `0px`;
                         }else{
-                            this.showOrHideOne = true;
-                            this.$refs.files.style.left = `${ - elementLeft + 100}px`;
+                            var x = Math.abs(fileLeft - (elementLeft + elementWidth));
+                            console.log('x',x);
+                            var y = fileLeft-x;
+                            console.log('y',y)
+                            // this.$refs.files.style.left = `{- y }px`
+                            this.$refs.files.style.left = `${ - y}px`;
                         }
                     }else{
-                        this.showOrHideTwo = false;
-                        this.showOrHideOne = false;
-                        this.$refs.files.style.left = `0px`;
+                        this.$refs.files.style.left = `{- fileLeft }px`
                     }
-                    // if(elementLeft == 0){
-
+                    // var filetabWidth = this.$refs.files.offsetWidth;
+                    // var tabWidth = this.$refs.tabs.offsetWidth;
+                    // var hiddenLength = filetabWidth - tabWidth;
+                    // var element = document.getElementById(""+id+"");
+                    // var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+                    // var elementWidth = element.offsetWidth;//当前元素的宽度
+                    // var currentLeft = this.$refs.files.offsetLeft || 0;
+                    // var hiddenRight = hiddenLength + currentLeft;
+                    // console.log('hiddenRight',hiddenRight)
+                    // if(hiddenLength > 0){
+                    //     //已超过
+                    //     this.showOrHideTwo = true;
+                    //     if(elementLeft == 0){
+                    //         this.showOrHideOne = false;
+                    //         this.$refs.files.style.left = `0px`;
+                    //     }else{
+                    //         this.showOrHideOne = true;
+                    //         this.$refs.files.style.left = `${ - elementLeft + 100}px`;
+                    //     }
                     // }else{
-
+                    //     this.showOrHideTwo = false;
+                    //     this.showOrHideOne = false;
+                    //     this.$refs.files.style.left = `0px`;
                     // }
                 }
-            }
+            },
+
 
         },
         //生命周期函数
@@ -870,9 +926,7 @@
 -->
 <style lang="less" scoped>
     @import "../../less/modules/theme.less";
-    .sole{
-        height:100%;
-    }
+
 .file-tab{
     display:flex;
     align-content: space-between;

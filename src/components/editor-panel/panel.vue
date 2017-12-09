@@ -452,7 +452,7 @@
             consoleHeight:function(){
                 console.log('consoleHeight',this.consoleHeight)
                 console.log(this.editor.resize())
-                this.editor.resize();
+                // this.editor.resize();
             }
 
         },
@@ -485,21 +485,7 @@
     flex-grow:1;
 
 }
-.ace_editor{
-    .ace_search.right{
-        border-right:3px;
-        right:0;
-    }
-    .ace_search{
-        background-color: red;
-        box-shadow: inset 1px -1px 0 0 rgba(0,0,0,.4);
-        max-width: 480px;
-        width: 480px;
-        line-height: 50px;
-        padding: 0 0 8px;
-        border: 1px solid #e5e5e5;
-    }
-}
+
 
 
 
