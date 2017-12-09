@@ -30,7 +30,7 @@
             <div class="modal-btn">
                 <el-button class='bgcanbtn white btn-info' @click='closeVaild'>取消</el-button>
                 <el-button class="bgblue white btn-info" type="p
-                rimary" @click='sureValid' :disabled='disabled'>确定</el-button>
+                rimary" @click='sureValid'>确定</el-button>
             </div>
         </div>
     </div>
@@ -56,7 +56,6 @@ export default{
                 codeERR: false,
                 checkCode:"",
                 activeColor:"",
-                disabled:false,
                 rules:{
                     accountPwd:{required:true,message:helpText.NOTEMPTY.pwd},
                     code:{required:true,message:helpText.NOTEMPTY.code}

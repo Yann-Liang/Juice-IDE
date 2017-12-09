@@ -7,7 +7,8 @@
 @warning:#faa732;
 @fontBase:#333;
 @white:#fff;
-
+@canael:#ababab;
+@readonly:#f2f2f2;
 //background color
 .bgblue{
   background-color: @blue!important;
@@ -20,6 +21,13 @@
 }
 .bggrayer{
   background-color:#eaeaea!important;
+}
+.bgcanbtn{
+  background-color:@canael!important;
+}
+//border color
+.borderBlue{
+  border-color:@blue!important;
 }
 //font color
 .default{
@@ -70,10 +78,13 @@
 .btn-info{
   background-color: @blue;
   color:@white;
-  border:solid 1px @blue;
+  // border:solid 1px @blue;
   &:hover{
     border-color:@darkblue;
     background-color: @darkblue;;
     color:@white;
   }
+}
+.readonly{
+  background-color:@readonly;
 }
