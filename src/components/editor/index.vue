@@ -790,7 +790,6 @@
                 if(this.fileData.length == 0){
                     //什么也不做
                 }else{
-                    console.log(this.$refs.files.offsetLeft)
                     var fileLeft = Math.abs(this.$refs.files.offsetLeft);//父元素的left
                     var tabWidth = this.$refs.tabs.offsetWidth;//tabs的宽度
                     var element = document.getElementById(""+id+"");
@@ -803,56 +802,38 @@
                     console.log('fileLeft+tabWidth',fileLeft+tabWidth);
                     if( (fileLeft+tabWidth) < elementLeft){
                         //当前元素被隐藏在右边
-                        var x = elementLeft + elementWidth - fileLeft;
-                        console.log('x',x);
+                        var x = (elementLeft + elementWidth) - (fileLeft + tabWidth);
+                        console.log('右边x',x);
                         var y = x+fileLeft;
-                        console.log('y',y);
-                        // this.$refs.files.style.left = `{- y }px`
+                        console.log('右边y',y);
                         this.$refs.files.style.left = `${- y}px`;
-                    }else if( (fileLeft+tabWidth) > elementLeft){
-                        //当前元素被隐藏在左边
-                        if(elementLeft == 0){
-                            this.showOrHideOne = false;
-                            this.$refs.files.style.left = `0px`;
+                        this.showOrHideOne = true;
+                    }else if((fileLeft+tabWidth) > elementLeft){
+                        if(fileLeft < elementLeft){
+                            //显示在窗口区域
+                            console.log('窗口区域',fileLeft)
+                            this.$refs.files.style.left = `${- (fileLeft)}px`;
+                            this.showOrHideOne = true;
                         }else{
-                            var x = Math.abs(fileLeft - (elementLeft + elementWidth));
-                            console.log('x',x);
-                            var y = fileLeft-x;
-                            console.log('y',y)
-                            // this.$refs.files.style.left = `{- y }px`
-                            this.$refs.files.style.left = `${ - y}px`;
+                            //隐藏在左边区域
+                            if(elementLeft == 0){
+                                console.log('正左边');
+                                this.$refs.files.style.left = `0px`;
+                                this.showOrHideOne = false;
+                            }else{
+                                //隐藏在左边区域
+                                console.log('左边',elementLeft);
+                                this.$refs.files.style.left = `${- elementLeft+20}px`;
+                                this.showOrHideOne = true;
+                            }
                         }
-                    }else{
-                        this.$refs.files.style.left = `{- fileLeft }px`
+                    }else if((fileLeft+tabWidth) == elementLeft){
+                        console.log('刚好右边边界')
+                        this.showOrHideOne = true;
+                        this.$refs.files.style.left = `${- (fileLeft+elementWidth)}px`;
                     }
-                    // var filetabWidth = this.$refs.files.offsetWidth;
-                    // var tabWidth = this.$refs.tabs.offsetWidth;
-                    // var hiddenLength = filetabWidth - tabWidth;
-                    // var element = document.getElementById(""+id+"");
-                    // var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
-                    // var elementWidth = element.offsetWidth;//当前元素的宽度
-                    // var currentLeft = this.$refs.files.offsetLeft || 0;
-                    // var hiddenRight = hiddenLength + currentLeft;
-                    // console.log('hiddenRight',hiddenRight)
-                    // if(hiddenLength > 0){
-                    //     //已超过
-                    //     this.showOrHideTwo = true;
-                    //     if(elementLeft == 0){
-                    //         this.showOrHideOne = false;
-                    //         this.$refs.files.style.left = `0px`;
-                    //     }else{
-                    //         this.showOrHideOne = true;
-                    //         this.$refs.files.style.left = `${ - elementLeft + 100}px`;
-                    //     }
-                    // }else{
-                    //     this.showOrHideTwo = false;
-                    //     this.showOrHideOne = false;
-                    //     this.$refs.files.style.left = `0px`;
-                    // }
                 }
             },
-
-
         },
         //生命周期函数
         created() {

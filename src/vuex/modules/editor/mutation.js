@@ -33,6 +33,7 @@ export const editorMutation = {
 	},
     ['UPDATE_COPY_TEXT'](state,data){
         state.copyText = data
+        console.log(state.copyText)
     },
     ['CHANGE_SUCCESS_VISIBLE'](state,bool){
         state.successVisible = bool;

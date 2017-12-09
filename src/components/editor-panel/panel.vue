@@ -37,13 +37,13 @@
         props: ["currentView","value","searchValue",'name','keyId'],
         //计算
         computed: {
-            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData','activeEditor'])
+            ...mapGetters(['actionCode','editData','editFile','fileTreeData','activeFile','getUrl','currentName','consoleFlag','consoleHeight','fileData','activeEditor','copyText'])
         },
         //方法
         methods: {
             ...mapActions(['saveCode','updateData','updateTreeData','updateActiveEditor','saveEditorFile','saveEditor','updateRightMenuBlock','saveOtherPath','saveAllFile','queryFileListData'
                 ,'updateEditFile','updateUrl','updateCurrentId','boolSuccessVisible','changeShowTipModal','changeShowDeleteModal','changeDeleteFile',
-	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile','queryFileData']),
+	            'changeShowFileNameModal','changeDirNameModal','setHintInfo','updateNewOpenFile','queryFileData','updateCopyText']),
             //放大缩小字体
             editorFontSize:function(incr){
                 this.editor.setFontSize(this.editor.getFontSize() + incr)
@@ -311,9 +311,6 @@
 	        this. intiFileData();
             this.change();
             this.editor.clearSelection();
-
-            // this.editor.resize(true);
-
             //设置格式化
             this.editor.commands.addCommand({
                 name: 'myCommand',
@@ -439,6 +436,26 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
+            //ctrl+c
+            this.editor.commands.addCommand({
+                name: 'myCopy',
+                bindKey: {win: 'Ctrl-C',  mac: 'Command-C'},
+                exec: function(editor) {
+                    console.log('复制文本')
+                    _this.updateCopyText(editor.getCopyText())
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
+            //ctrl+V
+            this.editor.commands.addCommand({
+                name: 'myPaste',
+                bindKey: {win: 'Ctrl-V',  mac: 'Command-V'},
+                exec: function(editor) {
+                    console.log('粘贴文本')
+                   editor.commands.commands.paste.exec(editor,_this.copyText)
+                },
+                readOnly: true // 如果不需要使用只读模式，这里设置false
+            });
             this.editor.resize(true);
 
         },

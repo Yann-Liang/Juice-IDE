@@ -277,8 +277,8 @@
                     // console.log('aaaaaaaaaaaaa',this.editor.commands.commands.find.exec(this.editor))
                     console.log('bbbbbbbbb',this.editor.onCopy())
                         // console.log(_this.editor.getCopyText())
-                        // _this.updateCopyText(_this.editor.getCopyText());//复制
-                        _this.editor.onCopy();
+                        _this.updateCopyText(_this.editor.getCopyText());//复制
+                        // _this.editor.onCopy();
 
                         break;
                     case '4':
@@ -287,9 +287,9 @@
                         break;
                     case '5':
                     case 5:
-                    console.log(_this.editor.onPaste())
+                    // console.log(_this.editor.onPaste())
 
-                        // _this.editor.commands.commands.paste.exec(_this.editor,_this.copyText)
+                        _this.editor.commands.commands.paste.exec(_this.editor,_this.copyText)
                         // _this.editor.insert(_this.copyText);//粘贴
                         // _this.editor.onPaste(_this.copyText)
                         break;
