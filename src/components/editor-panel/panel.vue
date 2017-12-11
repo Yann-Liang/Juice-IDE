@@ -469,7 +469,7 @@
             consoleHeight:function(){
                 console.log('consoleHeight',this.consoleHeight)
                 console.log(this.editor.resize())
-                // this.editor.resize();
+                this.editor.resize();
             }
 
         },
