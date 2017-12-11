@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-08 10:31:39
+ * @Last Modified time: 2017-12-11 17:33:09
  */
 //引入web3
 let Web3 = require('web3'),
@@ -731,28 +731,28 @@ class DeployService {
 
     sign(txParams) {
         //调试用
-        return new Promise((resolve, reject) => {
-            let tx = new EthereumTx(txParams);
-            console.log('txParams', txParams);
-            //钱包签名
-            let privateKey = Buffer.from(this.user.privateKey, 'hex');
-            tx.sign(privateKey);
-            const serializedTx = tx.serialize(),
-                serializedTxHex = "0x" + serializedTx.toString('hex');
-            resolve(serializedTxHex);
-        })
-
         // return new Promise((resolve, reject) => {
-        //     Juice.wallet.sign(txParams, (res) => {
-        //         if (res.code == 0) {
-        //             resolve(res.data);
-        //         } else {
-        //             consoleService.output('[签名失败]', {
-        //                 logError: res.msg
-        //             });
-        //         }
-        //     })
+        //     let tx = new EthereumTx(txParams);
+        //     console.log('txParams', txParams);
+        //     //钱包签名
+        //     let privateKey = Buffer.from(this.user.privateKey, 'hex');
+        //     tx.sign(privateKey);
+        //     const serializedTx = tx.serialize(),
+        //         serializedTxHex = "0x" + serializedTx.toString('hex');
+        //     resolve(serializedTxHex);
         // })
+
+        return new Promise((resolve, reject) => {
+            Juice.wallet.sign(txParams, (res) => {
+                if (res.code == 0) {
+                    resolve(res.data);
+                } else {
+                    consoleService.output('[签名失败]', {
+                        logError: res.msg
+                    });
+                }
+            })
+        })
     }
 
     //获取要查询的时间
