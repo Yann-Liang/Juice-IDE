@@ -787,6 +787,81 @@
             //     }
             // },
 
+            alreadyArrow:function(id){
+                var fileLeft = Math.abs(this.$refs.files.offsetLeft);//父元素的left绝对值
+                var tabWidth = this.$refs.tabs.offsetWidth;//tabs的宽度
+                var element = document.getElementById(""+id+"");
+                var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+                var elementWidth = element.offsetWidth;//当前元素的宽度
+                const leftWidathOfFile=fileLeft+tabWidth;
+
+                if(fileLeft>elementLeft){
+                    console.log('我在左边哦')
+                    this.$refs.files.style.left = `${-elementLeft}px`;
+                    elementLeft?'':this.showOrHideOne = false;
+                }else if(fileLeft+tabWidth<elementLeft+elementWidth){
+                    console.log('我在右边哦')
+                    this.$refs.files.style.left = `${fileLeft+tabWidth-(elementLeft+elementWidth)-fileLeft}px`;
+                }else{
+                    console.log('我在中间哦')
+                }
+
+
+
+
+
+
+                // if(this.fileData.length == 0){
+                //     //什么也不做
+                // }else{
+                //     var fileLeft = Math.abs(this.$refs.files.offsetLeft);//父元素的left
+                //     var tabWidth = this.$refs.tabs.offsetWidth;//tabs的宽度
+                //     var element = document.getElementById(""+id+"");
+                //     var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+                //     var elementWidth = element.offsetWidth;//当前元素的宽度
+                //     const leftWidathOfFile=fileLeft+tabWidth;
+                //     console.log('fileLeft',fileLeft);
+                //     console.log('tabWidth',tabWidth);
+                //     console.log('elementLeft',elementLeft);
+                //     console.log('elementWidth',elementWidth);
+                //     console.log('fileLeft+tabWidth',fileLeft+tabWidth);
+                //     if(leftWidathOfFile<elementLeft)
+
+                    // if( (fileLeft+tabWidth) < elementLeft){
+                    //     //当前元素被隐藏在右边
+                    //     var x = (elementLeft + elementWidth) - (fileLeft + tabWidth);
+                    //     console.log('右边x',x);
+                    //     var y = x+fileLeft;
+                    //     console.log('右边y',y);
+                    //     this.$refs.files.style.left = `${- y}px`;
+                    //     this.showOrHideOne = true;
+                    // }else if((fileLeft+tabWidth) > elementLeft){
+                    //     if(fileLeft < elementLeft){
+                    //         //显示在窗口区域
+                    //         console.log('窗口区域',fileLeft)
+                    //         this.$refs.files.style.left = `${- (fileLeft)}px`;
+                    //         this.showOrHideOne = true;
+                    //     }else{
+                    //         //隐藏在左边区域
+                    //         if(elementLeft == 0){
+                    //             console.log('正左边');
+                    //             this.$refs.files.style.left = `0px`;
+                    //             this.showOrHideOne = false;
+                    //         }else{
+                    //             //隐藏在左边区域
+                    //             console.log('左边',elementLeft);
+                    //             this.$refs.files.style.left = `${- elementLeft+20}px`;
+                    //             this.showOrHideOne = true;
+                    //         }
+                    //     }
+                    // }else if((fileLeft+tabWidth) == elementLeft){
+                    //     console.log('刚好右边边界')
+                    //     this.showOrHideOne = true;
+                    //     this.$refs.files.style.left = `${- (fileLeft+elementWidth)}px`;
+                    // }
+                //}
+            },
+
         },
         //生命周期函数
         created() {
