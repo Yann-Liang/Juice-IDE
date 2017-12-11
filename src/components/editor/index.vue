@@ -625,6 +625,9 @@
                     判断fileData是否为空，
                     为空：则不显示tab，并且编辑区显示为不可编辑状态     不为空：则默认显示第一个为高亮，且编辑区显示的为高亮tab下的代码
                 */
+                var filetabWidth = this.$refs.files.offsetWidth,
+                 tabWidth = this.$refs.tabs.offsetWidth,
+                 hiddenLength = filetabWidth - tabWidth;
                 if(this.fileData.length == 0){
                     //不显示tab
                     this.select = "";
@@ -641,6 +644,12 @@
                     this.keyId = this.fileData[0].keyId;
                     this.editorVisible = true;
                     this.tipsVisible = false;
+                    if(hiddenLength>0){
+                        //已超过，显示向右按钮
+                        this.showOrHideTwo = true;
+                    }else{
+                        this.showOrHideTwo = false;
+                    }
                 }
             },
             //push对象进数组
@@ -779,7 +788,9 @@
         },
         //生命周期函数
         created() {
-            this.init();
+            this.$nextTick(()=>{
+                this.init();
+            })
             var _this = this;
             document.onkeydown = function(event){
                 event.stopPropagation();
