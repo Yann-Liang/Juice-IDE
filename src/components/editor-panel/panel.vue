@@ -456,7 +456,7 @@
                 },
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
-            this.editor.resize(true);
+            // this.editor.resize(true);
             this.editor.setAutoScrollEditorIntoView(true);
 
         },
@@ -470,7 +470,7 @@
             consoleHeight:function(){
                 console.log('consoleHeight',this.consoleHeight,this.editor.setAutoScrollEditorIntoView(true))
                 console.log(this.editor.resize())
-                this.editor.resize();
+                // this.editor.resize();
                 this.editor.setAutoScrollEditorIntoView(true);
             }
 
