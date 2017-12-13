@@ -1,24 +1,22 @@
 <template>
-    <div class="">
-        <div class="file-tab bggrayer">
-            <div class="tabs" ref='tabs'>
+    <div class="no-chose">
+        <div class="file-tab bggrayer no-chose">
+            <div class="tabs  no-chose" ref='tabs'>
 
-                <div class='scroll-bar left-bar bggrayer'  v-if='showOrHideOne' ref='leftbar' @click='scrollLeft' >
-                    <i class="iconfont small">&#xe62f;</i>
-
+                <div class='scroll-bar left-bar bggrayer no-chose'  v-if='showOrHideOne' ref='leftbar' @click='scrollLeft' >
+                    <i class="iconfont small  no-chose">&#xe62f;</i>
                 </div>
-                <ul class='files' ref='files'>
-                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)" :id='item.name'>
-                        <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
-                        <span class="remove" v-if='dian'>...</span>
+                <ul class='files no-chose' ref='files'>
+                    <li class='file no-chose' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)" :id='item.name'>
+                        <span class="no-chose">{{item.name}}</span>
+                        <span class="remove no-chose" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
+                        <span class="remove no-chose" v-if='dian'>...</span>
                     </li>
-                    <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
+                    <li class='new-file no-chose' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
 
-                <div class='scroll-bar right-bar bggrayer'  v-if='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
-                    <i class="iconfont small">&#xe630;</i>
-
+                <div class='scroll-bar right-bar bggrayer no-chose'  v-if='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
+                    <i class="iconfont small no-chose">&#xe630;</i>
                 </div>
             </div>
             <div class="tools">
