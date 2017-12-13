@@ -105,7 +105,7 @@
             </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive
-                  class='javascript-editor' ref="childMethod" @findFunction='findFunction'
+                   ref="childMethod" @findFunction='findFunction'
                   @replaceFunction='replaceFunction' v-show="fileData.length > 0">。
 
         </v-editor>
@@ -355,6 +355,7 @@
             },
             //切换tab
             selectProp: function (index,item) {
+                console.log('item',item)
                 this.select = index;
                 this.currentView = index;
                 this.value = item.value;
@@ -364,7 +365,9 @@
 	                name:this.name,
 	                value:this.value,
                     keyId:this.keyId
-                })
+                });
+                //切换editor
+                // this.$refs.childMethod.open(this.name,)
                 // this.$refs.childMethod.change();
             },
             //效果切换
@@ -1196,10 +1199,7 @@
     color:#000;
 }
 
-.javascript-editor{
-    width:100%;
-    flex-grow:1;
-}
+
 
 .tips{
     display: -webkit-flex;

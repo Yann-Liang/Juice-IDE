@@ -1,6 +1,6 @@
 <template class="wrap">
 
-    <div id="javascript-editor" class='javascript-editor'></div>
+    <div id="javascript-editor"></div>
    <!--  <div id="tips"  v-show='tipsVisible'></div> -->
 
 
@@ -30,7 +30,8 @@
         data() {
             return {
                 editor:{},
-
+                sessions:{},
+                currentSession:""
             }
         },
         //数组或对象，用于接收来自父组件的数据
@@ -53,33 +54,7 @@
                 this.editor.setValue(beautify(this.editor.getValue()),1);
                 //引用了js-beautify库
             },
-            //设置值
-            setValue:function(){
-                // this.editor.session.clearBreakpoints();
-                console.log('setvalue》》》》》》》》》》》》》》》》》》')
-                let arr = this.editData.filter((item)=>{
-                    return item.keyId === this.keyId
-                });
-                if(arr.length != 0){
-                    console.log('缓存中的值')
-                    this.editor.setValue(beautify(arr[0].source),-1);
-                    this.setActiveEditor(this.getResult);
-                }else{
-                    if(this.value){
-	                    fs.readFile(this.value,"utf-8",  (err, data)=> {
-		                    if (err) {
-			                    return console.error(err);
-		                    }
-		                    console.log('读取路径文件的值')
-		                    this.editor.setValue(beautify(data.toString()),-1);
-		                    this.setActiveEditor(this.getResult);
-	                    });
-                    }else{
-                        this.editor.setValue(beautify("pragma solidity ^0.4.2;"),-1);
-	                    this.setActiveEditor(this.getResult);
-                    }
-                }
-            },
+
             //设置当前高亮显示即正在编辑状态的文件信息
             setActiveEditor(cb){
 	            const editorData = {
@@ -94,6 +69,19 @@
                     cb();
                 }
             },
+            // setActiveEditor(id,cb){
+            //     const editorData = {
+            //         value: this.editFile.value,
+            //         name: this.editFile.name,
+            //         keyId:this.editFile.keyId,
+            //         source: this.get(id)
+            //     }
+            //     console.log( "设置当前高亮即正在编辑状态的文件信息》》》》》》》》》》》》》》》")
+            //     this.updateActiveEditor(editorData);
+            //     if(cb && typeof(cb)=='function'){
+            //         cb();
+            //     }
+            // },
             //编辑区的change事件
             change:function(){
                 //监听编辑区的change事件
@@ -172,6 +160,11 @@
                 }
                 data.push(item);
                 this.updateData(data);
+            },
+            get:function (id) {
+                if (this.currentSession === id) {
+                  return this.editor.getValue()
+                }
             },
             //获取当前值
             getValue:function(){
@@ -273,7 +266,91 @@
 			        this.updateEditFile(data[0]);
 		        }
 	        },
-
+            createSession(content){
+                var s = new ace.EditSession(content,'ace/mode/javascript');
+                s.setUndoManager(new ace.UndoManager());
+                s.setTabSize(4);
+                s.setUseSoftTabs(true);
+                return s;
+            },
+            switchSession(id){
+                this.currentSession=id;
+                this.editor.setSession(this.sessions[this.currentSession]);
+                this.editor.focus();
+            },
+            //设置值
+            setValue:function(){
+                // this.editor.session.clearBreakpoints();
+                console.log('setvalue》》》》》》》》》》》》》》》》》》')
+                let arr = this.editData.filter((item)=>{
+                    return item.keyId === this.keyId
+                });
+                if(arr.length != 0){
+                    console.log('缓存中的值')
+                    this.editor.setValue(beautify(arr[0].source),1);
+                    this.setActiveEditor(this.getResult);
+                }else{
+                    if(this.value){
+                        fs.readFile(this.value,"utf-8",  (err, data)=> {
+                            if (err) {
+                                return console.error(err);
+                            }
+                            console.log('读取路径文件的值')
+                            this.editor.setValue(beautify(data.toString()),1);
+                            this.setActiveEditor(this.getResult);
+                        });
+                    }else{
+                        this.editor.setValue(beautify("pragma solidity ^0.4.2;"),1);
+                        this.setActiveEditor(this.getResult);
+                    }
+                }
+            },
+            //每次keyId改变，都要新建一个editor会话，并设值
+            open(){
+                let arr = this.editData.filter((item)=>{
+                    return item.keyId === this.keyId
+                });
+                let id=this.keyId;
+                if(arr.length != 0){
+                    console.log('读取缓存中的值');
+                    //设值新的editor会话并设值值
+                    if(!this.sessions[id]){
+                        var session = this.createSession(arr[0].source);
+                        sessions[id]=session;
+                    }else{
+                        this.sessions[id].setValue(arr[0].source,-1)
+                    }
+                }else{
+                    if(this.value){
+                        fs.readFile(this.value,'utf-8',(err,data)=>{
+                            if (err) {
+                                return console.error(err);
+                            }
+                            console.log('读取路径文件的值')
+                            console.log(this.sessions[id])
+                            // if(!this.sessions[id]){
+                            //     var session = this.createSession(data.toString());
+                            //     sessions[id]=session;
+                            // }else{
+                            //     this.sessions[id].setValue(data.toString(),-1);
+                            // }
+                        })
+                    }else{
+                        if(!this.sessions[id]){
+                            var session=this.createSession('pragma solidity ^0.4.2;');
+                            sessions[id]=session
+                        }else{
+                            this.sessions[id].setValue('pragma solidity ^0.4.2;',-1);
+                        }
+                    }
+                }
+                // this.setActiveEditor(id,this.getResult);
+                this.switchSession(id);
+            },
+            //高度变化
+            resize(){
+                this.editor.resize(true);
+            }
         },
         //生命周期函数
         created() {
@@ -294,6 +371,7 @@
             this.editor.$blockScrolling = Infinity;
             this.editor.getSession().setMode('ace/mode/javascript');
             this.editor.setTheme('ace/theme/tomorrow');
+            // this.editor.setKeyboardHandler('ace/keyboard/vim');
             //启用提示菜单
             this.editor.setOptions({
                 enableBasicAutocompletion: true,
@@ -436,42 +514,64 @@
                 readOnly: true // 如果不需要使用只读模式，这里设置false
             });
 
-            //ctrl+c
-            this.editor.commands.addCommand({
-                name: 'myCopy',
-                bindKey: {win: 'Ctrl-C',  mac: 'Command-C'},
-                exec: function(editor) {
-                    console.log('复制文本')
-                    _this.updateCopyText(editor.getCopyText())
-                },
-                readOnly: true // 如果不需要使用只读模式，这里设置false
-            });
-            //ctrl+V
-            this.editor.commands.addCommand({
-                name: 'myPaste',
-                bindKey: {win: 'Ctrl-V',  mac: 'Command-V'},
-                exec: function(editor) {
-                    console.log('粘贴文本')
-                   editor.commands.commands.paste.exec(editor,_this.copyText)
-                },
-                readOnly: true // 如果不需要使用只读模式，这里设置false
-            });
-            // this.editor.resize(true);
+            // this.editor.on('copy',()=>{
+            //     console.log('copy',this.editor.onCopy())
+            //     // alert('复制成功')
+            // });
+            this.editor.on('paste',()=>{
+                console.log('paste')
+            })
+            // //ctrl+c
+            // this.editor.commands.addCommand({
+            //     name: 'myCopy',
+            //     bindKey: {win: 'Ctrl-C',  mac: 'Command-C'},
+            //     exec: function(editor) {
+            //         console.log('复制文本')
+            //         _this.updateCopyText(editor.getCopyText())
+            //     },
+            //     readOnly: true // 如果不需要使用只读模式，这里设置false
+            // });
+            // //ctrl+V
+            // this.editor.commands.addCommand({
+            //     name: 'myPaste',
+            //     bindKey: {win: 'Ctrl-V',  mac: 'Command-V'},
+            //     exec: function(editor) {
+            //         console.log('粘贴文本')
+            //        editor.commands.commands.paste.exec(editor,_this.copyText)
+            //     },
+            //     readOnly: true // 如果不需要使用只读模式，这里设置false
+            // });
+            this.editor.resize(true);
             this.editor.setAutoScrollEditorIntoView(true);
+            var content = document.getElementsByClassName('ace_content');
+            console.log('content',content[0])
+            console.log('contentHeight',content[0].offsetWidth)
 
         },
         //监视
         watch: {
             keyId:function(){
+                console.log(1111111111111)
             	if(!this.editFile.unWatch){
 		            this.setValue();
+                    console.log('open',111111111111111111)
+                    // this.open();
                 }
             },
-            consoleHeight:function(){
-                console.log('consoleHeight',this.consoleHeight,this.editor.setAutoScrollEditorIntoView(true))
-                console.log(this.editor.resize())
-                // this.editor.resize();
-                this.editor.setAutoScrollEditorIntoView(true);
+            'consoleFlag':function(){
+                console.log('consoleFlag',this.consoleFlag)
+                // this.editor.resize(true)
+                this.$nextTick(()=>{
+                    this.resize();
+                })
+
+            },
+            'consoleHeight':function(){
+                console.log('consoleHeight',this.consoleHeight)
+                this.$nextTick(()=>{
+                    this.resize();
+                })
+                // this.editor.resize(true)
             }
 
         },
@@ -499,7 +599,7 @@
 .wrap{
 
 }
-.javascript-editor{
+.ace_editor{
     width:100%;
     flex-grow:1;
 
