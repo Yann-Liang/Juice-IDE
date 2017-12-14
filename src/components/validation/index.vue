@@ -264,7 +264,6 @@ export default{
         height:25px;
         float:right;
         margin-top:2px;
-        margin-right:10px;
         background: url('images/update.png') no-repeat  center 7px;
         cursor: pointer;
     }
