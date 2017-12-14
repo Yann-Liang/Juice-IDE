@@ -310,17 +310,24 @@
         line-height:24px;
     }
     .log-output::-webkit-scrollbar {
-        width:5px;
-        height:5px;
+        width: 14px;
+        height: 14px;
     }
     .log-output::-webkit-scrollbar-track-piece {
         background:#fff;
     }
     .log-output::-webkit-scrollbar-thumb{
-        background:#e5e5e5;
-        height:50px;
-        border-radius:5px;
-        z-index:999999;
+        min-height: 20px;
+        background-clip: content-box;
+        box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+        min-height:50px;
+        border-radius: 999px;
+        border: 5px solid transparent;
+    }
+    .log-output::-webkit-scrollbar-track{
+        box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+        border-radius: 999px;
+        border: 5px solid transparent;
     }
     .log-item{
         margin-bottom:15px;
