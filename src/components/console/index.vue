@@ -8,9 +8,9 @@
                     <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.right="near(1)" @keyup.left="near(-1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <!--<span class="direction" @click="near(-1)">↑</span>-->
                     <!--<span class="direction" @click="near(1)">↓</span>-->
-                     <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
-                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
-                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
+                     <span class="icon" @click="viewRecord()" title="部署记录"><i class="iconfont info">&#xe628;</i></span>
+                     <span class="icon" v-if="consoleFlag" @click="viewLog()" title="收缩"><i class="iconfont info">&#xe62d;</i></span>
+                    <span class="icon" v-else @click="viewLog()" title="展开"><i class="iconfont info">&#xe62c;</i></span>
                 </span>
             </h4>
         </div>
