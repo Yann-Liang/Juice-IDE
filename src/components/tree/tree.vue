@@ -142,11 +142,11 @@
 		},
 		//监视
 		watch: {
-            'newOpenFile.id':function(){
-            	if(this.newOpenFile.newFile.keyId === this.filesList.keyId){
-            		this.open = true;
-                }
-            }
+//            'newOpenFile.id':function(){
+//            	if(this.newOpenFile.newFile.keyId === this.filesList.keyId){
+//            		this.open = true;
+//                }
+//            }
         },
 		//组件
 		components: {}

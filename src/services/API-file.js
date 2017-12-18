@@ -361,6 +361,20 @@ class file {
 		}
 	}
 	
+	GetByValue(Data,value){
+		var Deep,T,F;
+		for (F = Data.length;F;)
+		{
+			T = Data[--F]
+			if (value === T.value) return T
+			if (T.children)
+			{
+				Deep = this.GetByValue(T.children,value)
+				if (Deep) return Deep
+			}
+		}
+	}
+	
 	// 根据value来获取树结构的值
 	GetById(Data,id){
 		var Deep,T;
@@ -528,11 +542,11 @@ class file {
 	}
 	
 	//获取solc路径
-	getTemplatePath(name) {
+	getTemplatePath() {
 		const app = require('electron').remote.app;
-		let exmPath = path.join(__static,'..',`src/services/compile-exe/solcs/${name}`);
+		let exmPath = path.join(__static,'..',`src/services/compile-exe/solcs/demo`);
 		exmPath = this.formatPath(exmPath);
-		return process.env.NODE_ENV === 'development' ? exmPath : path.join(app.getPath('exe'), '..', `/solcs/${name}`);
+		return process.env.NODE_ENV === 'development' ? exmPath : path.join(app.getPath('exe'), '..', `/solcs/demo`);
 	}
 }
 

@@ -633,39 +633,55 @@
                     });
                 }
             },
-            setIntSol(){
-            	const url = this.getUrl;
-            	if(url && url.length === 0){
-            		let data = [];
-            		const path1 = file.getTemplatePath('example1.sol');
-		            const path2 = file.getTemplatePath('example2.sol');
-            		if(file.isFile(path1)){
-			            data.push({
-				            name: 'example1.sol',
-				            value:path1
-			            })
+//            setIntSol(){
+//            	const url = this.getUrl;
+//            	if(url && url.length === 0){
+//            		let data = [];
+//            		const path1 = file.getTemplatePath('example1.sol');
+//		            const path2 = file.getTemplatePath('example2.sol');
+//            		if(file.isFile(path1)){
+//			            data.push({
+//				            name: 'example1.sol',
+//				            value:path1
+//			            })
+//                    }
+//                    if(file.isFile(path2)){
+//			            data.push({
+//				            name: 'example2.sol',
+//				            value:path2
+//			            })
+//                    }
+//		            this.updateUrl(data);
+//                }
+//            },
+	        setIntSol(){
+		        const url = this.getUrl;
+		        if(url && url.length === 0){
+			        let data = [];
+                    const path = file.getTemplatePath();
+                    if(file.isDir(path)){
+	                    data.push({
+		                    name: 'demo',
+		                    value:path
+	                    })
                     }
-                    if(file.isFile(path2)){
-			            data.push({
-				            name: 'example2.sol',
-				            value:path2
-			            })
-                    }
-		            this.updateUrl(data);
-                }
-            },
+			        this.updateUrl(data);
+		        }
+	        },
 	        setStorageFn(){
 		        const data = localStorage.getItem('fileData') ? JSON.parse(localStorage.getItem('fileData')) : [];
 		        this.setIntSol();
-		        if(data.length === 0){
+		        if(data.length === 0 &&　this.fileTreeData.length > 0){
 		        	const itemFile = file.GetById(this.fileTreeData,2);
-			        localStorage.setItem('fileData',JSON.stringify(
-				        [{
-					        name:itemFile.name,
-					        value:itemFile.value,
-					        keyId: itemFile.keyId,
-				        }]
-			        ))
+		        	if(itemFile){
+				        localStorage.setItem('fileData',JSON.stringify(
+					        [{
+						        name:itemFile.name,
+						        value:itemFile.value,
+						        keyId: itemFile.keyId,
+					        }]
+				        ))
+                    }
 		        }
 
 	        }

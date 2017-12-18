@@ -48,7 +48,12 @@ export const fileAction = {
 
 							const source = file.readFileSync(data.path);
 							if(sessionData != source){
+								// 更新activeEditor
+								const activeEditor = rootState.editor.activeEditor;
+								activeEditor.source = source;
+								dispatch('updateActiveEditor',activeEditor,{ root: true });
 								rootState.editor.editor.setValue(source.toString());
+								dispatch('saveEditorFile',null,{ root: true });
 							}
 						}else{
 							// 更新source
