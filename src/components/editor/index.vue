@@ -1,28 +1,26 @@
 <template>
-    <div class="">
-        <div class="file-tab bggrayer">
-            <div class="tabs" ref='tabs'>
+    <div class="no-chose">
+        <div class="file-tab bggrayer no-chose">
+            <div class="tabs  no-chose" ref='tabs'>
 
-                <div class='scroll-bar left-bar bggrayer'  v-if='showOrHideOne' ref='leftbar' @click='scrollLeft' >
-                    <i class="iconfont small">&#xe62f;</i>
-
+                <div class='scroll-bar left-bar bggrayer no-chose'  v-if='showOrHideOne' ref='leftbar' @click='scrollLeft' >
+                    <i class="iconfont small  no-chose">&#xe62f;</i>
                 </div>
-                <ul class='files' ref='files'>
-                    <li class='file' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)" :id='item.name'>
-                        <span>{{item.name}}</span>
-                        <span class="remove" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
-                        <span class="remove" v-if='dian'>...</span>
+                <ul class='files no-chose' ref='files'>
+                    <li class='file no-chose' v-for="(item,index) in fileData" :key='item.name' :title="item.value" :class="{'li-active':select===index}"  v-on:click="selectProp(index,item)" :id='item.name'>
+                        <span class="no-chose">{{item.name}}</span>
+                        <span class="remove no-chose" @click.stop="remove(index,item.keyId)" v-if='cha'></span>
+                        <span class="remove no-chose" v-if='dian'>...</span>
                     </li>
-                    <li class='new-file' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
+                    <li class='new-file no-chose' @click='newFile'><i class="iconfont darker">&#xe621;</i></li>
                 </ul>
 
-                <div class='scroll-bar right-bar bggrayer'  v-if='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
-                    <i class="iconfont small">&#xe630;</i>
-
+                <div class='scroll-bar right-bar bggrayer no-chose'  v-if='showOrHideTwo'  @click='scrollRight' ref='rightbar'>
+                    <i class="iconfont small no-chose">&#xe630;</i>
                 </div>
             </div>
             <div class="tools">
-                <div class="tool">
+                <div class="tool no-chose">
                     <span @click.prevent='save' title="保存当前文件"><i class="iconfont info">&#xe633;</i></span>
                     <span @click.prevent='search' title="搜索"><i class="iconfont info">&#xe62b;</i></span>
                     <span @click.prevent='format' title="代码格式化"><i class="iconfont info">&#xe624;</i></span>
@@ -32,7 +30,7 @@
                 </div>
             </div>
             <div class="search-model shadow" v-if='searchVisible'>
-                <div class='search-content'>
+                <div class='search-content no-chose'>
                     <span>
                         <input class="dark" type="text"  :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" v-model='inputValue' @keyup.up="findPrev" @keyup.left="findPrev" @keyup.down="findNext" @keyup.right="findNext" placeholder="搜索" @input='find' @keyup.enter='find' ref='search' autofocus="autofocus"  spellcheck="false" v-focus>
                     </span>
@@ -105,7 +103,7 @@
             </div>
         </div>
         <v-editor :currentView='currentView' :value='value' :keyId="keyId" :name='name' :searchValue='searchValue' keep-alive
-                  class='javascript-editor' ref="childMethod" @findFunction='findFunction'
+                   ref="childMethod" @findFunction='findFunction'
                   @replaceFunction='replaceFunction' v-show="fileData.length > 0">。
 
         </v-editor>
@@ -355,6 +353,7 @@
             },
             //切换tab
             selectProp: function (index,item) {
+                console.log('item',item)
                 this.select = index;
                 this.currentView = index;
                 this.value = item.value;
@@ -364,7 +363,9 @@
 	                name:this.name,
 	                value:this.value,
                     keyId:this.keyId
-                })
+                });
+                //切换editor
+                // this.$refs.childMethod.open(this.name,)
                 // this.$refs.childMethod.change();
             },
             //效果切换
@@ -625,6 +626,9 @@
                     判断fileData是否为空，
                     为空：则不显示tab，并且编辑区显示为不可编辑状态     不为空：则默认显示第一个为高亮，且编辑区显示的为高亮tab下的代码
                 */
+                var filetabWidth = this.$refs.files.offsetWidth,
+                 tabWidth = this.$refs.tabs.offsetWidth,
+                 hiddenLength = filetabWidth - tabWidth;
                 if(this.fileData.length == 0){
                     //不显示tab
                     this.select = "";
@@ -641,6 +645,12 @@
                     this.keyId = this.fileData[0].keyId;
                     this.editorVisible = true;
                     this.tipsVisible = false;
+                    if(hiddenLength>0){
+                        //已超过，显示向右按钮
+                        this.showOrHideTwo = true;
+                    }else{
+                        this.showOrHideTwo = false;
+                    }
                 }
             },
             //push对象进数组
@@ -698,9 +708,8 @@
                        this.$refs.files.style.left = `${currentLeft - this.vistual}px`
                     }else{
                         this.$refs.files.style.left = `${currentLeft - hiddenRight - 100}px`;
-                        this.showOrHideTwo = false;
-                        // this.showOrHideTwo = 'hide';
-                        // this.showOrHideOne = 'hide';
+                        // this.showOrHideTwo = false;
+
                     }
                 }
             },
@@ -737,7 +746,7 @@
                     console.log('hiddenLength',hiddenLength)
                     if(hiddenLength > 0){
                         //已超过，此时需要显示出来箭头
-                        // this.showOrHideTwo = true;
+                        this.showOrHideTwo = true;
                         this.showOrHideOne = true;
                         if(hiddenRight > 0){
                             if(hiddenRight > this.vistual){
@@ -756,51 +765,33 @@
                 }
 
             },
-            //已push进数组
             alreadyArrow:function(id){
-                if(this.fileData.length == 0){
-                    //什么也不做
+                var fileLeft = Math.abs(this.$refs.files.offsetLeft);//父元素的left绝对值
+                var tabWidth = this.$refs.tabs.offsetWidth;//tabs的宽度
+                var element = document.getElementById(""+id+"");
+                var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
+                var elementWidth = element.offsetWidth;//当前元素的宽度
+                const leftWidathOfFile=fileLeft+tabWidth;
+
+                if(fileLeft>elementLeft){
+                    console.log('我在左边哦',elementLeft)
+                    this.$refs.files.style.left = `${-elementLeft}px`;
+                    elementLeft?'':this.showOrHideOne = false;
+                }else if(fileLeft+tabWidth<elementLeft+elementWidth){
+                    console.log('我在右边哦')
+                    this.$refs.files.style.left = `${fileLeft+tabWidth-(elementLeft+elementWidth)-fileLeft}px`;
+                    this.showOrHideOne = true;
                 }else{
-                    var filetabWidth = this.$refs.files.offsetWidth;
-                    var tabWidth = this.$refs.tabs.offsetWidth;
-                    var hiddenLength = filetabWidth - tabWidth;
-                    var element = document.getElementById(""+id+"");
-                    var elementLeft = element.offsetLeft;//当前元素距离父元素的距离
-                    var elementWidth = element.offsetWidth;//当前元素的宽度
-                    // console.log('fileLeft',fileLeft)
-                    // console.log('elementLeft',elementLeft)
-                    // console.log('elementWidth',elementWidth)
-                    // console.log('current',current );
-                    var currentLeft = this.$refs.files.offsetLeft || 0;
-                    var hiddenRight = hiddenLength + currentLeft;
-                    console.log('hiddenRight',hiddenRight)
-                    if(hiddenLength > 0){
-                        //已超过
-                        this.showOrHideTwo = true;
-                        if(elementLeft == 0){
-                            this.showOrHideOne = false;
-                            this.$refs.files.style.left = `0px`;
-                        }else{
-                            this.showOrHideOne = true;
-                            this.$refs.files.style.left = `${ - elementLeft + 100}px`;
-                        }
-                    }else{
-                        this.showOrHideTwo = false;
-                        this.showOrHideOne = false;
-                        this.$refs.files.style.left = `0px`;
-                    }
-                    // if(elementLeft == 0){
-
-                    // }else{
-
-                    // }
+                    console.log('我在中间哦')
                 }
-            }
+            },
 
         },
         //生命周期函数
         created() {
-            this.init();
+            this.$nextTick(()=>{
+                this.init();
+            })
             var _this = this;
             document.onkeydown = function(event){
                 event.stopPropagation();
@@ -870,6 +861,7 @@
 -->
 <style lang="less" scoped>
     @import "../../less/modules/theme.less";
+
 .file-tab{
     display:flex;
     align-content: space-between;
@@ -1205,10 +1197,7 @@
     color:#000;
 }
 
-.javascript-editor{
-    width:100%;
-    flex-grow:1;
-}
+
 
 .tips{
     display: -webkit-flex;

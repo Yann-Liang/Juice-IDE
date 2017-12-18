@@ -2,7 +2,7 @@
  * @Author: liangyanxiang
  * @Date: 2017-10-25 17:34:42
  * @Last Modified by: liangyanxiang
- * @Last Modified time: 2017-12-05 18:36:29
+ * @Last Modified time: 2017-12-13 10:02:22
  */
 //引入web3
 let Web3 = require('web3'),
@@ -357,7 +357,7 @@ class DeployService {
         this.wrapCount = 60; //轮询次数
         this.timeout = 60; //超时时间
         this.user = {
-            privateKey: '9842e8e174e70eb133354ccd46e1b8ade11540e52eb2afd8310cfb01208a9558',//用户私钥
+            privateKey: '',//用户私钥9842e8e174e70eb133354ccd46e1b8ade11540e52eb2afd8310cfb01208a9558
             address: '', //用户钱包地址
             username: '',//用户名
             type:'',
@@ -731,28 +731,28 @@ class DeployService {
 
     sign(txParams) {
         //调试用
-        return new Promise((resolve, reject) => {
-            let tx = new EthereumTx(txParams);
-            console.log('txParams', txParams);
-            //钱包签名
-            let privateKey = Buffer.from(this.user.privateKey, 'hex');
-            tx.sign(privateKey);
-            const serializedTx = tx.serialize(),
-                serializedTxHex = "0x" + serializedTx.toString('hex');
-            resolve(serializedTxHex);
-        })
-
         // return new Promise((resolve, reject) => {
-        //     Juice.wallet.sign(txParams, (res) => {
-        //         if (res.code == 0) {
-        //             resolve(res.data);
-        //         } else {
-        //             consoleService.output('[签名失败]', {
-        //                 logError: res.msg
-        //             });
-        //         }
-        //     })
+        //     let tx = new EthereumTx(txParams);
+        //     console.log('txParams', txParams);
+        //     //钱包签名
+        //     let privateKey = Buffer.from(this.user.privateKey, 'hex');
+        //     tx.sign(privateKey);
+        //     const serializedTx = tx.serialize(),
+        //         serializedTxHex = "0x" + serializedTx.toString('hex');
+        //     resolve(serializedTxHex);
         // })
+
+        return new Promise((resolve, reject) => {
+            Juice.wallet.sign(txParams, (res) => {
+                if (res.code == 0) {
+                    resolve(res.data);
+                } else {
+                    consoleService.output('[签名失败]', {
+                        logError: res.msg
+                    });
+                }
+            })
+        })
     }
 
     //获取要查询的时间

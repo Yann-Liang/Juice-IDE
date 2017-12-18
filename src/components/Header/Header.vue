@@ -1,7 +1,7 @@
 <template>
     <div class="header bggray no-chose">
         <div>
-            <ul class="list" style="cursor:default" @click.stop='setHeaderTab($event)'>
+            <ul class="list no-chose" style="cursor:default" @click.stop='setHeaderTab($event)'>
                 <li>
                     文件
                     <!-- <div v-show="visible" ref="filedata" style="background:#000">弹出层</div> -->
@@ -246,7 +246,6 @@
                     case '9':
                     case 9:
                         //删除所有文件
-//                        _this.removeAllFile();
 	                    _this.changeShowTipModal(true)
                         break;
                 }
@@ -275,20 +274,21 @@
                         break;
                     case '3':
                     case 3:
-                        console.log(_this.editor.getCopyText())
-                        _this.updateCopyText(_this.editor.getCopyText());//复制
-                        // _this.editor.onCopy();
-
+                        // console.log('bbbbbbbbb',this.editor.onCopy())
+                        // _this.updateCopyText(_this.editor.getCopyText());//复制
+                        console.log('oncopy')
+                        _this.editor.onCopy();
                         break;
                     case '4':
                     case 4:
                         _this.editor.commands.commands.cut.exec(_this.editor);//剪切
+                        // _this.editor.onCut();
                         break;
                     case '5':
                     case 5:
-                        _this.editor.commands.commands.paste.exec(_this.editor,_this.copyText)
-                        // _this.editor.insert(_this.copyText);//粘贴
-                        // _this.editor.onPaste(_this.copyText)
+                        // _this.editor.commands.commands.paste.exec(_this.editor,_this.copyText);//粘贴
+                        console.log(_this.editor.getCopyText())
+                        _this.editor.onPaste(_this.editor.getCopyText())
                         break;
                     case '6':
                     case 6:

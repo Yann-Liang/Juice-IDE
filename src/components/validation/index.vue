@@ -30,7 +30,7 @@
             <div class="modal-btn">
                 <el-button class='bgcanbtn white btn-info' @click='closeVaild'>取消</el-button>
                 <el-button class="bgblue white btn-info" type="p
-                rimary" @click='sureValid' :disabled='disabled'>确定</el-button>
+                rimary" @click='sureValid'>确定</el-button>
             </div>
         </div>
     </div>
@@ -56,7 +56,6 @@ export default{
                 codeERR: false,
                 checkCode:"",
                 activeColor:"",
-                disabled:false,
                 rules:{
                     accountPwd:{required:true,message:helpText.NOTEMPTY.pwd},
                     code:{required:true,message:helpText.NOTEMPTY.code}
@@ -132,8 +131,6 @@ export default{
                                 },(res)=>{
                                     this.codeURL();//更新验证码
                                     if(!res.code){
-                                        this.login2.accountPwd='';
-                                        this.login2.code='';
                                         this.$emit('emitDeploy');
                                     }else{
                                         //不存在
@@ -267,7 +264,6 @@ export default{
         height:25px;
         float:right;
         margin-top:2px;
-        margin-right:10px;
         background: url('images/update.png') no-repeat  center 7px;
         cursor: pointer;
     }

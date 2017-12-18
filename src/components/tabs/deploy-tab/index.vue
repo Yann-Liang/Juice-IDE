@@ -14,7 +14,7 @@
         </el-form>
 
         <el-button class="tab-btn btn-info" @click="deploy" :disabled="disabled">部署合约</el-button>
-        <run ref="ref" v-if="flag" :abi="form.contractItem.abi" :address="form.address"></run>
+        <run ref="ref" v-if="flag" :abi="abi" :address="form.address"></run>
         <validation :valid-flag="validFlag" @emitDeploy='publicDeploy' @close="closeValidation"></validation>
     </div>
 </template>
@@ -41,7 +41,7 @@
                 },
                 flag:false,
                 args:[],
-                //deployedData:contractServies.data,
+                deployedData:contractServies.data,
                 user:{
                     address:contractServies.user.address
                 },
@@ -60,19 +60,7 @@
             },
             compileData(){
                 return this.form.select?this.compileResult[this.form.select].data :[];
-
             },
-            runDisabled() {
-                let bool=false;
-                // for(let i=0;i<this.form2.selectFnIndex.inputs.length;i++){
-                //      console.log(this.selectFnIndex.inputs[i].arg)
-                //     if(!this.selectFnIndex.inputs[i].arg){
-                //         bool=true;
-                //         break;
-                //     }
-                // }
-                return bool;
-            }
         },
         //方法
         methods: {
@@ -83,9 +71,11 @@
                 this.validFlag=false;
                 let item=this.form.contractItem,
                 deploy=()=>{
+                    console.log(item)
                     contractServies.deploy(this.compileResult[this.form.select].name,item.contractName,item.abi,item.bin,this.user.address).then((address)=>{
                         if(address){
                             this.form.address=address;
+                            this.abi=item.abi;
                             this.flag=true;
                         }else{
                             this.flag=false;
@@ -125,19 +115,31 @@
                 this.validFlag=false;
             },
             formChange(){
-                console.log('formChange',this.compileResult,this.form.contractItem,this.form.address);
-                let flag=false;
-                for (const key in this.deployedData) {
-                    let item=this.deployedData[key];
-                    if (this.form.select==item.fileName&&this.form.contractItem.contractName==item.contractName) {
-                        this.flag=true;
-                        this.form.address=item.contractAddress;
-                        this.abi=item.contract.abi;
-                        flag=true;
-                        break;
+                console.log(this.form)
+                let flag=false,
+                    name=this.compileResult[this.form.select].name,
+                    item=null,
+                    contractName=null;
+                    if(this.form.contractItem){
+                        contractName=this.form.contractItem.contractName;
+                        for (const key in this.deployedData) {
+                            item=this.deployedData[key];
+                            if (name==item.fileName&&contractName==item.contractName) {
+                                this.flag=true;
+                                this.form.address=item.contractAddress;
+                                this.abi=item.contract.abi;
+                                console.log(this)
+                                flag=true;
+                                break;
+                            }
+                        }
                     }
-                }
+
                 this.flag=flag;
+            },
+            selectChange(){
+                this.form.contractItem=this.compileData[0];
+                //this.formChange();
             }
         },
         //生命周期函数
@@ -153,7 +155,7 @@
         },
         //监视
         watch: {
-            'form.select':'formChange',
+            'form.select':'selectChange',
             'form.contractItem':'formChange',
         },
         //组件

@@ -4,13 +4,13 @@
              <i class="log-border" @mousedown="mousedown($event)"></i>
             <h4 class="bggray">
                 <span class="default no-chose"  ondragstart="return false">控制台</span>
-                <span class="search">
+                <span class="search no-chose">
                     <input class="dark" :style="{backgroundColor:hasMatch?'#fff':'#d43718'}" type="text" v-model="inputValue" placeholder="搜索" @focus="saveData" @input="searchFn()" @keyup.enter="near(1)" @keyup.right="near(1)" @keyup.left="near(-1)" @keyup.up="near(-1)" @keyup.down="near(1)">
                     <!--<span class="direction" @click="near(-1)">↑</span>-->
                     <!--<span class="direction" @click="near(1)">↓</span>-->
-                     <span class="icon" @click="viewRecord()"><i class="iconfont info">&#xe628;</i></span>
-                     <span class="icon" v-if="consoleFlag" @click="viewLog()"><i class="iconfont info">&#xe62d;</i></span>
-                    <span class="icon" v-else @click="viewLog()"><i class="iconfont info">&#xe62c;</i></span>
+                     <span class="icon" @click="viewRecord()" title="部署记录"><i class="iconfont info">&#xe628;</i></span>
+                     <span class="icon" v-if="consoleFlag" @click="viewLog()" title="收缩"><i class="iconfont info">&#xe62d;</i></span>
+                    <span class="icon" v-else @click="viewLog()" title="展开"><i class="iconfont info">&#xe62c;</i></span>
                 </span>
             </h4>
         </div>
@@ -310,17 +310,24 @@
         line-height:24px;
     }
     .log-output::-webkit-scrollbar {
-        width:5px;
-        height:5px;
+        width: 14px;
+        height: 14px;
     }
     .log-output::-webkit-scrollbar-track-piece {
         background:#fff;
     }
     .log-output::-webkit-scrollbar-thumb{
-        background:#e5e5e5;
-        height:50px;
-        border-radius:5px;
-        z-index:999999;
+        min-height: 20px;
+        background-clip: content-box;
+        box-shadow: 0 0 0 5px rgba(0,0,0,.2) inset;
+        min-height:50px;
+        border-radius: 999px;
+        border: 5px solid transparent;
+    }
+    .log-output::-webkit-scrollbar-track{
+        box-shadow: 1px 1px 5px rgba(0,0,0,.2) inset;
+        border-radius: 999px;
+        border: 5px solid transparent;
     }
     .log-item{
         margin-bottom:15px;
